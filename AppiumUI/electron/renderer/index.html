@@ -1,0 +1,432 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Replay Appium - UI</title>
+    <style>
+      :root {
+        --bg: #0b1220; --panel: #0f172a; --muted: #94a3b8; --text: #e2e8f0; --accent: #3b82f6; --accent-2: #22c55e; --warn: #f59e0b; --danger: #ef4444; --card: #111827; --border: #1f2937;
+      }
+      * { box-sizing: border-box; }
+      body { font-family: -apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; color: var(--text); background: linear-gradient(180deg, #0b1220, #0b1220 200px, #0b1220); }
+      header { padding: 18px 20px; background: var(--panel); border-bottom: 1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+      header h1 { font-size: 16px; margin: 0; letter-spacing: .4px; color:#e5e7eb; }
+      header .badge { font-size: 12px; background: #0b1220; padding: 6px 10px; border-radius: 999px; color: var(--muted); border: 1px solid var(--border); }
+      main { padding: 18px; display: grid; grid-template-columns: 380px 1fr; gap: 18px; align-items: start; }
+      .card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); padding: 16px; }
+      .card.sidebar { position: sticky; top: 18px; align-self: start; z-index: 2; }
+      .card.logs-card { /* la zone de logs ne scrolle pas, ce sont les panes qui scrollent */ }
+      .split-vertical { display:flex; flex-direction: column; height: calc(100vh - 180px); min-height: 360px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background:#0b1220; }
+      .split-vertical .pane { min-height: 120px; display:flex; }
+      .split-vertical .pane.top { flex: 0 0 auto; height: 50%; }
+      .split-vertical .pane.bottom { flex: 1 1 auto; }
+      .split-vertical textarea { width: 100%; height: 100%; border: 0; border-radius: 0; background: transparent; overflow: auto; }
+      .divider { height: 6px; background: #1f2937; cursor: row-resize; border-top: 1px solid #111827; border-bottom: 1px solid #111827; }
+      body.resizing { user-select: none; cursor: row-resize; }
+      .card h2 { margin: 0 0 10px 0; font-size: 14px; color: #e5e7eb; letter-spacing: .3px; }
+      .sub { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+      label { display: block; font-weight: 600; margin-top: 12px; font-size: 12px; color:#cbd5e1; }
+      input[type="text"], input[type="url"] { width: 100%; padding: 10px 12px; background:#0b1220; color:var(--text); border: 1px solid var(--border); border-radius: 8px; }
+      .row { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+      .btn { background: var(--accent); color: white; border: 0; border-radius: 8px; padding: 10px 14px; cursor: pointer; font-weight:600; font-size: 13px; }
+      .btn.secondary { background: #334155; }
+      .btn.ghost { background: transparent; border: 1px solid var(--border); color:#cbd5e1; }
+      .btn.warn { background: var(--warn); color:#0b1220; }
+      .btn.ok { background: var(--accent-2); }
+      textarea { width: 100%; height: 260px; background:#0b1220; color:#e5e7eb; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; }
+      .pill { display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid var(--border); border-radius:999px; color:#cbd5e1; font-size:12px; }
+      .pill .dot { width:8px; height:8px; border-radius:999px; background:#64748b; }
+      .pill.ok .dot { background: #22c55e; }
+      .pill.warn .dot { background: #f59e0b; }
+      .pill.err .dot { background: #ef4444; }
+      .stack { display:flex; flex-direction: column; gap: 12px; }
+      .section { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+      .hl { color:#eab308; }
+      .tabs { display:flex; align-items:flex-end; gap: 8px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+      .tab-btn { padding: 8px 12px; background:#0b1220; color:#cbd5e1; border: 1px solid var(--border); border-bottom: none; border-radius: 8px 8px 0 0; cursor: pointer; }
+      .tab-btn.active { background:#111827; color:#e5e7eb; }
+      .tab-spacer { flex:1; }
+      .hidden { display:none; }
+      .tab-panel { display:none; height: calc(100vh - 240px); }
+      .tab-panel.active { display:block; }
+      .device-card { padding: 14px; border-radius: 12px; border:1px solid var(--border); background:#0b1220; }
+      .device-header { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+      .device-title { font-weight:600; color:#e5e7eb; font-size:13px; }
+      .device-sub { color:#94a3b8; font-size:11px; }
+      .badges { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:6px; }
+      .badge-soft { background:#0f172a; color:#cbd5e1; border:1px solid var(--border); padding:4px 8px; border-radius:999px; font-size:11px; }
+      .actions { display:flex; gap:8px; }
+      @media (max-width: 1100px) {
+        main { grid-template-columns: 1fr; }
+        .card.sidebar { position: static; }
+        .card.logs-card { }
+        .split-vertical { height: 60vh; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Replay Appium</h1>
+      <div class="badge">UI macOS • XCUITest</div>
+    </header>
+    <main>
+      <section class="card sidebar">
+        <div class="section">
+          <h2>Appareil</h2>
+          <div id="devicePill" class="pill"><span class="dot"></span><span id="devicePillText">Inconnu</span></div>
+        </div>
+        <div class="stack">
+          
+          <div>
+            <div class="section">
+              <label>Serveur Appium</label>
+              <div id="appiumPill" class="pill warn"><span class="dot"></span><span id="appiumPillText">Hors ligne</span></div>
+            </div>
+            <input id="server" type="url" placeholder="http://127.0.0.1:1265/wd/hub" />
+          </div>
+          <div class="row" style="justify-content:space-between; align-items:flex-end;">
+            <div class="stack" style="flex:1;">
+              <div id="deviceStatus" class="sub">Statut: inconnu</div>
+              <select id="deviceSelect" style="background:#0b1220;color:#e5e7eb;border:1px solid var(--border);border-radius:8px;padding:10px 12px;min-width:240px;">
+                <option value="">(aucun appareil)</option>
+              </select>
+            </div>
+            <button id="refreshBtn" class="btn ghost">Rafraîchir</button>
+          </div>
+          <div class="row">
+            <label style="display:flex;align-items:center;gap:6px;"><input id="respectDelays" type="checkbox" checked />Respecter les délais</label>
+            <label style="display:flex;align-items:center;gap:6px;"><input id="dryRun" type="checkbox" />Dry‑run</label>
+          </div>
+          <div class="row">
+            <button id="startAppiumBtn" class="btn ok">Démarrer Appium + WDA</button>
+            <button id="stopAppiumBtn" class="btn secondary">Stop Appium</button>
+          </div>
+          <div class="row">
+            <label>Script à lancer</label>
+            <input id="scriptPath" type="text" placeholder="/chemin/vers/bot.js" />
+            <button id="chooseScriptBtn" class="btn ghost">Parcourir…</button>
+          </div>
+          <div class="row">
+            <label>Arguments</label>
+            <input id="scriptArgs" type="text" placeholder="ex: iphone14 tinderjailed" />
+          </div>
+          <div class="row">
+            <button id="startScriptBtn" class="btn">Start Script (bot.js)</button>
+            <button id="stopScriptBtn" class="btn secondary">Stop Script</button>
+          </div>
+          <hr style="border:0;border-top:1px solid var(--border);margin:12px 0;" />
+          <div class="row">
+            <label>Démarrage multi‑appareils</label>
+            <button id="startMultiBtn" class="btn ok">Start Creation (multi)</button>
+            <button id="stopMultiBtn" class="btn secondary">Stop All Processes</button>
+          </div>
+        </div>
+      </section>
+      <section class="card logs-card">
+        <div class="tabs">
+          <button id="tabAppium" class="tab-btn active">Appium / WDA</button>
+          <button id="tabReplay" class="tab-btn">Relecture</button>
+          <button id="tabMulti" class="tab-btn">Multi</button>
+          <button id="tabDevices" class="tab-btn">Devices</button>
+          <div class="tab-spacer"></div>
+          <button id="clearAppium" class="btn ghost">Effacer</button>
+          <button id="clearReplay" class="btn ghost hidden">Effacer</button>
+          <button id="clearMulti" class="btn ghost hidden">Effacer</button>
+        </div>
+        <div id="panelAppium" class="tab-panel active">
+          <textarea id="outputAppium" readonly placeholder="Logs Appium / WDA..."></textarea>
+        </div>
+        <div id="panelReplay" class="tab-panel">
+          <textarea id="outputReplay" readonly placeholder="Logs Relecture (script)..."></textarea>
+        </div>
+        <div id="panelMulti" class="tab-panel">
+          <textarea id="outputMulti" readonly placeholder="Logs multi-appareils (multi.js)..."></textarea>
+        </div>
+        <div id="panelDevices" class="tab-panel">
+          <div class="sub">Lancer/stopper le bot par téléphone. Les logs s’affichent sous chaque appareil.</div>
+          <div id="devicesList" class="stack"></div>
+        </div>
+      </section>
+    </main>
+    <script>
+      
+      const server = document.getElementById('server');
+      const respectDelays = document.getElementById('respectDelays');
+      const dryRun = document.getElementById('dryRun');
+      const startScriptBtn = document.getElementById('startScriptBtn');
+      const stopScriptBtn = document.getElementById('stopScriptBtn');
+      const scriptPath = document.getElementById('scriptPath');
+      const chooseScriptBtn = document.getElementById('chooseScriptBtn');
+      const scriptArgs = document.getElementById('scriptArgs');
+      const outputAppium = document.getElementById('outputAppium');
+      const outputReplay = document.getElementById('outputReplay');
+      const deviceStatus = document.getElementById('deviceStatus');
+      const refreshBtn = document.getElementById('refreshBtn');
+      const startAppiumBtn = document.getElementById('startAppiumBtn');
+      const stopAppiumBtn = document.getElementById('stopAppiumBtn');
+      const devicePill = document.getElementById('devicePill');
+      const devicePillText = document.getElementById('devicePillText');
+      const appiumPill = document.getElementById('appiumPill');
+      const appiumPillText = document.getElementById('appiumPillText');
+      const deviceSelect = document.getElementById('deviceSelect');
+      const clearAppium = document.getElementById('clearAppium');
+      const clearReplay = document.getElementById('clearReplay');
+      const tabAppium = document.getElementById('tabAppium');
+      const tabReplay = document.getElementById('tabReplay');
+      const tabMulti = document.getElementById('tabMulti');
+      const tabDevices = document.getElementById('tabDevices');
+      const panelAppium = document.getElementById('panelAppium');
+      const panelReplay = document.getElementById('panelReplay');
+      const panelMulti = document.getElementById('panelMulti');
+      const outputMulti = document.getElementById('outputMulti');
+      const panelDevices = document.getElementById('panelDevices');
+      const devicesList = document.getElementById('devicesList');
+      const startMultiBtn = document.getElementById('startMultiBtn');
+      const stopMultiBtn = document.getElementById('stopMultiBtn');
+      const clearMulti = document.getElementById('clearMulti');
+
+      function appendAppium(msg) {
+        outputAppium.value += msg.replace(/\u001b\[[0-9;]*m/g, '') + '\n';
+        outputAppium.scrollTop = outputAppium.scrollHeight;
+      }
+      function appendReplay(msg) {
+        outputReplay.value += msg.replace(/\u001b\[[0-9;]*m/g, '') + '\n';
+        outputReplay.scrollTop = outputReplay.scrollHeight;
+      }
+      function appendMulti(msg) {
+        outputMulti.value += msg.replace(/\u001b\[[0-9;]*m/g, '') + '\n';
+        outputMulti.scrollTop = outputMulti.scrollHeight;
+      }
+
+      startScriptBtn.addEventListener('click', async () => {
+        appendReplay('[ui] Lancement bot.js...');
+        await window.script.start({ scriptPath: scriptPath.value || undefined, args: scriptArgs.value || '' });
+      });
+      stopScriptBtn.addEventListener('click', async () => {
+        appendReplay('[ui] Arrêt bot.js...');
+        await window.script.stop();
+      });
+      chooseScriptBtn.addEventListener('click', async () => {
+        const chosen = await window.script.choose();
+        if (chosen) scriptPath.value = chosen;
+      });
+
+      // Listeners Appium
+      window.appium.onOutput((msg) => appendAppium(String(msg).trimEnd()));
+      window.appium.onReady((url) => {
+        appendAppium(`[ui] Appium prêt sur ${url}`);
+        server.value = url;
+        appiumPill.className = 'pill ok';
+        appiumPillText.textContent = url;
+      });
+      window.appium.onExit((code) => {
+        appendAppium(`[appium] terminé avec code ${code}`);
+        appiumPill.className = 'pill warn';
+        appiumPillText.textContent = 'Hors ligne';
+      });
+
+      let refreshing = false;
+      async function refreshDevices() {
+        if (refreshing) return;
+        refreshing = true;
+        const originalText = refreshBtn.textContent;
+        refreshBtn.disabled = true;
+        refreshBtn.textContent = 'Rafraîchissement...';
+        deviceStatus.textContent = 'Statut: vérification...';
+        try {
+          const res = await window.devices.refresh();
+          const list = res && res.devices ? res.devices : [];
+          const previous = deviceSelect.value;
+          deviceSelect.innerHTML = '';
+          if (list.length === 0) {
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.textContent = '(aucun appareil)';
+            deviceSelect.appendChild(opt);
+          } else {
+            for (const d of list) {
+              const opt = document.createElement('option');
+              opt.value = d.udid || '';
+              opt.textContent = `${d.name || 'iPhone'}${d.udid ? ' ('+d.udid+')' : ''}`;
+              deviceSelect.appendChild(opt);
+            }
+            // Préserver la sélection si possible
+            if (previous && Array.from(deviceSelect.options).some(o => o.value === previous)) {
+              deviceSelect.value = previous;
+            }
+          }
+          if (list.length === 0) {
+            deviceStatus.textContent = 'Statut: aucun iPhone détecté';
+            devicePill.className = 'pill err';
+            devicePillText.textContent = 'Aucun iPhone';
+          } else {
+            const first = list[0];
+            deviceStatus.textContent = `Statut: ${first.name || 'iPhone'} ${first.udid ? '('+first.udid+')' : ''}`;
+            devicePill.className = 'pill ok';
+            devicePillText.textContent = `${first.name || 'iPhone'} ${first.udid ? '('+first.udid+')' : ''}`;
+          }
+        } catch (e) {
+          deviceStatus.textContent = 'Statut: erreur de détection';
+          devicePill.className = 'pill warn';
+          devicePillText.textContent = 'Erreur détection';
+        }
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = originalText;
+        refreshing = false;
+      }
+
+      refreshBtn.addEventListener('click', refreshDevices);
+      refreshDevices();
+
+      startAppiumBtn.addEventListener('click', async () => {
+        appendAppium('[ui] Démarrage Appium...');
+        await window.appium.start({ port: 1265, basePath: '/wd/hub', udid: deviceSelect.value || undefined });
+      });
+      stopAppiumBtn.addEventListener('click', async () => {
+        appendAppium('[ui] Arrêt Appium...');
+        await window.appium.stop();
+      });
+
+      clearAppium.addEventListener('click', () => { outputAppium.value = ''; });
+      clearReplay.addEventListener('click', () => { outputReplay.value = ''; });
+      clearMulti.addEventListener('click', () => { outputMulti.value = ''; });
+
+      window.script.onOutput((msg) => appendReplay(String(msg).trimEnd()));
+      window.script.onExit((code) => appendReplay(`[script] terminé avec code ${code}`));
+
+      // Tabs gestion
+      function activateTab(target) {
+        const isAppium = target === 'appium';
+        const isReplay = target === 'replay';
+        const isMulti = target === 'multi';
+        const isDevices = target === 'devices';
+        tabAppium.classList.toggle('active', isAppium);
+        tabReplay.classList.toggle('active', isReplay);
+        tabMulti.classList.toggle('active', isMulti);
+        tabDevices.classList.toggle('active', isDevices);
+        panelAppium.classList.toggle('active', isAppium);
+        panelReplay.classList.toggle('active', isReplay);
+        panelMulti.classList.toggle('active', isMulti);
+        panelDevices.classList.toggle('active', isDevices);
+        clearAppium.classList.toggle('hidden', !isAppium);
+        clearReplay.classList.toggle('hidden', !isReplay);
+        clearMulti.classList.toggle('hidden', !isMulti);
+      }
+      tabAppium.addEventListener('click', () => activateTab('appium'));
+      tabReplay.addEventListener('click', () => activateTab('replay'));
+      tabMulti.addEventListener('click', () => activateTab('multi'));
+      tabDevices.addEventListener('click', () => { activateTab('devices'); renderPerDevice(); });
+      // ----- Per-device UI -----
+      function el(tag, attrs = {}, children = []) {
+        const e = document.createElement(tag);
+        for (const [k, v] of Object.entries(attrs)) {
+          if (k === 'class') e.className = v; else if (k === 'text') e.textContent = v; else e.setAttribute(k, v);
+        }
+        for (const c of children) e.appendChild(c);
+        return e;
+      }
+
+      const deviceLogs = new Map();
+      const deviceLogsCache = new Map();
+
+      async function renderPerDevice() {
+        devicesList.innerHTML = '';
+        const res = await window.deviceRun.list();
+        const list = (res && res.devices) || [];
+        if (list.length === 0) {
+          devicesList.appendChild(el('div', { class: 'sub', text: 'Aucun appareil détecté.' }));
+          return;
+        }
+        for (const d of list) {
+          const row = el('div', { class: 'device-card' });
+          const left = el('div', {}, [
+            el('div', { class: 'device-title', text: d.name || 'iPhone' }),
+            el('div', { class: 'device-sub', text: d.udid || '' }),
+            el('div', { class: 'badges' }, [
+              el('span', { class: 'badge-soft', text: d.model || 'Model?' }),
+              el('span', { class: 'badge-soft', text: d.ios ? `iOS ${d.ios}` : 'iOS ?' }),
+            ]),
+          ]);
+          const right = el('div', { class: 'actions' }, [
+            el('button', { class: 'btn ok', id: `startfull-${d.udid || 'unknown'}`, text: 'Start (Appium+WDA+Bot)' }),
+            el('button', { class: 'btn', id: `start-${d.udid || 'unknown'}`, text: 'Start bot' }),
+            el('button', { class: 'btn secondary', id: `stop-${d.udid || 'unknown'}`, text: 'Stop' }),
+          ]);
+          const header = el('div', { class: 'device-header' }, [left, right]);
+          const area = el('textarea', { style: 'width:100%;height:120px;margin-top:10px;background:#0b1220;color:#e5e7eb;border:1px solid var(--border);border-radius:8px;' });
+          const cached = deviceLogsCache.get(d.udid || 'unknown');
+          if (cached) { area.value = cached; }
+          deviceLogs.set(d.udid || 'unknown', area);
+          row.appendChild(header);
+          row.appendChild(area);
+          devicesList.appendChild(row);
+          document.getElementById(`startfull-${d.udid || 'unknown'}`).addEventListener('click', async () => {
+            area.value += '[ui] Démarrage Appium+WDA+bot pour cet appareil...\n';
+            await window.deviceRun.startFull({ udid: d.udid, deviceName: d.name, deviceLabel: `${d.name || 'iPhone'} (${d.udid || ''})` });
+          });
+          document.getElementById(`start-${d.udid || 'unknown'}`).addEventListener('click', async () => {
+            area.value += '[ui] Démarrage bot pour cet appareil...\n';
+            await window.deviceRun.start({ udid: d.udid, deviceName: d.name, deviceLabel: `${d.name || 'iPhone'} (${d.udid || ''})` });
+          });
+          document.getElementById(`stop-${d.udid || 'unknown'}`).addEventListener('click', async () => {
+            area.value += '[ui] Arrêt bot pour cet appareil...\n';
+            await window.deviceRun.stop(d.udid);
+          });
+        }
+      }
+
+      window.deviceRun.onOutput(({ udid, line }) => {
+        const area = deviceLogs.get(udid || 'unknown');
+        const norm = String(line).replace(/\u001b\[[0-9;]*m/g, '') + '\n';
+        const key = udid || 'unknown';
+        const prev = deviceLogsCache.get(key) || '';
+        deviceLogsCache.set(key, prev + norm);
+        if (area) { area.value += norm; area.scrollTop = area.scrollHeight; }
+      });
+      window.deviceRun.onExit(({ udid, code }) => {
+        const area = deviceLogs.get(udid || 'unknown');
+        const key = udid || 'unknown';
+        const line = `[device] terminé avec code ${code}\n`;
+        const prev = deviceLogsCache.get(key) || '';
+        deviceLogsCache.set(key, prev + line);
+        if (area) { area.value += line; }
+      });
+
+      // Affichage statut/progression depuis state.json
+      async function refreshProgress() {
+        try {
+          const state = await window.state.read();
+          if (!state || !state.devices) return;
+          for (const [udid, info] of Object.entries(state.devices)) {
+            const area = deviceLogs.get(udid || 'unknown');
+            const key = udid || 'unknown';
+            const line = `[progress] ${info.created || 0}/${info.target || 0}\n`;
+            const prev = deviceLogsCache.get(key) || '';
+            if (!prev.includes(line)) {
+              deviceLogsCache.set(key, prev + line);
+              if (area) { area.value += line; }
+            }
+          }
+        } catch (_) {}
+      }
+      setInterval(refreshProgress, 5000);
+
+      // Multi runner bindings
+      startMultiBtn.addEventListener('click', async () => {
+        appendMulti('[ui] Lancement multi-appareils...');
+        await window.multi.start({});
+        activateTab('multi');
+      });
+      stopMultiBtn.addEventListener('click', async () => {
+        appendMulti('[ui] Arrêt multi-appareils...');
+        await window.multi.stop();
+      });
+
+      window.multi.onOutput((msg) => appendMulti(String(msg).trimEnd()));
+      window.multi.onExit((code) => appendMulti(`[multi] terminé avec code ${code}`));
+    </script>
+  </body>
+  </html>
+
+

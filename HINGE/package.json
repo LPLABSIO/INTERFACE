@@ -1,0 +1,20 @@
+{
+  "name": "tinder-bot",
+  "version": "1.0.0",
+  "description": "Tinder bot for BlazeX",
+  "main": "index.js",
+  "scripts": {
+    "devices:scan": "node -e \"require('./src/deviceManager').saveDevices(require('./src/deviceManager').listConnectedUdids())\"",
+    "multi": "node multi.js"
+  },
+  "dependencies": {
+    "@turf/turf": "^7.2.0",
+    "axios": "^1.9.0",
+    "csv-parser": "^3.2.0",
+    "fast-csv": "^5.0.2",
+    "node-fetch": "^2.7.0",
+    "imapflow": "^1.0.164",
+    "socks-proxy-agent": "^8.0.5",
+    "webdriverio": "^9.12.3"
+  }
+}

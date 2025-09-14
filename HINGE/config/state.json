@@ -1,0 +1,14 @@
+{
+  "devices": {
+    "af5afd94d5a9256554e735003c2f72fd16ec22f8": {
+      "created": 0,
+      "target": 10,
+      "deviceTag": "dev-1"
+    }
+  },
+  "progress": {
+    "created": 0,
+    "target": 0
+  },
+  "lastRun": null
+}

@@ -1,0 +1,176 @@
+CountryCode,state,city,lat,lon,area_code,zip_code
+us,New York,New York City,40.7419,-73.9938,"212, 718, 347, 929, 917",10001
+us,Pennsylvania,Philadelphia,39.9456,-75.1624,"215, 267, 445",19101
+us,Florida,Jacksonville,30.3322,-81.6557,904,32201
+us,North Carolina,Charlotte,35.2271,-80.8431,"704, 980",28201
+us,Indiana,Indianapolis,39.7684,-86.158,"317, 463",46201
+us,Washington,Seattle,47.6097,-122.3331,"206, 425, 253",98101
+us,Colorado,Denver,39.7392,-104.9903,"303, 720",80201
+us,D.C.,Washington D.C.,38.9072,-77.0369,202,20001
+us,Massachusetts,Boston,42.3601,-71.0589,"617, 857",02101
+us,Tennessee,Nashville,36.1627,-86.7816,"615, 629",37201
+us,Texas,Houston,29.7604,-95.3698,"713, 281, 832, 346",77001
+us,Texas,Dallas,32.7767,-96.797,"214, 469, 972, 682",75201
+us,Texas,Fort Worth,32.7555,-97.3308,"817, 682",76101
+us,California,Los Angeles,34.0604,-118.2294,"213, 310, 323, 424, 818, 626",90001
+us,California,San Jose,37.3382,-121.8863,"408, 669",95101
+us,California,San Francisco,37.7749,-122.4194,"415, 628",94101
+us,Texas,El Paso,31.7619,-106.485,915,79901
+us,Michigan,Detroit,42.3314,-83.0458,"313, 734, 248",48201
+us,Tennessee,Memphis,35.1495,-90.049,901,37501
+us,Kentucky,Louisville,38.2527,-85.7585,502,40201
+us,Maryland,Baltimore,39.2904,-76.6122,"410, 443, 667",21201
+us,Wisconsin,Milwaukee,43.0389,-87.9065,414,53201
+us,Arizona,Tucson,32.2226,-110.9747,520,85701
+us,California,Fresno,36.7378,-119.7871,559,93650
+us,California,Sacramento,38.5816,-121.4944,916,95814
+us,Arizona,Mesa,33.4152,-111.8315,480,85201
+us,Georgia,Atlanta,33.749,-84.388,"404, 470, 678, 770",30301
+us,Florida,Cape Coral,26.6406,-81.9923,239,33904
+us,California,Santa Clarita,34.3917,-118.5426,661,91350
+us,California,San Bernardino,34.1083,-117.2898,909,92401
+us,Washington,Tacoma,47.2529,-122.4443,253,98401
+us,Florida,Hialeah,25.8576,-80.2785,"305, 786",33002
+us,Louisiana,Baton Rouge,30.4515,-91.1871,225,70801
+us,California,Modesto,37.6391,-120.9969,209,95350
+us,California,Fontana,34.0926,-117.435,909,92335
+us,Texas,McKinney,33.1975,-96.6398,"214, 972",75069
+us,California,Moreno Valley,33.9425,-117.2297,951,92553
+us,Iowa,Des Moines,41.5868,-93.625,515,50301
+us,North Carolina,Fayetteville,35.0527,-78.8784,910,28301
+us,Utah,Salt Lake City,40.7608,-111.891,"385, 801",84101
+us,Minnesota,Saint Paul,44.9537,-93.09,651,55101
+us,Pennsylvania,Pittsburgh,40.4406,-79.9959,"412, 724",15201
+us,North Carolina,Greensboro,36.0726,-79.791,336,27401
+us,North Carolina,Durham,35.994,-78.8986,919,27701
+us,Nebraska,Lincoln,40.8136,-96.7026,402,68501
+us,New Jersey,Jersey City,40.7282,-74.0776,"201, 551",07302
+us,Texas,Plano,33.0198,-96.6989,"972, 469",75023
+us,Alaska,Anchorage,61.2176,-149.8992,907,99501
+us,Nevada,North Las Vegas,36.1989,-115.1175,702,89030
+us,Missouri,St. Louis,38.627,-90.1994,314,63101
+us,Wisconsin,Madison,43.0731,-89.4012,608,53703
+us,Arizona,Chandler,33.3062,-111.841,480,85224
+us,Arizona,Gilbert,33.4126,-111.789,480,85233
+us,Nevada,Reno,39.5296,-119.8138,775,89501
+us,New York,Buffalo,42.8864,-78.8784,716,14201
+us,California,Chula Vista,32.64,-117.0842,619,91909
+us,Ohio,Cleveland,41.4993,-81.6944,"216, 440",44101
+us,Hawaii,Honolulu,21.3069,-157.8583,808,96801
+us,California,Anaheim,33.8366,-117.9145,"714, 657",92801
+us,Nevada,Henderson,36.0395,-114.9817,702,89002
+us,California,Stockton,37.9577,-121.2908,209,95201
+us,Colorado,Lakewood,39.7051,-105.0814,303,80226
+us,California,Riverside,33.9806,-117.3755,951,92501
+us,Texas,San Angelo,31.4638,-100.437,325,76901
+us,Connecticut,Bridgeport,41.1792,-73.189,203,06601
+us,Arizona,Peoria,33.5806,-112.237,623,85345
+us,California,Santa Maria,34.9592,-120.4357,805,93454
+us,California,Escondido,33.1192,-116.9338,760,92025
+us,Missouri,Springfield,37.2087,-93.2923,417,65801
+us,California,Lancaster,34.6868,-118.1542,661,93534
+us,California,Thousand Oaks,34.1706,-118.8376,805,91360
+us,California,Simi Valley,34.2694,-118.7815,805,93062
+us,California,Garden Grove,33.7739,-117.9411,714,92840
+us,California,Inglewood,33.9617,-118.22,310,90301
+us,California,Downey,33.9401,-118.1327,562,90239
+us,North Dakota,Bismarck,46.8083,-100.7837,701,58501
+us,Utah,St. George,37.0967,-113.5765,435,84770
+us,Texas,Lubbock,33.5779,-101.8552,806,79401
+us,South Dakota,Rapid City,44.0805,-103.231,605,57701
+us,Alabama,Tuscaloosa,33.2098,-87.5692,205,35401
+us,New Mexico,Farmington,36.7281,-108.2187,505,87401
+us,Montana,Billings,45.7833,-108.5007,406,59101
+us,Wisconsin,Eau Claire,44.8113,-91.4985,715,54701
+us,Virginia,Lynchburg,37.4138,-79.1423,434,24501
+us,Michigan,Kalamazoo,42.2917,-85.5872,269,49001
+us,California,Redlands,34.0556,-117.1825,909,92373
+us,New Hampshire,Concord,43.2081,-71.5375,603,03301
+us,Wyoming,Casper,42.85,-106.32,307,82601
+us,Missouri,Jefferson City,38.5767,-92.1735,573,65101
+us,Texas,Longview,32.5,-94.74,"903, 430",75601
+us,Colorado,Grand Junction,39.0639,-108.55,970,81501
+us,South Carolina,Spartanburg,34.9496,-81.932,864,29301
+us,California,Carlsbad,33.1581,-117.3502,760,92008
+us,Oregon,Redmond,44.2587,-121.3153,541,97756
+us,Ohio,Westerville,40.1263,-82.933,614,43081
+us,Wisconsin,Brookfield,43.08,-88.1074,262,53005
+us,Illinois,Danville,40.1231,-87.6306,217,61832
+us,Georgia,Marietta,33.9526,-84.5499,770,30060
+us,Wisconsin,Kenosha,42.5847,-87.8211,262,53140
+us,Michigan,Battle Creek,42.3194,-85.1794,269,49014
+us,Florida,Gainesville,29.6516,-82.3248,352,32601
+us,Indiana,Muncie,40.1934,-85.3863,765,47302
+us,Indiana,Evansville,37.9716,-87.5711,812,47708
+us,Texas,Waco,31.5497,-97.1467,254,76701
+us,California,Glendora,34.1366,-117.8654,626,91740
+us,Iowa,Waterloo,42.4925,-92.3126,319,50701
+us,Idaho,Meridian,43.6121,-116.3915,208,83642
+us,Indiana,Anderson,40.105,-85.6801,765,46011
+us,Missouri,O'Fallon,38.8104,-90.6983,636,63366
+us,Texas,San Marcos,29.884,-97.9414,512,78666
+us,Massachusetts,Haverhill,42.7762,-71.0775,978,01830
+us,Ohio,Elyria,41.3685,-82.1076,440,44035
+us,Texas,McKinney,33.1977,-96.6398,"214, 469, 972",75069
+us,South Carolina,Sumter,33.9207,-80.3415,803,29150
+us,Illinois,Wheaton,41.8662,-88.1061,630,60187
+us,Idaho,Pocatello,42.8713,-112.4455,208,83201
+us,Wisconsin,La Crosse,43.8014,-91.2396,608,54601
+us,Kansas,Shawnee,39.9396,-94.6739,"913, 785",66203
+us,California,Madera,36.9613,-120.0608,559,93637
+us,Wisconsin,Waukesha,43.0122,-88.231,262,53186
+us,Washington,Puyallup,47.1852,-122.293,253,98371
+us,Illinois,Decatur,39.8403,-88.9543,217,62521
+us,Texas,Laredo,27.5069,-99.5075,956,78040
+us,Michigan,Saginaw,43.419,-83.95,989,48601
+us,Texas,Killeen,31.1171,-97.7278,254,76540
+us,Kentucky,Paducah,37.0834,-88.607,270,42001
+us,Missouri,Springfield,37.2087,-93.2923,417,65802
+us,Oklahoma,Stillwater,36.1156,-97.0589,405,74074
+us,Mississippi,Brookhaven,31.5536,-90.4352,601,39601
+us,Texas,Seguin,29.5689,-97.9644,830,78155
+us,Illinois,Peoria,40.6936,-89.5885,309,61601
+us,Texas,Victoria,28.8053,-97.0025,361,77901
+us,Ohio,Norwalk,41.2385,-82.6132,419,44857
+us,Arkansas,Bentonville,36.3727,-94.2087,479,72712
+us,Texas,New Braunfels,29.7047,-98.1245,830,78130
+us,Illinois,Highland Park,42.1954,-87.7701,847,60035
+us,Georgia,Macon,32.8407,-83.6324,478,31201
+us,Tennessee,Jackson,35.6145,-88.8139,731,38301
+us,Kentucky,Hopkinsville,36.8657,-87.4871,270,42240
+us,Iowa,Ankeny,41.7311,-93.6025,515,50021
+us,Texas,Cedar Park,30.5072,-97.8203,512,78613
+us,Indiana,Westfield,40.042,-86.1284,317,46074
+us,Minnesota,St. Cloud,45.5577,-94.1632,320,56301
+us,Michigan,Owosso,42.987,-84.1896,989,48867
+us,Georgia,Decatur,33.7748,-84.2963,404,30030
+us,South Dakota,Watertown,44.898,-97.1197,605,57201
+us,Ohio,Perrysburg,41.5577,-83.6523,419,43551
+us,California,Turlock,37.4947,-120.8463,209,95380
+us,Michigan,Novi,42.4818,-83.4755,248,48374
+us,Georgia,Tifton,31.4581,-83.5042,229,31794
+us,California,Clovis,36.8252,-119.7022,559,93611
+us,Minnesota,Eagan,44.8092,-93.1668,651,55121
+us,Colorado,Greeley,40.4233,-104.7091,970,80631
+us,California,Merced,37.3022,-120.482,209,95340
+us,Montana,Bozeman,45.6796,-111.0377,406,59715
+us,Delaware,Dover,39.1582,-75.5244,302,19901
+us,Colorado,Fort Collins,40.5853,-105.0844,970,80521
+us,California,Martinez,38.0196,-122.134,925,94553
+us,Illinois,Brookfield,41.8244,-87.8197,708,60513
+us,Florida,West Palm Beach,26.7153,-80.0534,561,33401
+us,Oregon,McMinnville,45.2045,-123.202,503,97128
+us,Ohio,Zanesville,39.9407,-82.0138,740,43701
+us,Colorado,Loveland,40.3977,-105.074,970,80537
+us,Minnesota,Mankato,44.1638,-94.0004,507,56001
+us,Illinois,Grayslake,42.3455,-88.0214,847,60030
+us,Oklahoma,Norman,35.2226,-97.4395,405,73069
+us,Indiana,Evansville,37.9716,-87.5711,812,47708
+us,Wyoming,Sheridan,44.7962,-106.9564,307,82801
+us,South Dakota,Aberdeen,45.4687,-98.48,605,57401
+us,Minnesota,Woodbury,44.9233,-92.997,651,55125
+us,Texas,Flower Mound,33.0216,-97.0957,972,75027
+us,Colorado,Loveland,40.3977,-105.074,970,80537
+us,Colorado,Wiggins,39.7472,-104.0162,970,80654
+us,California,Lompoc,34.6391,-120.4579,805,93436
+us,Georgia,Statesboro,32.4487,-81.782,912,30458
