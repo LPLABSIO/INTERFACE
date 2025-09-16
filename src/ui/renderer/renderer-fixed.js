@@ -2,6 +2,7 @@
 const appState = {
     devices: new Map(),
     selectedDevice: null,
+    selectedDevices: new Set(), // Pour la sélection multiple
     processes: new Map(),
     logs: {
         script: [],
@@ -247,12 +248,15 @@ function updateDeviceList(devices) {
 
 function createDeviceElement(device) {
     const div = document.createElement('div');
-    div.className = 'device-item';
+    const isSelected = appState.selectedDevices.has(device.udid);
+    div.className = `device-item${isSelected ? ' selected' : ''}`;
     div.dataset.udid = device.udid;
 
     const statusClass = device.status === 'online' ? 'online' : 'offline';
+    const isChecked = isSelected ? 'checked' : '';
 
     div.innerHTML = `
+        <input type="checkbox" class="device-checkbox" ${isChecked} data-udid="${device.udid}">
         <div class="device-item-icon">📱</div>
         <div class="device-item-info">
             <div class="device-item-name">${device.name || 'iPhone'}</div>
@@ -261,9 +265,54 @@ function createDeviceElement(device) {
         <div class="device-item-status ${statusClass}"></div>
     `;
 
-    div.addEventListener('click', () => selectDevice(device.udid));
+    // Gérer le clic sur la checkbox
+    const checkbox = div.querySelector('.device-checkbox');
+    checkbox.addEventListener('change', (e) => {
+        e.stopPropagation();
+        toggleDeviceSelection(device.udid, e.target.checked);
+
+        // Mettre à jour la classe selected
+        div.classList.toggle('selected', e.target.checked);
+    });
+
+    // Gérer le clic sur l'item (pour afficher les détails)
+    div.addEventListener('click', (e) => {
+        if (e.target.type !== 'checkbox') {
+            selectDevice(device.udid);
+        }
+    });
 
     return div;
+}
+
+function toggleDeviceSelection(udid, isChecked) {
+    if (isChecked) {
+        appState.selectedDevices.add(udid);
+    } else {
+        appState.selectedDevices.delete(udid);
+    }
+
+    // Mettre à jour le texte du bouton de lancement
+    updateLaunchButtonText();
+
+    console.log('Selected devices:', Array.from(appState.selectedDevices));
+}
+
+function updateLaunchButtonText() {
+    const launchBtn = document.getElementById('launch-bot-btn');
+    if (launchBtn) {
+        const count = appState.selectedDevices.size;
+        if (count === 0) {
+            launchBtn.textContent = 'Sélectionnez des appareils';
+            launchBtn.disabled = true;
+        } else if (count === 1) {
+            launchBtn.textContent = 'Démarrer le bot (1 appareil)';
+            launchBtn.disabled = false;
+        } else {
+            launchBtn.textContent = `Démarrer les bots (${count} appareils)`;
+            launchBtn.disabled = false;
+        }
+    }
 }
 
 function selectDevice(udid) {
@@ -361,72 +410,98 @@ function updateDeviceStatus(udid, status) {
 
 // Fonctions pour le contrôle du bot
 async function startBot() {
-    if (!appState.selectedDevice) {
+    // Vérifier qu'au moins un appareil est sélectionné
+    if (appState.selectedDevices.size === 0) {
         addLog('system', 'Aucun appareil sélectionné', 'error');
         if (window.UIEnhancements) {
-            window.UIEnhancements.showNotification('Veuillez sélectionner un appareil', 'warning');
+            window.UIEnhancements.showNotification('Veuillez sélectionner au moins un appareil', 'warning');
         }
         return;
     }
 
-    const device = appState.devices.get(appState.selectedDevice);
+    const selectedUdids = Array.from(appState.selectedDevices);
 
     try {
         elements.startBotBtn.disabled = true;
+        const deviceCount = selectedUdids.length;
+        const message = deviceCount === 1 ? 'Démarrage du bot...' : `Démarrage de ${deviceCount} bots...`;
+
         if (window.UIEnhancements) {
-            window.UIEnhancements.showNotification('Démarrage du bot...', 'info');
+            window.UIEnhancements.showNotification(message, 'info');
         }
 
-        // Démarrer Appium
-        addLog('system', `Démarrage d'Appium sur le port ${device.appiumPort || appState.settings.appiumBasePort}...`, 'info');
-        updateServiceStatus('appium', 'starting');
+        addLog('system', `Lancement sur ${deviceCount} appareil(s)`, 'info');
 
-        await window.electronAPI.startAppium({
-            udid: device.udid,
-            port: device.appiumPort || appState.settings.appiumBasePort,
-            wdaPort: device.wdaPort || appState.settings.wdaBasePort
-        });
+        // Lancer un bot pour chaque appareil sélectionné
+        let portOffset = 0;
+        for (const udid of selectedUdids) {
+            const device = appState.devices.get(udid);
+            if (!device) continue;
 
-        updateServiceStatus('appium', 'running');
-        addLog('system', 'Appium démarré avec succès', 'success');
+            // Assigner des ports uniques
+            device.appiumPort = appState.settings.appiumBasePort + portOffset;
+            device.wdaPort = appState.settings.wdaBasePort + portOffset;
 
-        // Démarrer WDA
-        addLog('system', `Démarrage de WebDriverAgent sur le port ${device.wdaPort || appState.settings.wdaBasePort}...`, 'info');
-        updateServiceStatus('wda', 'starting');
+            addLog('system', `[${device.name}] Démarrage d'Appium sur le port ${device.appiumPort}...`, 'info');
+            updateServiceStatus('appium', 'starting');
 
-        await window.electronAPI.startWDA({
-            udid: device.udid,
-            port: device.wdaPort || appState.settings.wdaBasePort
-        });
+            await window.electronAPI.startAppium({
+                udid: device.udid,
+                port: device.appiumPort,
+                wdaPort: device.wdaPort
+            });
 
-        updateServiceStatus('wda', 'running');
-        addLog('system', 'WebDriverAgent démarré avec succès', 'success');
+            addLog('system', `[${device.name}] Appium démarré avec succès`, 'success');
 
-        // Démarrer le bot
-        addLog('system', `Démarrage du bot ${appState.settings.app}...`, 'info');
-        updateServiceStatus('script', 'starting');
+            // Démarrer WDA
+            addLog('system', `[${device.name}] Démarrage de WebDriverAgent sur le port ${device.wdaPort}...`, 'info');
 
-        await window.electronAPI.startBot({
-            udid: device.udid,
-            deviceName: device.name || 'iPhone',
-            app: appState.settings.app,
-            appiumPort: device.appiumPort || appState.settings.appiumBasePort,
-            wdaPort: device.wdaPort || appState.settings.wdaBasePort,
-            accountsNumber: appState.settings.accountsNumber,
-            proxyProvider: appState.settings.proxyProvider
-        });
+            await window.electronAPI.startWDA({
+                udid: device.udid,
+                port: device.wdaPort
+            });
 
+            addLog('system', `[${device.name}] WebDriverAgent démarré avec succès`, 'success');
+
+            // Démarrer le bot
+            addLog('system', `[${device.name}] Démarrage du bot ${appState.settings.app}...`, 'info');
+
+            await window.electronAPI.startBot({
+                udid: device.udid,
+                deviceName: device.name || 'iPhone',
+                app: appState.settings.app,
+                appiumPort: device.appiumPort,
+                wdaPort: device.wdaPort,
+                accountsNumber: appState.settings.accountsNumber,
+                proxyProvider: appState.settings.proxyProvider
+            });
+
+            addLog('system', `[${device.name}] Bot démarré avec succès`, 'success');
+            updateDeviceStatus(device.udid, 'running');
+
+            // Incrémenter le port offset pour le prochain appareil
+            portOffset++;
+        }
+
+        // Mettre à jour les statuts globaux après avoir lancé tous les bots
         updateServiceStatus('script', 'running');
-        addLog('system', 'Bot démarré avec succès', 'success');
-        updateDeviceStatus(device.udid, 'running');
+
+        const successMessage = selectedUdids.length === 1
+            ? 'Bot démarré avec succès!'
+            : `${selectedUdids.length} bots démarrés avec succès!`;
 
         if (window.UIEnhancements) {
-            window.UIEnhancements.showNotification('Bot démarré avec succès!', 'success');
+            window.UIEnhancements.showNotification(successMessage, 'success');
         }
+
+        elements.startBotBtn.style.display = 'none';
+        elements.stopBotBtn.style.display = 'inline-block';
 
     } catch (error) {
         console.error('Erreur lors du démarrage:', error);
         addLog('system', `Erreur: ${error.message}`, 'error');
+        elements.startBotBtn.disabled = false;
+
         if (window.UIEnhancements) {
             window.UIEnhancements.showNotification(`Erreur: ${error.message}`, 'error');
         }

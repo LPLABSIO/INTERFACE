@@ -228,6 +228,22 @@ body {
     box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
+.device-item.selected {
+    background: rgba(79, 70, 229, 0.08);
+    border-left: 3px solid var(--primary-color);
+    padding-left: calc(1rem - 3px);
+}
+
+/* Device Checkbox */
+.device-checkbox {
+    margin-right: 0.75rem;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+    flex-shrink: 0;
+}
+
 .device-item-header {
     display: flex;
     justify-content: space-between;
