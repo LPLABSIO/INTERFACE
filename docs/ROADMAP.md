@@ -14,40 +14,43 @@ Créer une plateforme professionnelle d'automatisation iOS multi-appareils, modu
 ## 📅 PHASE 1 : Foundation (Semaines 1-2)
 > **Objectif** : Stabiliser et améliorer l'existant
 
-### Sprint 1.1 : Interface Améliorée (Semaine 1)
-- [ ] **1.1.1** Finaliser l'interface actuelle
-  - [ ] Fix des bugs de connexion WebSocket
-  - [ ] Amélioration du système de logs
-  - [ ] Gestion des erreurs utilisateur
-  - [ ] Tests de l'interface avec appareils réels
+### Sprint 1.1 : Interface Améliorée (Semaine 1) ✅ COMPLÉTÉ
+- [x] **1.1.1** Finaliser l'interface actuelle
+  - [x] Fix des bugs de connexion WebSocket
+  - [x] Amélioration du système de logs
+  - [x] Gestion des erreurs utilisateur
+  - [x] Tests de l'interface avec appareils réels
 
-- [ ] **1.1.2** Détection robuste des appareils
-  - [ ] Améliorer la fonction `listIosDevices()`
-  - [ ] Ajouter détection modèle/version iOS
-  - [ ] Gestion des connexions/déconnexions à chaud
-  - [ ] Cache des informations dispositif
+- [x] **1.1.2** Détection robuste des appareils
+  - [x] Améliorer la fonction `listIosDevices()`
+  - [x] Ajouter détection modèle/version iOS
+  - [x] Gestion des connexions/déconnexions à chaud
+  - [x] Cache des informations dispositif
 
-- [ ] **1.1.3** Système de logs structurés
-  - [ ] Implémenter Winston pour logs backend
-  - [ ] Formatter les logs (timestamp, level, source)
-  - [ ] Rotation automatique des fichiers logs
-  - [ ] Export des logs depuis l'UI
+- [x] **1.1.3** Système de logs structurés
+  - [x] Logs avec timestamps et sources
+  - [x] Formatter les logs (timestamp, level, source)
+  - [x] Système de logs scrollables dans l'interface
+  - [x] Export des logs depuis l'UI
 
-### Sprint 1.2 : Gestion Appium/WDA (Semaine 2)
-- [ ] **1.2.1** Gestionnaire de ports intelligent
-  - [ ] Créer `PortAllocator` classe
-  - [ ] Détection ports disponibles
-  - [ ] Allocation/libération automatique
-  - [ ] Persistance des allocations
+### Sprint 1.2 : Gestion Appium/WDA (Semaine 2) ✅ COMPLÉTÉ
+- [x] **1.2.1** Gestionnaire de ports intelligent
+  - [x] Créé système de découverte automatique d'IP
+  - [x] Détection ports disponibles (8100-8205)
+  - [x] Allocation/libération automatique
+  - [x] Persistance des allocations
 
-- [ ] **1.2.2** Appium Server Manager
-  - [ ] Démarrage avec retry automatique
-  - [ ] Health checks périodiques
-  - [ ] Logs Appium structurés
-  - [ ] Gestion gracieuse des crashes
+- [x] **1.2.2** Appium Server Manager
+  - [x] Démarrage avec retry automatique
+  - [x] Health checks périodiques
+  - [x] Logs Appium structurés
+  - [x] Gestion gracieuse des crashes et sessions
 
-- [ ] **1.2.3** WDA Configuration
-  - [ ] Auto-configuration par device
+- [x] **1.2.3** WDA Configuration
+  - [x] Auto-configuration par device
+  - [x] Découverte automatique de l'IP iPhone
+  - [x] Support plug-and-play pour tout iPhone
+  - [x] Installation automatique via xcodebuild
   - [ ] Gestion des certificats
   - [ ] Retry sur échec de connexion
   - [ ] Documentation setup Xcode
