@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Manager - Contrôle Multi-Appareils</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">
+                    <span class="logo">📱</span>
+                    Bot Manager
+                </h1>
+                <div class="header-actions">
+                    <button id="scan-devices" class="btn btn-primary">
+                        <span class="icon">🔍</span>
+                        Scanner les appareils
+                    </button>
+                    <button id="dashboard-btn" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <span class="icon">📊</span>
+                        Dashboard
+                    </button>
+                    <button id="analytics-btn" class="btn btn-primary" style="background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);">
+                        <span class="icon">📈</span>
+                        Analytics
+                    </button>
+                    <button id="queue-btn" class="btn btn-primary" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                        <span class="icon">📋</span>
+                        Queue Manager
+                    </button>
+                    <button id="settings-btn" class="btn btn-secondary">
+                        <span class="icon">⚙️</span>
+                        Paramètres
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sidebar - Device List -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2>Appareils connectés</h2>
+                    <span id="device-count" class="device-count">0</span>
+                </div>
+                <div id="device-list" class="device-list">
+                    <!-- Les appareils seront ajoutés dynamiquement ici -->
+                </div>
+            </aside>
+
+            <!-- Device Detail Panel -->
+            <section class="device-panel">
+                <div id="no-device-selected" class="no-device">
+                    <div class="no-device-content">
+                        <span class="icon-large">📱</span>
+                        <h3>Aucun appareil sélectionné</h3>
+                        <p>Sélectionnez un appareil dans la liste pour voir ses détails</p>
+                    </div>
+                </div>
+
+                <div id="device-detail" class="device-detail" style="display: none;">
+                    <!-- Device Header -->
+                    <div class="device-header">
+                        <div class="device-info">
+                            <h2 id="device-name">iPhone</h2>
+                            <div class="device-meta">
+                                <span class="device-udid" id="device-udid">UDID: </span>
+                                <span class="device-status" id="device-status">
+                                    <span class="status-indicator"></span>
+                                    <span class="status-text">Déconnecté</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="device-controls">
+                            <button id="start-bot" class="btn btn-success">
+                                <span class="icon">▶️</span>
+                                Démarrer le bot
+                            </button>
+                            <button id="stop-bot" class="btn btn-danger" style="display: none;">
+                                <span class="icon">⏹️</span>
+                                Arrêter le bot
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Status Cards -->
+                    <div class="status-cards">
+                        <div class="status-card">
+                            <div class="status-card-header">
+                                <span class="status-icon">🤖</span>
+                                <h3>Script</h3>
+                            </div>
+                            <div class="status-card-body">
+                                <span id="script-status" class="status-badge badge-inactive">Inactif</span>
+                                <div class="status-details" id="script-details">
+                                    <small>Aucun script en cours</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="status-card">
+                            <div class="status-card-header">
+                                <span class="status-icon">⚡</span>
+                                <h3>Appium</h3>
+                            </div>
+                            <div class="status-card-body">
+                                <span id="appium-status" class="status-badge badge-inactive">Arrêté</span>
+                                <div class="status-details">
+                                    <small>Port: <span id="appium-port">-</span></small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="status-card">
+                            <div class="status-card-header">
+                                <span class="status-icon">🔧</span>
+                                <h3>WebDriverAgent</h3>
+                            </div>
+                            <div class="status-card-body">
+                                <span id="wda-status" class="status-badge badge-inactive">Arrêté</span>
+                                <div class="status-details">
+                                    <small>Port: <span id="wda-port">-</span></small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="status-card">
+                            <div class="status-card-header">
+                                <span class="status-icon">📊</span>
+                                <h3>Statistiques</h3>
+                            </div>
+                            <div class="status-card-body">
+                                <div class="stats-grid">
+                                    <div class="stat">
+                                        <span class="stat-value" id="accounts-created">0</span>
+                                        <span class="stat-label">Comptes créés</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-value" id="success-rate">-</span>
+                                        <span class="stat-label">Taux de succès</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Logs Section -->
+                    <div class="logs-section">
+                        <div class="logs-tabs">
+                            <button class="tab-btn" data-tab="script">
+                                <span class="icon">📝</span>
+                                Logs du Script
+                            </button>
+                            <button class="tab-btn" data-tab="appium">
+                                <span class="icon">⚡</span>
+                                Logs Appium
+                            </button>
+                            <button class="tab-btn active" data-tab="system">
+                                <span class="icon">💻</span>
+                                Logs Système
+                            </button>
+                        </div>
+
+                        <div class="logs-controls">
+                            <button id="clear-logs" class="btn btn-small">
+                                <span class="icon">🗑️</span>
+                                Effacer
+                            </button>
+                            <button id="export-logs" class="btn btn-small">
+                                <span class="icon">💾</span>
+                                Exporter
+                            </button>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="auto-scroll" checked>
+                                Défilement auto
+                            </label>
+                        </div>
+
+                        <div class="logs-container">
+                            <div id="logs-container" class="log-content">
+                                <!-- Les logs apparaîtront ici -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Paramètres</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-group">
+                        <h3>Configuration Appium</h3>
+                        <div class="form-group">
+                            <label>Port de base Appium:</label>
+                            <input type="number" id="appium-base-port" value="4723">
+                        </div>
+                        <div class="form-group">
+                            <label>Port de base WDA:</label>
+                            <input type="number" id="wda-base-port" value="8100">
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Configuration du Bot</h3>
+                        <div class="form-group">
+                            <label>Application:</label>
+                            <select id="app-select">
+                                <option value="hinge">Hinge</option>
+                                <option value="tinder">Tinder</option>
+                                <option value="pof">POF</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre de comptes:</label>
+                            <input type="number" id="accounts-number" value="1" min="1" max="10">
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Configuration Proxy</h3>
+                        <div class="form-group">
+                            <label>Fournisseur:</label>
+                            <select id="proxy-provider">
+                                <option value="marsproxies">Mars Proxies</option>
+                                <option value="none">Aucun</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancel-settings">Annuler</button>
+                    <button class="btn btn-primary" id="save-settings">Sauvegarder</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="ui-enhancements.js"></script>
+    <script src="logs-enhanced.js"></script>
+    <script src="multi-actions.js"></script>
+    <script src="renderer-fixed.js"></script>
+</body>
+</html>

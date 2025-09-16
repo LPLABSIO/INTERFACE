@@ -3,409 +3,329 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Session Management</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .header {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .header h1 {
-            color: #333;
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .stat-card h3 {
-            font-size: 12px;
-            color: #666;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-
-        .stat-card .value {
-            font-size: 28px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .stat-card .change {
-            font-size: 12px;
-            margin-top: 5px;
-        }
-
-        .stat-card .change.positive {
-            color: #10b981;
-        }
-
-        .stat-card .change.negative {
-            color: #ef4444;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .panel {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .panel h2 {
-            font-size: 18px;
-            margin-bottom: 15px;
-            color: #333;
-        }
-
-        .sessions-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .session-item {
-            background: #f7f7f7;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .session-item:hover {
-            background: #efefef;
-        }
-
-        .session-info {
-            flex: 1;
-        }
-
-        .session-id {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 4px;
-        }
-
-        .session-device {
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-
-        .session-state {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-
-        .session-state.running {
-            background: #10b981;
-            color: white;
-        }
-
-        .session-state.paused {
-            background: #f59e0b;
-            color: white;
-        }
-
-        .session-state.completed {
-            background: #6b7280;
-            color: white;
-        }
-
-        .session-state.error {
-            background: #ef4444;
-            color: white;
-        }
-
-        .session-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #5a67d8;
-        }
-
-        .btn-danger {
-            background: #ef4444;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-
-        .btn-success {
-            background: #10b981;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #059669;
-        }
-
-        .devices-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
-        }
-
-        .device-card {
-            background: #f7f7f7;
-            border-radius: 8px;
-            padding: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .device-card:hover {
-            background: #efefef;
-            transform: translateY(-2px);
-        }
-
-        .device-card.busy {
-            background: #fef3c7;
-        }
-
-        .device-card.selected {
-            background: #ddd6fe;
-            border: 2px solid #667eea;
-        }
-
-        .device-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .device-name {
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-
-        .device-status {
-            font-size: 11px;
-            color: #666;
-        }
-
-        .metrics-chart {
-            height: 200px;
-            background: #f7f7f7;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #999;
-        }
-
-        .logs-container {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            border-radius: 8px;
-            padding: 12px;
-            font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 12px;
-            height: 200px;
-            overflow-y: auto;
-        }
-
-        .log-entry {
-            margin-bottom: 4px;
-            white-space: pre-wrap;
-        }
-
-        .log-entry.info {
-            color: #3b82f6;
-        }
-
-        .log-entry.success {
-            color: #10b981;
-        }
-
-        .log-entry.warning {
-            color: #f59e0b;
-        }
-
-        .log-entry.error {
-            color: #ef4444;
-        }
-
-        .control-bar {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-buttons {
-            display: flex;
-            gap: 10px;
-            margin-left: auto;
-        }
-
-        #refreshBtn {
-            animation: spin 2s linear infinite;
-            animation-play-state: paused;
-        }
-
-        #refreshBtn.spinning {
-            animation-play-state: running;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-    </style>
+    <title>Dashboard - Bot Manager</title>
+    <link rel="stylesheet" href="styles-global.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>📊 Dashboard - Session Management</h1>
-            <div id="lastUpdate">Dernière mise à jour: --</div>
-        </div>
+    <div class="app-container">
+        <!-- Header unifié -->
+        <header class="header page-header">
+            <div class="header-content">
+                <div class="header-brand">
+                    <h1 class="app-title">Bot Manager</h1>
+                </div>
 
-        <!-- Control Bar -->
-        <div class="control-bar">
-            <button class="btn btn-success" id="launchSessionBtn">🚀 Nouvelle Session</button>
-            <button class="btn btn-primary" id="refreshBtn">🔄 Rafraîchir</button>
-            <button class="btn btn-danger" id="cleanupBtn">🧹 Nettoyer</button>
+                <nav class="header-nav">
+                    <button class="nav-button" onclick="window.location.href='index.html'">
+                        Principal
+                    </button>
+                    <button class="nav-button" data-current-page="true">
+                        Dashboard
+                    </button>
+                    <button class="nav-button" onclick="window.location.href='analytics.html'">
+                        Analytics
+                    </button>
+                    <button class="nav-button" onclick="window.location.href='queue-manager.html'">
+                        Queue
+                    </button>
+                </nav>
 
-            <div class="nav-buttons">
-                <button class="btn btn-primary" id="backBtn">← Retour</button>
+                <div class="header-actions">
+                    <button id="refresh-data" class="btn btn--primary">
+                        Rafraîchir
+                    </button>
+                    <button id="settings-btn" class="btn btn--secondary">
+                        Paramètres
+                    </button>
+                </div>
             </div>
-        </div>
+        </header>
 
-        <!-- Stats Grid -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Appareils</h3>
-                <div class="value" id="totalDevices">0</div>
-                <div class="change positive" id="devicesChange">0 connectés</div>
+        <!-- Contenu principal -->
+        <main class="page-container">
+            <div>
+                <h2 class="page-title">Dashboard</h2>
+                <p class="page-subtitle">Vue d'ensemble des sessions et performances en temps réel</p>
             </div>
-            <div class="stat-card">
-                <h3>Sessions Actives</h3>
-                <div class="value" id="activeSessions">0</div>
-                <div class="change" id="sessionsChange">0 en cours</div>
-            </div>
-            <div class="stat-card">
-                <h3>Taux de Succès</h3>
-                <div class="value" id="successRate">0%</div>
-                <div class="change positive" id="successChange">↑ 0%</div>
-            </div>
-            <div class="stat-card">
-                <h3>CPU Moyen</h3>
-                <div class="value" id="avgCpu">0%</div>
-                <div class="change" id="cpuChange">Normal</div>
-            </div>
-            <div class="stat-card">
-                <h3>RAM Utilisée</h3>
-                <div class="value" id="totalRam">0 MB</div>
-                <div class="change" id="ramChange">Stable</div>
-            </div>
-        </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Sessions Panel -->
-            <div class="panel">
-                <h2>📱 Sessions Actives</h2>
-                <div class="sessions-list" id="sessionsList">
-                    <!-- Sessions will be populated here -->
+            <!-- Métriques principales -->
+            <div class="grid-4-cols">
+                <div class="metric-card">
+                    <div class="metric-card__label">Sessions Actives</div>
+                    <div class="metric-card__value" id="active-sessions">0</div>
+                    <div class="metric-card__change metric-card__change--positive">
+                        ↑ +12% depuis hier
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-card__label">Comptes Créés</div>
+                    <div class="metric-card__value" id="accounts-created">0</div>
+                    <div class="metric-card__change metric-card__change--positive">
+                        ↑ +8% cette semaine
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-card__label">Taux de Succès</div>
+                    <div class="metric-card__value" id="success-rate">0%</div>
+                    <div class="metric-card__change metric-card__change--negative">
+                        ↓ -2% aujourd'hui
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-card__label">Temps Moyen</div>
+                    <div class="metric-card__value" id="avg-time">0m</div>
+                    <div class="metric-card__change metric-card__change--positive">
+                        ↑ Optimisé de 15%
+                    </div>
                 </div>
             </div>
 
-            <!-- Devices Panel -->
-            <div class="panel">
-                <h2>🔌 Appareils Connectés</h2>
-                <div class="devices-grid" id="devicesGrid">
-                    <!-- Devices will be populated here -->
+            <!-- Graphiques -->
+            <div class="grid-2-cols">
+                <!-- Performance Chart -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Performance sur 7 jours</h3>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-dot" style="background: var(--success)"></span>
+                                <span>Succès</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-dot" style="background: var(--danger)"></span>
+                                <span>Échecs</span>
+                            </div>
+                        </div>
+                    </div>
+                    <canvas id="performance-chart"></canvas>
                 </div>
-            </div>
-        </div>
 
-        <!-- Metrics & Logs -->
-        <div class="main-content" style="margin-top: 20px;">
-            <!-- Metrics Panel -->
-            <div class="panel">
-                <h2>📈 Métriques de Performance</h2>
-                <div class="metrics-chart" id="metricsChart">
-                    Graphique de performance (à venir)
+                <!-- Device Distribution -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Répartition des Appareils</h3>
+                    </div>
+                    <canvas id="device-chart"></canvas>
                 </div>
             </div>
 
-            <!-- Logs Panel -->
-            <div class="panel">
-                <h2>📝 Logs Système</h2>
-                <div class="logs-container" id="logsContainer">
-                    <!-- Logs will be populated here -->
+            <!-- Sessions Table -->
+            <div style="margin-top: var(--space-lg);">
+                <div class="action-bar">
+                    <div class="action-bar__left">
+                        <h3 style="color: var(--text-primary);">Sessions Récentes</h3>
+                    </div>
+                    <div class="action-bar__right">
+                        <input type="text" class="input input--small" placeholder="Rechercher...">
+                        <select class="select select--small">
+                            <option>Toutes</option>
+                            <option>Actives</option>
+                            <option>Terminées</option>
+                            <option>Échouées</option>
+                        </select>
+                    </div>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Session ID</th>
+                            <th>Appareil</th>
+                            <th>Application</th>
+                            <th>Démarré</th>
+                            <th>Durée</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sessions-table">
+                        <!-- Les sessions seront ajoutées dynamiquement ici -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Activity Timeline -->
+            <div class="grid-2-cols" style="margin-top: var(--space-lg);">
+                <!-- Recent Activity -->
+                <div>
+                    <h3 style="color: var(--text-primary); margin-bottom: var(--space-md);">
+                        Activité Récente
+                    </h3>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-time">Il y a 2 min</div>
+                            <div class="timeline-content">
+                                <strong>Session démarrée</strong> sur iPhone X
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">Il y a 15 min</div>
+                            <div class="timeline-content">
+                                <strong>Compte créé</strong> avec succès
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">Il y a 1h</div>
+                            <div class="timeline-content">
+                                <strong>Session terminée</strong> - 5 comptes créés
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Health -->
+                <div>
+                    <h3 style="color: var(--text-primary); margin-bottom: var(--space-md);">
+                        Santé du Système
+                    </h3>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-icon" style="background: var(--success-light);">
+                                ✓
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Appium Server</div>
+                                <div class="activity-description">En cours d'exécution sur port 1265</div>
+                            </div>
+                            <span class="badge badge--success">EN LIGNE</span>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon" style="background: var(--success-light);">
+                                ✓
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">WebDriverAgent</div>
+                                <div class="activity-description">Connecté et opérationnel</div>
+                            </div>
+                            <span class="badge badge--success">ACTIF</span>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon" style="background: var(--warning-light);">
+                                !
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Utilisation CPU</div>
+                                <div class="activity-description">78% - Charge élevée détectée</div>
+                            </div>
+                            <span class="badge badge--warning">ATTENTION</span>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon" style="background: var(--info-light);">
+                                i
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Queue Manager</div>
+                                <div class="activity-description">12 tâches en attente</div>
+                            </div>
+                            <span class="badge badge--primary">INFO</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
-    <script src="dashboard.js"></script>
+    <!-- Scripts -->
+    <script>
+        // Initialisation du dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Dashboard initialized');
+
+            // Rafraîchir les données
+            document.getElementById('refresh-data')?.addEventListener('click', () => {
+                loadDashboardData();
+            });
+
+            // Charger les données initiales
+            loadDashboardData();
+
+            // Mise à jour automatique toutes les 30 secondes
+            setInterval(loadDashboardData, 30000);
+        });
+
+        function loadDashboardData() {
+            // Simulation de chargement de données
+            updateMetrics();
+            updateSessionsTable();
+        }
+
+        function updateMetrics() {
+            // Mise à jour des métriques (simulation)
+            document.getElementById('active-sessions').textContent =
+                Math.floor(Math.random() * 10);
+            document.getElementById('accounts-created').textContent =
+                Math.floor(Math.random() * 100);
+            document.getElementById('success-rate').textContent =
+                Math.floor(Math.random() * 100) + '%';
+            document.getElementById('avg-time').textContent =
+                Math.floor(Math.random() * 60) + 'm';
+        }
+
+        function updateSessionsTable() {
+            const tbody = document.getElementById('sessions-table');
+            if (!tbody) return;
+
+            // Effacer le contenu existant
+            tbody.innerHTML = '';
+
+            // Ajouter quelques sessions d'exemple
+            const sessions = [
+                {
+                    id: 'sess_001',
+                    device: 'iPhone X',
+                    app: 'Hinge',
+                    started: '14:30',
+                    duration: '25m',
+                    status: 'active'
+                },
+                {
+                    id: 'sess_002',
+                    device: 'iPhone 12',
+                    app: 'Tinder',
+                    started: '13:45',
+                    duration: '1h 15m',
+                    status: 'completed'
+                },
+                {
+                    id: 'sess_003',
+                    device: 'iPhone 11',
+                    app: 'POF',
+                    started: '12:00',
+                    duration: '45m',
+                    status: 'failed'
+                }
+            ];
+
+            sessions.forEach(session => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${session.id}</td>
+                    <td>${session.device}</td>
+                    <td>${session.app}</td>
+                    <td>${session.started}</td>
+                    <td>${session.duration}</td>
+                    <td>
+                        <span class="badge badge--${
+                            session.status === 'active' ? 'success' :
+                            session.status === 'completed' ? 'primary' :
+                            'danger'
+                        }">
+                            ${session.status.toUpperCase()}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn--small btn--ghost">Détails</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+    </script>
 </body>
 </html>

@@ -351,26 +351,67 @@ class StateManager extends EventEmitter {
    * Persister l'état
    */
   async save() {
-    const serializable = {
-      devices: Array.from(this.state.devices.entries()),
-      sessions: Array.from(this.state.sessions.entries()),
-      processes: Array.from(this.state.processes.entries()),
-      config: this.state.config,
-      metrics: this.state.metrics,
-      ui: {
-        ...this.state.ui,
-        selectedDevices: Array.from(this.state.ui.selectedDevices),
-        logs: this.state.ui.logs.slice(-100) // Garder seulement les 100 derniers logs
-      }
-    };
+    try {
+      // Fonction pour nettoyer les objets non-sérialisables
+      const cleanForSerialization = (obj) => {
+        if (!obj || typeof obj !== 'object') return obj;
 
-    await fs.writeFile(
-      this.persistPath,
-      JSON.stringify(serializable, null, 2),
-      'utf-8'
-    );
+        const cleaned = {};
+        for (const [key, value] of Object.entries(obj)) {
+          // Ignorer les timers et fonctions
+          if (key.startsWith('_') || key === 'timer' || typeof value === 'function') {
+            continue;
+          }
+          // Ignorer les objets Timeout
+          if (value && value.constructor && value.constructor.name === 'Timeout') {
+            continue;
+          }
+          // Convertir les Sets en Arrays
+          if (value instanceof Set) {
+            cleaned[key] = Array.from(value);
+          }
+          // Convertir les Maps en Arrays
+          else if (value instanceof Map) {
+            cleaned[key] = Array.from(value.entries());
+          }
+          // Récursivement nettoyer les objets
+          else if (value && typeof value === 'object' && !Array.isArray(value)) {
+            cleaned[key] = cleanForSerialization(value);
+          }
+          else {
+            cleaned[key] = value;
+          }
+        }
+        return cleaned;
+      };
 
-    this.emit('state:saved');
+      // Créer une version propre pour la sérialisation
+      const serializable = {
+        devices: Array.from(this.state.devices.entries()),
+        sessions: Array.from(this.state.sessions.entries()).map(([k, v]) => [k, cleanForSerialization(v)]),
+        processes: Array.from(this.state.processes.entries()).map(([k, v]) => [k, cleanForSerialization(v)]),
+        config: this.state.config,
+        metrics: this.state.metrics,
+        ui: {
+          ...this.state.ui,
+          selectedDevices: Array.from(this.state.ui.selectedDevices),
+          logs: this.state.ui.logs.slice(-100) // Garder seulement les 100 derniers logs
+        },
+        tasks: this.state.tasks ? cleanForSerialization(this.state.tasks) : {},
+        timestamp: new Date().toISOString()
+      };
+
+      await fs.writeFile(
+        this.persistPath,
+        JSON.stringify(serializable, null, 2),
+        'utf-8'
+      );
+
+      this.emit('state:saved');
+    } catch (error) {
+      console.error('[StateManager] Save error:', error.message);
+      // Ne pas propager l'erreur pour éviter de crasher l'app
+    }
   }
 
   /**

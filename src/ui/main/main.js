@@ -86,8 +86,8 @@ function createWindow() {
 
   mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
 
-  // Ouvrir automatiquement les DevTools en mode développement
-  mainWindow.webContents.openDevTools();
+  // DevTools désactivé - Décommenter uniquement pour le débogage
+  // mainWindow.webContents.openDevTools();
 
   // Log des erreurs de chargement
   mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {

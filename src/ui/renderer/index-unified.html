@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bot Manager - Interface Professionnelle</title>
-    <link rel="stylesheet" href="styles-fixed.css">
+    <link rel="stylesheet" href="styles-unified.css">
 </head>
 <body>
     <div class="app-container">
@@ -32,7 +32,7 @@
 
                 <div class="header-actions">
                     <button id="scan-devices" class="btn btn--primary">
-                        Scanner appareils
+                        Scanner
                     </button>
                     <button id="settings-btn" class="btn btn--secondary">
                         Paramètres
@@ -59,7 +59,7 @@
                 <!-- No Device Selected State -->
                 <div id="no-device-selected" class="empty-state">
                     <div class="empty-state__content">
-                        <div class="empty-state__icon"></div>
+                        <div class="empty-state__icon">📱</div>
                         <h3 class="empty-state__title">Aucun appareil sélectionné</h3>
                         <p class="empty-state__description">
                             Sélectionnez un appareil dans la liste pour voir ses détails
@@ -96,7 +96,7 @@
                         <!-- Script Status -->
                         <div class="status-card">
                             <div class="status-card__header">
-                                <span class="status-card__icon"></span>
+                                <span class="status-card__icon">🤖</span>
                                 <h3 class="status-card__title">Script</h3>
                             </div>
                             <div class="status-card__body">
@@ -110,7 +110,7 @@
                         <!-- Appium Status -->
                         <div class="status-card">
                             <div class="status-card__header">
-                                <span class="status-card__icon"></span>
+                                <span class="status-card__icon">⚡</span>
                                 <h3 class="status-card__title">Appium</h3>
                             </div>
                             <div class="status-card__body">
@@ -124,7 +124,7 @@
                         <!-- WebDriverAgent Status -->
                         <div class="status-card">
                             <div class="status-card__header">
-                                <span class="status-card__icon"></span>
+                                <span class="status-card__icon">🔧</span>
                                 <h3 class="status-card__title">WebDriverAgent</h3>
                             </div>
                             <div class="status-card__body">
@@ -138,7 +138,7 @@
                         <!-- Statistics -->
                         <div class="status-card">
                             <div class="status-card__header">
-                                <span class="status-card__icon"></span>
+                                <span class="status-card__icon">📊</span>
                                 <h3 class="status-card__title">Statistiques</h3>
                             </div>
                             <div class="status-card__body">
@@ -332,7 +332,7 @@
                     } else if (view === 'queue') {
                         const queueBtn = document.getElementById('queue-btn');
                         if (queueBtn && window.location) {
-                            window.location.href = 'queue-manager.html';
+                            window.location.href = 'queue.html';
                         }
                     }
                 });

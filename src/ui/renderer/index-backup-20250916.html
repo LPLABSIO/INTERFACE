@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Manager - Interface Améliorée</title>
+    <link rel="stylesheet" href="styles-improved-backup.css">
+    <style>
+        /* Ajustements pour compatibilité */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+            margin-right: 20px;
+        }
+
+        .nav-tab {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: none;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .nav-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .device-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .device-status-badge.available {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-color);
+        }
+
+        .device-status-badge.busy {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning-color);
+        }
+
+        .logs-filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .logs-search-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .logs-search-box input {
+            flex: 1;
+            padding: 8px 12px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        /* Amélioration des logs */
+        #logs-container {
+            height: 50vh;
+            min-height: 400px;
+        }
+
+        .status-cards {
+            margin-bottom: 20px;
+        }
+
+        /* Notification system */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .notification {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            max-width: 500px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid;
+        }
+
+        .notification.success { border-left-color: var(--success-color); }
+        .notification.error { border-left-color: var(--danger-color); }
+        .notification.warning { border-left-color: var(--warning-color); }
+        .notification.info { border-left-color: var(--info-color); }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header Amélioré -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">
+                    <span class="logo">📱</span>
+                    Bot Manager
+                </h1>
+
+                <!-- Navigation Tabs -->
+                <nav class="nav-tabs">
+                    <button class="nav-tab active" onclick="switchTab('main')">
+                        Principal
+                    </button>
+                    <button id="dashboard-btn" class="nav-tab" onclick="switchTab('dashboard')">
+                        Dashboard
+                    </button>
+                    <button id="analytics-btn" class="nav-tab" onclick="switchTab('analytics')">
+                        Analytics
+                    </button>
+                    <button id="queue-btn" class="nav-tab" onclick="switchTab('queue')">
+                        Queue
+                    </button>
+                </nav>
+
+                <div class="header-actions">
+                    <button id="scan-devices" class="btn btn-primary">
+                        <span class="icon">🔍</span>
+                        Scanner
+                    </button>
+                    <button id="settings-btn" class="btn btn-secondary">
+                        <span class="icon">⚙️</span>
+                        Paramètres
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sidebar - Device List (garde les mêmes IDs) -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2>Appareils connectés</h2>
+                    <span id="device-count" class="device-count">0</span>
+                </div>
+                <div id="device-list" class="device-list">
+                    <!-- Les appareils seront ajoutés dynamiquement ici -->
+                </div>
+            </aside>
+
+            <!-- Device Detail Panel (garde les mêmes IDs) -->
+            <section class="device-panel">
+                <div id="no-device-selected" class="no-device">
+                    <div class="no-device-content">
+                        <span class="icon-large">📱</span>
+                        <h3>Aucun appareil sélectionné</h3>
+                        <p>Sélectionnez un appareil dans la liste pour voir ses détails</p>
+                    </div>
+                </div>
+
+                <div id="device-detail" class="device-detail" style="display: none;">
+                    <!-- Device Header -->
+                    <div class="device-header">
+                        <div class="device-info">
+                            <h2 id="device-name">iPhone</h2>
+                            <div class="device-meta">
+                                <span class="device-udid" id="device-udid">UDID: </span>
+                                <span class="device-status" id="device-status">
+                                    <span class="status-indicator"></span>
+                                    <span class="status-text">Déconnecté</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="device-controls">
+                            <button id="start-bot" class="btn btn-success">
+                                <span class="icon">▶️</span>
+                                Démarrer le bot
+                            </button>
+                            <button id="stop-bot" class="btn btn-danger" style="display: none;">
+                                <span class="icon">⏹️</span>
+                                Arrêter le bot
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Status Cards (garde les mêmes IDs) -->
+                    <div class="status-cards">
+                        <div class="status-card">
+                            <div class="status-card-header">
+                                <span class="status-icon">🤖</span>
+                                <h3>Script</h3>
+                            </div>
+                            <div class="status-card-body">
+                                <span id="script-status" class="status-badge badge-inactive">Inactif</span>
+                                <div class="status-details" id="script-details">
+                                    <small>Aucun script en cours</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="status-card">
+                            <div class="status-card-header">
+                                <span class="status-icon">⚡</span>
+                                <h3>Appium</h3>
+                            </div>
+                            <div class="status-card-body">
+                                <span id="appium-status" class="status-badge badge-inactive">Arrêté</span>
+                                <div class="status-details">
+                                    <small>Port: <span id="appium-port">-</span></small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="status-card">
+                            <div class="status-card-header">
+                                <span class="status-icon">🔧</span>
+                                <h3>WebDriverAgent</h3>
+                            </div>
+                            <div class="status-card-body">
+                                <span id="wda-status" class="status-badge badge-inactive">Arrêté</span>
+                                <div class="status-details">
+                                    <small>Port: <span id="wda-port">-</span></small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="status-card">
+                            <div class="status-card-header">
+                                <span class="status-icon">📊</span>
+                                <h3>Statistiques</h3>
+                            </div>
+                            <div class="status-card-body">
+                                <div class="stats-grid">
+                                    <div class="stat">
+                                        <span class="stat-value" id="accounts-created">0</span>
+                                        <span class="stat-label">Comptes créés</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-value" id="success-rate">-</span>
+                                        <span class="stat-label">Taux de succès</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Logs Section -->
+                    <div class="logs-section">
+                        <div class="logs-tabs">
+                            <button class="tab-btn" data-tab="script">
+                                <span class="icon">📝</span>
+                                Logs du Script
+                            </button>
+                            <button class="tab-btn" data-tab="appium">
+                                <span class="icon">⚡</span>
+                                Logs Appium
+                            </button>
+                            <button class="tab-btn active" data-tab="system">
+                                <span class="icon">💻</span>
+                                Logs Système
+                            </button>
+                        </div>
+
+                        <div class="logs-controls">
+                            <!-- Filtres améliorés -->
+                            <div class="logs-filters">
+                                <button class="filter-btn active" data-level="all">Tout</button>
+                                <button class="filter-btn" data-level="info">Info</button>
+                                <button class="filter-btn" data-level="success">Succès</button>
+                                <button class="filter-btn" data-level="warning">Avertissement</button>
+                                <button class="filter-btn" data-level="error">Erreur</button>
+                            </div>
+
+                            <!-- Recherche -->
+                            <div class="logs-search-box">
+                                <input type="text" id="log-search" placeholder="🔍 Rechercher dans les logs...">
+                                <button id="clear-logs" class="btn btn-small">
+                                    <span class="icon">🗑️</span>
+                                    Effacer
+                                </button>
+                                <button id="export-logs" class="btn btn-small">
+                                    <span class="icon">💾</span>
+                                    Exporter
+                                </button>
+                            </div>
+
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="auto-scroll" checked>
+                                Défilement auto
+                            </label>
+                        </div>
+
+                        <div class="logs-container">
+                            <div id="logs-container" class="log-content">
+                                <!-- Les logs apparaîtront ici -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Settings Modal (garde le même ID) -->
+        <div id="settings-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Paramètres</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-group">
+                        <h3>Configuration Appium</h3>
+                        <div class="form-group">
+                            <label>Port de base Appium:</label>
+                            <input type="number" id="appium-base-port" value="4723">
+                        </div>
+                        <div class="form-group">
+                            <label>Port de base WDA:</label>
+                            <input type="number" id="wda-base-port" value="8100">
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Configuration du Bot</h3>
+                        <div class="form-group">
+                            <label>Application:</label>
+                            <select id="app-select">
+                                <option value="hinge">Hinge</option>
+                                <option value="tinder">Tinder</option>
+                                <option value="pof">POF</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre de comptes:</label>
+                            <input type="number" id="accounts-number" value="1" min="1" max="10">
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Configuration Proxy</h3>
+                        <div class="form-group">
+                            <label>Fournisseur:</label>
+                            <select id="proxy-provider">
+                                <option value="marsproxies">Mars Proxies</option>
+                                <option value="none">Aucun</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancel-settings">Annuler</button>
+                    <button class="btn btn-primary" id="save-settings">Sauvegarder</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Container -->
+        <div id="notification-container" class="notification-container"></div>
+    </div>
+
+    <!-- Scripts existants -->
+    <script src="ui-enhancements.js"></script>
+    <script src="logs-enhanced.js"></script>
+    <script src="multi-actions.js"></script>
+    <script src="renderer.js"></script>
+
+    <!-- Script de compatibilité -->
+    <script>
+        // Fonction pour changer d'onglet
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Trigger existing navigation if available
+            if (tab === 'dashboard' && document.getElementById('dashboard-btn')) {
+                document.getElementById('dashboard-btn').click();
+            } else if (tab === 'analytics' && document.getElementById('analytics-btn')) {
+                document.getElementById('analytics-btn').click();
+            } else if (tab === 'queue' && document.getElementById('queue-btn')) {
+                document.getElementById('queue-btn').click();
+            }
+        }
+
+        // Système de notifications simple
+        window.showNotification = function(message, type = 'info') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()">×</button>
+            `;
+            container.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        };
+
+        // Amélioration des filtres de logs
+        document.addEventListener('DOMContentLoaded', () => {
+            // Filtres de logs
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+
+                    const level = e.target.dataset.level;
+                    filterLogs(level);
+                });
+            });
+
+            // Recherche dans les logs
+            const searchInput = document.getElementById('log-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    searchLogs(e.target.value);
+                });
+            }
+        });
+
+        function filterLogs(level) {
+            const logs = document.querySelectorAll('.log-entry');
+            logs.forEach(log => {
+                if (level === 'all' || log.classList.contains(level)) {
+                    log.style.display = 'block';
+                } else {
+                    log.style.display = 'none';
+                }
+            });
+        }
+
+        function searchLogs(term) {
+            const logs = document.querySelectorAll('.log-entry');
+            const searchTerm = term.toLowerCase();
+
+            logs.forEach(log => {
+                const text = log.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    log.style.display = 'block';
+                    // Highlight search term
+                    if (term) {
+                        const regex = new RegExp(`(${term})`, 'gi');
+                        log.innerHTML = log.textContent.replace(regex, '<mark>$1</mark>');
+                    }
+                } else {
+                    log.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Manager - Interface Améliorée</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header Amélioré -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">
+                    <span class="logo">⚡</span>
+                    Bot Manager
+                </h1>
+
+                <!-- Navigation Principale -->
+                <nav class="nav-tabs">
+                    <button class="nav-tab active" data-view="devices">
+                        <span class="tab-icon">📱</span>
+                        <span>Appareils</span>
+                    </button>
+                    <button class="nav-tab" data-view="control">
+                        <span class="tab-icon">🎯</span>
+                        <span>Centre de Contrôle</span>
+                    </button>
+                    <button class="nav-tab" data-view="queue">
+                        <span class="tab-icon">📋</span>
+                        <span>File d'Attente</span>
+                    </button>
+                    <button class="nav-tab" data-view="reports">
+                        <span class="tab-icon">📊</span>
+                        <span>Rapports</span>
+                    </button>
+                </nav>
+
+                <div class="header-actions">
+                    <button id="refresh-btn" class="btn btn-ghost" data-tooltip="Rafraîchir">
+                        <span class="spinner" style="display: none;"></span>
+                        <span class="btn-text">↻</span>
+                    </button>
+                    <button id="settings-btn" class="btn btn-ghost" data-tooltip="Paramètres">
+                        ⚙️
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Vue Appareils (Par défaut) -->
+        <main id="view-devices" class="main-view active">
+            <div class="view-layout">
+                <!-- Sidebar - Liste des Appareils -->
+                <aside class="sidebar-improved">
+                    <div class="sidebar-header">
+                        <h2>Appareils Connectés</h2>
+                        <button id="scan-devices" class="btn btn-primary btn-sm">
+                            Scanner
+                        </button>
+                    </div>
+
+                    <div class="device-stats">
+                        <div class="stat-item">
+                            <span class="stat-value" id="devices-total">0</span>
+                            <span class="stat-label">Total</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value success" id="devices-available">0</span>
+                            <span class="stat-label">Disponibles</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value warning" id="devices-busy">0</span>
+                            <span class="stat-label">Occupés</span>
+                        </div>
+                    </div>
+
+                    <div id="device-list" class="device-list-improved">
+                        <!-- Les appareils seront ajoutés ici -->
+                    </div>
+                </aside>
+
+                <!-- Panneau Principal -->
+                <section class="content-panel">
+                    <div id="no-device-selected" class="empty-state">
+                        <div class="empty-state-content">
+                            <div class="empty-icon">📱</div>
+                            <h3>Aucun appareil sélectionné</h3>
+                            <p>Sélectionnez un appareil dans la liste pour voir ses détails</p>
+                        </div>
+                    </div>
+
+                    <div id="device-detail" class="device-detail-improved" style="display: none;">
+                        <!-- En-tête de l'appareil -->
+                        <div class="device-header-improved">
+                            <div class="device-info">
+                                <h2 id="device-name">iPhone</h2>
+                                <div class="device-meta">
+                                    <span class="device-udid" id="device-udid">UDID: </span>
+                                    <div id="device-status" class="device-status-indicator available">
+                                        <span class="status-dot"></span>
+                                        <span class="status-text">Disponible</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="device-actions">
+                                <button id="start-bot" class="btn btn-primary">
+                                    ▶ Démarrer
+                                </button>
+                                <button id="stop-bot" class="btn btn-danger" style="display: none;">
+                                    ■ Arrêter
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cartes d'État -->
+                        <div class="status-grid">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Bot</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div id="bot-status" class="badge">Inactif</div>
+                                    <div class="card-subtitle" id="bot-details">-</div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Appium</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div id="appium-status" class="badge">Arrêté</div>
+                                    <div class="card-subtitle">Port: <span id="appium-port">-</span></div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">WebDriver</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div id="wda-status" class="badge">Arrêté</div>
+                                    <div class="card-subtitle">Port: <span id="wda-port">-</span></div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Performances</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="perf-metrics">
+                                        <div class="metric">
+                                            <span class="metric-value" id="accounts-created">0</span>
+                                            <span class="metric-label">Comptes</span>
+                                        </div>
+                                        <div class="metric">
+                                            <span class="metric-value" id="success-rate">-</span>
+                                            <span class="metric-label">Succès</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section Logs Améliorée -->
+                        <div class="logs-section-improved">
+                            <div class="logs-header">
+                                <div class="logs-filters">
+                                    <button class="filter-chip active" data-level="all">Tout</button>
+                                    <button class="filter-chip" data-level="info">Info</button>
+                                    <button class="filter-chip" data-level="warning">Avertissement</button>
+                                    <button class="filter-chip" data-level="error">Erreur</button>
+                                </div>
+                                <div class="logs-actions">
+                                    <div class="logs-search">
+                                        <span class="logs-search-icon">🔍</span>
+                                        <input type="text" placeholder="Rechercher..." id="logs-search">
+                                    </div>
+                                    <button class="btn btn-ghost btn-sm" id="clear-logs">Effacer</button>
+                                    <button class="btn btn-ghost btn-sm" id="export-logs">Exporter</button>
+                                </div>
+                            </div>
+                            <div id="logs-container" class="logs-content-improved">
+                                <!-- Les logs apparaîtront ici -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Vue Centre de Contrôle (Dashboard + Analytics fusionnés) -->
+        <main id="view-control" class="main-view" style="display: none;">
+            <div class="control-center">
+                <!-- Statistiques Globales -->
+                <div class="stats-overview">
+                    <div class="stat-card-large">
+                        <h3>Sessions Actives</h3>
+                        <div class="stat-value-large" id="active-sessions">0</div>
+                    </div>
+                    <div class="stat-card-large">
+                        <h3>Tâches en Queue</h3>
+                        <div class="stat-value-large" id="queued-tasks">0</div>
+                    </div>
+                    <div class="stat-card-large">
+                        <h3>Taux de Succès</h3>
+                        <div class="stat-value-large" id="global-success-rate">-</div>
+                    </div>
+                    <div class="stat-card-large">
+                        <h3>Temps Moyen</h3>
+                        <div class="stat-value-large" id="avg-time">-</div>
+                    </div>
+                </div>
+
+                <!-- Graphiques -->
+                <div class="charts-grid">
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Performance par Heure</h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="performance-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Répartition des Tâches</h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="tasks-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions Rapides -->
+                <div class="quick-actions">
+                    <h3>Actions Rapides</h3>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">Démarrer Tous</button>
+                        <button class="btn btn-danger">Arrêter Tous</button>
+                        <button class="btn btn-ghost">Nettoyer Queue</button>
+                        <button class="btn btn-ghost">Exporter Rapport</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Vue File d'Attente -->
+        <main id="view-queue" class="main-view" style="display: none;">
+            <div class="queue-manager-improved">
+                <!-- En-tête de la Queue -->
+                <div class="queue-header-improved">
+                    <div class="queue-stats">
+                        <div class="badge badge-success">En cours: <span id="queue-running">0</span></div>
+                        <div class="badge badge-warning">En attente: <span id="queue-pending">0</span></div>
+                        <div class="badge">Terminées: <span id="queue-completed">0</span></div>
+                    </div>
+                    <div class="queue-actions">
+                        <button class="btn btn-primary">+ Nouvelle Tâche</button>
+                        <button class="btn btn-ghost">Pause Queue</button>
+                    </div>
+                </div>
+
+                <!-- Liste des Tâches -->
+                <div class="queue-list-improved">
+                    <div id="queue-items">
+                        <!-- Les tâches seront affichées ici -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Vue Rapports -->
+        <main id="view-reports" class="main-view" style="display: none;">
+            <div class="reports-view">
+                <h2>Rapports et Analyses</h2>
+                <!-- Contenu des rapports -->
+            </div>
+        </main>
+
+        <!-- Modal Paramètres Amélioré -->
+        <div id="settings-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Paramètres</h2>
+                    <button class="modal-close">×</button>
+                </div>
+                <div class="modal-body">
+                    <!-- Contenu des paramètres -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-ghost">Annuler</button>
+                    <button class="btn btn-primary">Sauvegarder</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Système de Notifications -->
+        <div id="notification-container" class="notification-container"></div>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay" style="display: none;">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
