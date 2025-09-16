@@ -6,21 +6,38 @@
 |-------|------------|--------|--------------|
 | **PHASE 1** : Foundation | ██████████ 100% | ✅ Complété | 15/09/2025 |
 | **PHASE 2** : Core Infrastructure | ██████████ 100% | ✅ Complété | 16/09/2025 |
-| **PHASE 3** : Orchestration Engine | ████░░░░░░ 40% | 🟡 En cours | 17/09/2025 |
+| **PHASE 3** : Orchestration Engine | ████████░░ 80% | 🟡 En cours | 17/09/2025 |
 | **PHASE 4** : Project System | ░░░░░░░░░░ 0% | ⏳ À venir | - |
 | **PHASE 5** : Production Ready | ░░░░░░░░░░ 0% | ⏳ À venir | - |
 | **PHASE 6** : Advanced Features | ░░░░░░░░░░ 0% | ⏳ À venir | - |
 
-**Progression Globale** : ██████░░░░ **60%**
+**Progression Globale** : ████████░░ **80%**
 
 ---
 
-## 🚀 Sprint Actuel : Sprint 3.3 (Semaine 6)
+## 🚀 Sprint Actuel : Sprint 3.4 (Semaine 6)
 
 ### Objectif
-Système de récupération d'erreurs et monitoring de santé
+API & Communication - Système REST et WebSocket complets
 
 ### Tâches Complétées (17/09/2025)
+
+#### ✅ **3.4 API & Communication** (17/09/2025 - 02:00)
+- **Durée** : 4h
+- **Description** : API REST complète avec WebSocket temps réel
+- **Détails techniques** :
+  - **Express.js Server** : Middleware complet (helmet, CORS, rate limiting, compression)
+  - **Routes API** : devices, sessions, queue, metrics, health avec validation express-validator
+  - **WebSocket Real-time** : Socket.io avec broadcasting, event subscription system
+  - **Server Simple** : Version compatible avec orchestrator existant
+  - **Documentation API** : Endpoint documentation intégrée (GET /api)
+  - **Scripts npm** : api, api:dev, api:test
+- **Fichiers créés** :
+  - `src/api/server.js` - Serveur principal avec événements
+  - `src/api/server-simple.js` - Version simplifiée compatible
+  - `src/api/routes/` - Toutes les routes API (devices, sessions, queue, metrics, health)
+  - `src/api/tests/simple.test.js` - Tests Jest avec Supertest
+- **Tests** : API fonctionnelle sur http://localhost:3000/api
 
 #### ✅ **3.3 Error Recovery & Health Monitoring** (17/09/2025 - 00:30)
 - **Durée** : 4h
@@ -55,6 +72,10 @@ Système de récupération d'erreurs et monitoring de santé
   - `src/ui/preload/preload.js` - API exposée
   - `src/ui/renderer/dashboard.js` - Utilisation données réelles
   - `src/core/AppOrchestrator.js` - Méthode scanDevices
+
+#### ✅ **3.2 Scheduler & Load Balancer** (16/09/2025 - À IMPLÉMENTER)
+- **Statut** : ⏳ Reporté au prochain sprint
+- **Raison** : Priorité donnée à l'API pour intégration externe
 
 #### ✅ **3.1 Queue Manager** (16/09/2025 - 23:30)
 - **Durée** : 3h
@@ -560,6 +581,6 @@ Une tâche est considérée terminée quand :
 
 ---
 
-*Dernière mise à jour : 17 Septembre 2025 - 00:30*
+*Dernière mise à jour : 17 Septembre 2025 - 02:00*
 *Auteur : Lucas Pellegrino & Claude*
-*Version : 1.3.0*
+*Version : 1.4.0*

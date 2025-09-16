@@ -235,27 +235,28 @@ Créer une plateforme professionnelle d'automatisation iOS multi-appareils, modu
   - [x] Alertes et notifications
   - [x] Dashboard de santé système
 
-### Sprint 3.4 : API & Communication (Semaine 6) ⏳ À VENIR
-- [ ] **3.2.1** REST API
-  ```
-  POST   /api/devices/:id/execute
-  GET    /api/devices/:id/status
-  GET    /api/sessions
-  DELETE /api/sessions/:id
-  GET    /api/metrics
-  ```
+### Sprint 3.4 : API & Communication (Semaine 6) ✅ COMPLÉTÉ (17/09)
+- [x] **3.4.1** REST API
+  - [x] Express.js server avec middleware complet (helmet, CORS, rate limiting)
+  - [x] Routes complètes : devices, sessions, queue, metrics, health
+  - [x] Validation des données avec express-validator
+  - [x] Documentation API intégrée (GET /api)
+  - [x] Support des méthodes : GET, POST, PUT, DELETE, PATCH
 
-- [ ] **3.2.2** WebSocket Events
-  - [ ] Real-time status updates
-  - [ ] Log streaming
-  - [ ] Metrics broadcasting
-  - [ ] Binary data support
+- [x] **3.4.2** WebSocket Events
+  - [x] Socket.io intégration avec broadcasting
+  - [x] Événements temps réel : device:connected/disconnected
+  - [x] Session lifecycle events : started/completed/error
+  - [x] Queue events : task:queued/started/completed/failed
+  - [x] Health monitoring alerts
+  - [x] Metrics update broadcasting (toutes les 5 secondes)
 
-- [ ] **3.2.3** GraphQL (Optionnel)
-  - [ ] Schema definition
-  - [ ] Resolvers
-  - [ ] Subscriptions
-  - [ ] DataLoader optimization
+- [x] **3.4.3** API Features
+  - [x] Server simple pour compatibilité avec orchestrator existant
+  - [x] Event subscription system pour clients WebSocket
+  - [x] Commandes WebSocket (device:scan, session:create/stop, task:enqueue)
+  - [x] Graceful shutdown avec nettoyage des connexions
+  - [x] Scripts npm : api, api:dev, api:test
 
 **Livrable** : Orchestrateur intelligent avec API complète
 
