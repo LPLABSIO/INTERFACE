@@ -25,7 +25,8 @@ const wdaPort = process.env.WDA_PORT || 8100;
 console.log(`[BOT] Configuration des ports - Appium: ${appiumPort}, WDA: ${wdaPort}`);
 
 // ANCIENNE CONFIG - N'EST PLUS UTILISÉE (gardée pour référence)
-// const iphone8_opts = {
+/*
+const iphone8_opts = {
   hostname: "127.0.0.1", // Explicitement défini pour Appium 2
   port: appiumPort,
   path: "/wd/hub", // Correction pour Appium 2 avec /wd/hub
@@ -75,7 +76,9 @@ console.log(`[BOT] Configuration des ports - Appium: ${appiumPort}, WDA: ${wdaPo
     "appium:newCommandTimeout": 600, // Sets maximum timeout for new commands to 600 seconds
   },
 };
+*/
 
+/*
 const iphone12_opts = {
   hostname: "127.0.0.1",
   port: 4724,
@@ -120,8 +123,9 @@ const iphone12_opts = {
     "appium:newCommandTimeout": 600, // Sets maximum timeout for new commands to 600 seconds
   },
 };
+*/
 
-
+/*
 const iphone14_opts = {
   hostname: "127.0.0.1",
   port: 4725,
@@ -167,9 +171,9 @@ const iphone14_opts = {
     "appium:newCommandTimeout": 1200,
   },
 };
+*/
 
-
-
+/*
 const iphonex_opts = {
   hostname: "127.0.0.1",
   port: 1265,
@@ -190,7 +194,7 @@ const iphonex_opts = {
     "appium:usePrebuiltWDA": true,       // Utiliser WDA déjà installé
     "appium:skipWDAInstall": true,       // WDA déjà installé et actif
     "appium:showXcodeLog": true,
-    "appium:webDriverAgentUrl": "http://192.168.1.57:8100",  // URL directe de WDA sur l'iPhone
+    "appium:webDriverAgentUrl": "http://127.0.0.1:8100",  // URL directe de WDA sur localhost
     "appium:derivedDataPath": "/tmp/wda_derived",
     "appium:xcodeOrgId": "JLS2F99MK6",
     "appium:xcodeSigningId": "Apple Development",
@@ -222,7 +226,7 @@ const iphonex_opts = {
     "appium:newCommandTimeout": 600,
   },
 };
-
+*/
 
 const country_gb = "gb";
 const country_usa = "usa";
@@ -261,8 +265,8 @@ const generic_opts = {
     // Si WDA_URL est fourni, l'utiliser (WDA déjà lancé)
     ...(process.env.WDA_URL && {
       'appium:webDriverAgentUrl': process.env.WDA_URL,
-      'appium:usePrebuiltWDA': true,
-      'appium:skipWDAInstall': true,
+      'appium:usePrebuiltWDA': false,  // Forcer la reconstruction si nécessaire
+      'appium:skipWDAInstall': false,  // Permettre la réinstallation si nécessaire
     }),
 
     // Si pas de WDA_URL, laisser Appium le lancer

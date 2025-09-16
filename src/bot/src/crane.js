@@ -115,8 +115,10 @@ async function performCraneForApp(client, appName, city) {
         await findAndClickWithPolling(client, '-ios predicate string:name == "Delete"');
         log('Delete button clicked');
 
-        await client.execute('mobile: terminateApp', { bundleId: 'com.apple.Preferences' });
-        log('Preferences app terminated');
+        // Note: terminateApp sur Preferences peut fermer la session Appium sur certains iOS
+        // Plutôt retourner au home screen
+        await client.execute('mobile: pressButton', { name: 'home' });
+        log('Returned to home screen');
 
     } catch (uiError) {
         log(`Error during UI interaction (generic): ${uiError.message}`, uiError);

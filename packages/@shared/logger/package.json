@@ -1,0 +1,25 @@
+{
+  "name": "@shared/logger",
+  "version": "1.0.0",
+  "description": "Centralized logging system for automation platform",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "logger",
+    "logging",
+    "winston"
+  ],
+  "author": "Lucas Pellegrino",
+  "license": "MIT",
+  "dependencies": {
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0",
+    "chalk": "^4.1.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

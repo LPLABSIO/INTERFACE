@@ -59,36 +59,54 @@ Créer une plateforme professionnelle d'automatisation iOS multi-appareils, modu
 
 ---
 
+## 🚨 PRIORITÉS IMMÉDIATES (Avant multi-appareils)
+
+### Tests et Stabilisation (À faire maintenant)
+- [ ] **P.1** Tests avec 2-3 appareils connectés
+  - [ ] Vérifier que chaque appareil obtient son port unique
+  - [ ] Tester le lancement de sessions simultanées
+  - [ ] Valider l'isolation entre sessions
+
+- [ ] **P.2** Adaptation de bot.js pour multi-instances
+  - [ ] Vérifier la gestion des variables d'environnement
+  - [ ] Tester avec différents ports Appium (1265-1270)
+  - [ ] S'assurer que chaque instance a son propre WDA
+
+- [ ] **P.3** Documentation d'installation
+  - [ ] Guide pour installer WDA sur nouveaux iPhones
+  - [ ] Procédure de setup pour développeurs
+  - [ ] Troubleshooting commun
+
+- [ ] **P.4** Migration progressive du code
+  - [ ] Déplacer hinge.js vers @apps/hinge-bot
+  - [ ] Déplacer tinder.js vers @apps/tinder-bot
+  - [ ] Adapter les imports dans bot.js
+
 ## 📅 PHASE 2 : Core Infrastructure (Semaines 3-4)
 > **Objectif** : Construire les fondations techniques solides
 
-### Sprint 2.1 : Architecture Modulaire (Semaine 3)
-- [ ] **2.1.1** Setup Monorepo
-  - [ ] Configuration Lerna/Nx
-  - [ ] Structure des workspaces
-  - [ ] Scripts de build centralisés
-  - [ ] Configuration ESLint/Prettier globale
+### Sprint 2.1 : Architecture Modulaire (Semaine 3) ✅ COMPLÉTÉ (16/09)
+- [x] **2.1.1** Setup Monorepo
+  - [x] Configuration Lerna
+  - [x] Structure des workspaces
+  - [x] Scripts de build centralisés
+  - [x] Configuration packages
 
-- [ ] **2.1.2** Device Manager Module
+- [x] **2.1.2** Device Manager Module ✅
   ```javascript
   @shared/device-manager
   ├── src/
   │   ├── DeviceManager.js
-  │   ├── DeviceMonitor.js
-  │   ├── DeviceInfo.js
-  │   └── utils/
-  ├── tests/
+  │   ├── DeviceDiscovery.js
+  │   └── index.js
   └── package.json
   ```
 
-- [ ] **2.1.3** Logger Module
+- [x] **2.1.3** Logger Module ✅
   ```javascript
   @shared/logger
   ├── src/
-  │   ├── Logger.js
-  │   ├── LogAggregator.js
-  │   ├── formatters/
-  │   └── transports/
+  │   └── index.js (Winston + rotation)
   └── package.json
   ```
 

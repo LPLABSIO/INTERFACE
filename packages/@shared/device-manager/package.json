@@ -1,0 +1,26 @@
+{
+  "name": "@shared/device-manager",
+  "version": "1.0.0",
+  "description": "iOS device management for automation platform",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": [
+    "ios",
+    "device",
+    "automation",
+    "appium"
+  ],
+  "author": "Lucas Pellegrino",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.8",
+    "debug": "^4.3.7"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

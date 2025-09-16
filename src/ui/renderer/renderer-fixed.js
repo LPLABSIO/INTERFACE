@@ -159,10 +159,18 @@ function initializeIPC() {
         updateDeviceStatus(data.deviceId, data.status);
     });
 
+    // Recevoir les mises à jour de statut des services
+    window.electronAPI.onServiceStatusUpdate((data) => {
+        updateServiceStatus(data.service, data.status);
+    });
+
     // Recevoir les statistiques
     window.electronAPI.onStatsUpdate((data) => {
         updateStats(data);
     });
+
+    // Démarrer le système de vérification périodique des statuts
+    startStatusPolling();
 }
 
 // Fonctions pour la gestion des appareils
@@ -648,14 +656,135 @@ function switchTab(tabType) {
     }
 }
 
+// Variables pour le polling des statuts
+let statusPollingInterval = null;
+let servicesStatus = {
+    script: 'inactive',
+    appium: 'stopped',
+    wda: 'stopped'
+};
+
+// Fonction pour démarrer le polling des statuts
+function startStatusPolling() {
+    // Arrêter le polling existant s'il y en a un
+    if (statusPollingInterval) {
+        clearInterval(statusPollingInterval);
+    }
+
+    // Vérifier immédiatement au démarrage
+    checkServicesStatus();
+
+    // Puis vérifier toutes les 2 secondes
+    statusPollingInterval = setInterval(checkServicesStatus, 2000);
+}
+
+// Fonction pour arrêter le polling
+function stopStatusPolling() {
+    if (statusPollingInterval) {
+        clearInterval(statusPollingInterval);
+        statusPollingInterval = null;
+    }
+}
+
+// Fonction pour vérifier le statut des services
+async function checkServicesStatus() {
+    try {
+        // Vérifier le statut via l'API Electron
+        if (window.electronAPI && window.electronAPI.checkServicesStatus) {
+            const statuses = await window.electronAPI.checkServicesStatus();
+
+            // Mettre à jour uniquement si les statuts ont changé
+            if (statuses.script !== servicesStatus.script) {
+                servicesStatus.script = statuses.script;
+                updateServiceStatus('script', statuses.script);
+            }
+
+            if (statuses.appium !== servicesStatus.appium) {
+                servicesStatus.appium = statuses.appium;
+                updateServiceStatus('appium', statuses.appium);
+            }
+
+            if (statuses.wda !== servicesStatus.wda) {
+                servicesStatus.wda = statuses.wda;
+                updateServiceStatus('wda', statuses.wda);
+            }
+        }
+    } catch (error) {
+        console.error('Erreur lors de la vérification des statuts:', error);
+    }
+}
+
 // Fonctions pour les services
 function updateServiceStatus(service, status) {
-    const serviceCard = document.querySelector(`[data-service="${service}"]`);
-    if (serviceCard) {
-        const statusElement = serviceCard.querySelector('.service-status');
-        if (statusElement) {
-            statusElement.textContent = status;
-            statusElement.className = `service-status ${status}`;
+    // Mapper les services aux IDs corrects dans le HTML
+    const serviceIdMap = {
+        'script': 'script-status',
+        'appium': 'appium-status',
+        'wda': 'wda-status'
+    };
+
+    const elementId = serviceIdMap[service];
+    if (!elementId) return;
+
+    const statusElement = document.getElementById(elementId);
+    if (statusElement) {
+        // Mapper les statuts aux textes et classes appropriés
+        let displayText = '';
+        let badgeClass = 'badge-inactive';
+
+        switch (status) {
+            case 'running':
+                displayText = 'En cours';
+                badgeClass = 'badge-active';
+                break;
+            case 'starting':
+                displayText = 'Démarrage...';
+                badgeClass = 'badge-warning';
+                break;
+            case 'stopping':
+                displayText = 'Arrêt...';
+                badgeClass = 'badge-warning';
+                break;
+            case 'stopped':
+            case 'inactive':
+                displayText = service === 'script' ? 'Inactif' : 'Arrêté';
+                badgeClass = 'badge-inactive';
+                break;
+            case 'error':
+                displayText = 'Erreur';
+                badgeClass = 'badge-error';
+                break;
+            default:
+                displayText = status;
+                badgeClass = 'badge-inactive';
+        }
+
+        statusElement.textContent = displayText;
+        statusElement.className = `status-badge ${badgeClass}`;
+
+        // Mettre à jour les ports si nécessaire
+        if (service === 'appium') {
+            const portElement = document.getElementById('appium-port');
+            if (portElement && status === 'running' && appState.selectedDevices.size > 0) {
+                const firstDevice = appState.devices.get(Array.from(appState.selectedDevices)[0]);
+                if (firstDevice) {
+                    portElement.textContent = firstDevice.appiumPort || appState.settings.appiumBasePort;
+                }
+            } else if (portElement && status !== 'running') {
+                portElement.textContent = '-';
+            }
+        }
+
+        if (service === 'wda') {
+            const portElement = document.getElementById('wda-port');
+            if (portElement && status === 'running' && appState.selectedDevices.size > 0) {
+                const firstDevice = appState.devices.get(Array.from(appState.selectedDevices)[0]);
+                if (firstDevice) {
+                    portElement.textContent = firstDevice.wdaPort || appState.settings.wdaBasePort;
+                }
+            } else if (portElement && status !== 'running') {
+                portElement.textContent = '-';
+            }
         }
     }
 }

@@ -13,6 +13,8 @@ contextBridge.exposeInMainWorld('devices', {
   refresh: () => ipcRenderer.invoke('devices:refresh'),
 });
 
+// Supprimé - sera fusionné avec la définition existante plus bas
+
 contextBridge.exposeInMainWorld('appium', {
   start: (payload) => ipcRenderer.invoke('appium:start', payload),
   stop: () => ipcRenderer.invoke('appium:stop'),
@@ -63,7 +65,7 @@ contextBridge.exposeInMainWorld('state', {
 contextBridge.exposeInMainWorld('electronAPI', {
     // Device management
     scanDevices: () => ipcRenderer.invoke('scan-devices'),
-    onDeviceUpdate: (callback) => ipcRenderer.on('device-update', (event, data) => callback(data)),
+    onDeviceUpdate: (callback) => ipcRenderer.on('device-update', (_event, data) => callback(data)),
 
     // Bot control
     startBot: (config) => ipcRenderer.invoke('start-bot', config),
@@ -74,6 +76,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     stopAppium: (config) => ipcRenderer.invoke('stop-appium', config),
     startWDA: (config) => ipcRenderer.invoke('start-wda', config),
     stopWDA: (config) => ipcRenderer.invoke('stop-wda', config),
+
+    // Status checking
+    checkServicesStatus: () => ipcRenderer.invoke('checkServicesStatus'),
+    onServiceStatusUpdate: (callback) => ipcRenderer.on('service-status-update', (_event, data) => callback(data)),
+    onStatusUpdate: (callback) => ipcRenderer.on('status-update', (_event, data) => callback(data)),
+    onStatsUpdate: (callback) => ipcRenderer.on('stats-update', (_event, data) => callback(data)),
 
     // Logs
     onScriptLog: (callback) => ipcRenderer.on('script-log', (event, data) => callback(data)),

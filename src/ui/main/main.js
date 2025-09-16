@@ -232,6 +232,32 @@ ipcMain.handle('devices:refresh', () => {
   return { devices };
 });
 
+// Fonction pour vérifier le statut des services
+ipcMain.handle('checkServicesStatus', () => {
+  const statuses = {
+    script: 'inactive',
+    appium: 'stopped',
+    wda: 'stopped'
+  };
+
+  // Vérifier si le processus enfant du bot est en cours
+  if (scriptChild && !scriptChild.killed) {
+    statuses.script = 'running';
+  }
+
+  // Vérifier si Appium est en cours
+  if (appiumChild && !appiumChild.killed) {
+    statuses.appium = 'running';
+  }
+
+  // Vérifier si une session WDA est active
+  if (currentSessionId) {
+    statuses.wda = 'running';
+  }
+
+  return statuses;
+});
+
 function waitForAppiumReady() {
   return new Promise((resolve) => {
     let resolved = false;
@@ -278,7 +304,7 @@ function extractCreateSessionPayloadFromLogs(logPath) {
 async function createSessionToLaunchWDA({ serverUrl, udid }) {
   // Crée une session minimale sans lire de fichier log
   const cfg = readDataJson() || {};
-  const wdaLocalPort = Number(cfg.baseWdaPort || 8205);
+  const wdaLocalPort = Number(cfg.baseWdaPort || 8100);
   const payload = {
     capabilities: {
       alwaysMatch: {
@@ -818,7 +844,7 @@ ipcMain.handle('start-bot', async (_e, config) => {
       APPIUM_BASEPATH: '/wd/hub',
       APPIUM_UDID: udid,
       WDA_PORT: String(discoveredWdaPort),
-      WDA_URL: wdaUrl,
+      // WDA_URL: wdaUrl,  // Commenté pour laisser Appium gérer WDA
       BOT_ACCOUNTS: String(accountsNumber || 1),
       PROXY_PROVIDER: proxyProvider || 'marsproxies',
       NODE_NO_WARNINGS: '1',

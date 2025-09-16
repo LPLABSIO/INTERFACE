@@ -10,14 +10,24 @@
     "dev": "electron src/ui/main/main.js --dev",
     "build:mac": "electron-builder --mac --config config/build/electron-builder.yml",
     "build:win": "electron-builder --win --config config/build/electron-builder.yml",
-    "test": "echo \"Tests à implémenter\"",
+    "test": "lerna run test",
     "clean": "rm -rf dist build node_modules",
     "clean:old": "rm -rf AppiumUI electron",
     "lint": "eslint src/",
     "format": "prettier --write \"src/**/*.{js,json,css,html}\"",
     "setup": "npm install && node scripts/setup.js",
-    "appium": "sh scripts/start_appium.sh"
+    "appium": "sh scripts/start_appium.sh",
+    "bootstrap": "lerna bootstrap",
+    "packages:install": "lerna bootstrap --hoist",
+    "packages:build": "lerna run build",
+    "packages:test": "lerna run test",
+    "packages:publish": "lerna publish"
   },
+  "workspaces": [
+    "packages/@shared/*",
+    "packages/@apps/*",
+    "packages/@ui/*"
+  ],
   "keywords": [
     "ios",
     "automation",
@@ -50,6 +60,7 @@
   "devDependencies": {
     "electron-builder": "^24.13.3",
     "eslint": "^8.50.0",
+    "lerna": "^8.2.4",
     "prettier": "^3.0.3"
   },
   "build": {
