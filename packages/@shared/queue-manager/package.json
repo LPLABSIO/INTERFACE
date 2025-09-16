@@ -1,0 +1,16 @@
+{
+  "name": "@shared/queue-manager",
+  "version": "1.0.0",
+  "description": "Queue management system for task orchestration",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {
+    "uuid": "^9.0.0",
+    "eventemitter3": "^5.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0"
+  }
+}

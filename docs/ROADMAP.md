@@ -181,29 +181,61 @@ Créer une plateforme professionnelle d'automatisation iOS multi-appareils, modu
 
 ---
 
-## 📅 PHASE 3 : Orchestration Engine (Semaines 5-6)
+## 📅 PHASE 3 : Orchestration Engine (Semaines 5-6) 🚧 EN COURS
 > **Objectif** : Créer le cerveau de la plateforme
 
-### Sprint 3.1 : Orchestrator Core (Semaine 5)
-- [ ] **3.1.1** Task Queue System
-  - [ ] Implémentation avec Bull/BullMQ
-  - [ ] Priorités et scheduling
-  - [ ] Retry avec backoff
-  - [ ] Dead letter queue
+### Sprint 3.1 : Queue Manager (Semaine 5) ✅ COMPLÉTÉ (16/09)
+- [x] **3.1.1** Task Queue System
+  - [x] Implémentation custom (sans Bull/BullMQ)
+  - [x] 4 niveaux de priorité (CRITICAL, HIGH, NORMAL, LOW)
+  - [x] Retry avec limite configurable (3 par défaut)
+  - [x] Dead letter queue pour échecs permanents
 
-- [ ] **3.1.2** Workflow Engine
+- [x] **3.1.2** Queue Manager
+  - [x] Distribution automatique des tâches
+  - [x] Stratégies d'allocation (round-robin, least-loaded, fastest, random)
+  - [x] Scheduling de tâches futures
+  - [x] Monitoring temps réel avec EventEmitter
+
+- [x] **3.1.3** Intégration Orchestrator
+  - [x] Enregistrement automatique des appareils
+  - [x] Pipeline d'exécution des tâches
+  - [x] Gestion des timeouts
+  - [x] Statistiques détaillées
+
+### Sprint 3.2 : Scheduler & Load Balancer (Semaine 5-6) ⏳ À VENIR
+- [ ] **3.2.1** Task Scheduler Avancé
+  - [ ] Cron-like scheduling
+  - [ ] Recurring tasks
+  - [ ] Task dependencies
+  - [ ] Conditional execution
+
+- [ ] **3.2.2** Load Balancer Intelligent
+  - [ ] Métriques de performance par appareil
+  - [ ] Distribution basée sur la charge CPU/RAM
+  - [ ] Prédiction de temps d'exécution
+  - [ ] Auto-scaling virtuel
+
+- [ ] **3.2.3** Workflow Engine
   - [ ] Définition des workflows en YAML/JSON
   - [ ] Étapes conditionnelles
   - [ ] Parallel/Sequential execution
   - [ ] Rollback capabilities
 
-- [ ] **3.1.3** Resource Pool
-  - [ ] Pool de devices disponibles
-  - [ ] Allocation optimale
-  - [ ] Load balancing
-  - [ ] Resource locking
+### Sprint 3.3 : Error Recovery & Monitoring (Semaine 6) ⏳ À VENIR
+- [ ] **3.3.1** Système de Récupération
+  - [ ] Checkpointing des tâches
+  - [ ] Reprise après crash
+  - [ ] Sauvegarde d'état distribué
+  - [ ] Rollback automatique
 
-### Sprint 3.2 : API & Communication (Semaine 6)
+- [ ] **3.3.2** Health Monitoring
+  - [ ] Heartbeat des appareils
+  - [ ] Détection automatique des pannes
+  - [ ] Alertes et notifications
+  - [ ] Dashboard de santé système
+
+### Sprint 3.4 : API & Communication (Semaine 6) ⏳ À VENIR
 - [ ] **3.2.1** REST API
   ```
   POST   /api/devices/:id/execute

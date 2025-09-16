@@ -150,6 +150,32 @@ function initializeEventListeners() {
         });
     });
 
+    // Navigation buttons - Check if they exist before adding listeners
+    try {
+        const dashboardBtn = document.getElementById('dashboard-btn');
+        if (dashboardBtn) {
+            dashboardBtn.addEventListener('click', () => {
+                window.location.href = 'dashboard.html';
+            });
+        }
+
+        const analyticsBtn = document.getElementById('analytics-btn');
+        if (analyticsBtn) {
+            analyticsBtn.addEventListener('click', () => {
+                window.location.href = 'analytics.html';
+            });
+        }
+
+        const queueBtn = document.getElementById('queue-btn');
+        if (queueBtn) {
+            queueBtn.addEventListener('click', () => {
+                window.location.href = 'queue-manager.html';
+            });
+        }
+    } catch (navError) {
+        console.warn('Navigation buttons setup error:', navError);
+    }
+
     // Modal backdrop click
     const settingsModal = document.getElementById('settings-modal');
     if (settingsModal) {

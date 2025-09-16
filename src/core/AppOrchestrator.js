@@ -1,6 +1,7 @@
 const { SessionManager, SessionState } = require('@shared/session-manager');
 const ProcessManager = require('@shared/process-manager');
 const StateManager = require('@shared/state-manager');
+const { QueueManager, TaskPriority } = require('@shared/queue-manager');
 const deviceDiscovery = require('../utils/device-discovery');
 const path = require('path');
 
@@ -30,6 +31,13 @@ class AppOrchestrator {
       maxHistorySize: 50
     });
 
+    this.queueManager = new QueueManager({
+      maxConcurrentTasks: options.maxConcurrentTasks || 5,
+      taskTimeout: options.taskTimeout || 300000,
+      allocationStrategy: options.allocationStrategy || 'round-robin',
+      enableDeadLetterQueue: true
+    });
+
     // Utiliser directement deviceDiscovery pour le moment
     this.deviceManager = deviceDiscovery;
 
@@ -55,10 +63,14 @@ class AppOrchestrator {
       // Initialiser les managers
       await this.sessionManager.initialize();
       await this.stateManager.initialize();
+      await this.queueManager.initialize();
       // deviceDiscovery n'a pas de méthode initialize
 
       // Scanner les appareils
       await this.scanDevices();
+
+      // Register devices with queue manager
+      await this.registerDevicesWithQueue();
 
       this.isInitialized = true;
 
@@ -114,6 +126,21 @@ class AppOrchestrator {
       const process = this.stateManager.get(`processes.${id}`) || {};
       process.metrics = metrics;
       this.stateManager.set(`processes.${id}`, process);
+    });
+
+    // QueueManager events
+    this.queueManager.on('task:execute', async ({ task, device }) => {
+      await this.executeTask(task, device);
+    });
+
+    this.queueManager.on('task:completed', ({ task, result }) => {
+      this.stateManager.set(`tasks.completed.${task.id}`, { task, result, completedAt: new Date() });
+      this.broadcastEvent('task:completed', { task, result });
+    });
+
+    this.queueManager.on('task:failed', ({ task, error }) => {
+      this.stateManager.set(`tasks.failed.${task.id}`, { task, error, failedAt: new Date() });
+      this.broadcastEvent('task:failed', { task, error });
     });
 
     // DeviceManager events - Commented out as deviceDiscovery is not an EventEmitter
@@ -349,6 +376,132 @@ class AppOrchestrator {
   }
 
   /**
+   * Enqueue a task
+   * @param {Object} taskData - Task data
+   * @param {Object} options - Task options
+   * @returns {Object} Created task
+   */
+  enqueueTask(taskData, options = {}) {
+    return this.queueManager.submitTask(taskData, options);
+  }
+
+  /**
+   * Schedule a task for future execution
+   * @param {Object} taskData - Task data
+   * @param {Date|number} when - When to execute
+   * @param {Object} options - Task options
+   * @returns {string} Scheduler ID
+   */
+  scheduleTask(taskData, when, options = {}) {
+    return this.queueManager.scheduleTask(taskData, when, options);
+  }
+
+  /**
+   * Execute a task (called by queue manager)
+   * @param {Object} task - Task to execute
+   * @param {Object} device - Device to execute on
+   */
+  async executeTask(task, device) {
+    try {
+      // Notify task started
+      this.queueManager.startTask(task.id);
+
+      // Create session for task
+      const session = await this.sessionManager.createSession(device.id, {
+        taskId: task.id,
+        ...task.data.config
+      });
+
+      // Start process based on task type
+      const processId = `task-${task.id}`;
+
+      if (task.data.type === 'bot') {
+        // Launch bot process
+        await this.processManager.spawnProcess(
+          processId,
+          'node',
+          [
+            path.join(process.cwd(), 'src', 'bot', 'bot.js'),
+            device.name || device.id,
+            task.data.app || 'hinge',
+            task.data.accountsNumber || '1',
+            task.data.proxyProvider || 'marsproxies'
+          ],
+          {
+            env: {
+              ...process.env,
+              DEVICE_UDID: device.id,
+              SESSION_ID: session.id,
+              TASK_ID: task.id,
+              APPIUM_PORT: device.appiumPort || '1265',
+              WDA_PORT: device.wdaPort || '8100'
+            },
+            cwd: process.cwd()
+          }
+        );
+      } else if (task.data.type === 'test') {
+        // Launch test process
+        await this.processManager.spawnProcess(
+          processId,
+          'npm',
+          ['test', '--', task.data.testFile],
+          {
+            env: {
+              ...process.env,
+              DEVICE_UDID: device.id,
+              SESSION_ID: session.id,
+              TASK_ID: task.id
+            },
+            cwd: process.cwd()
+          }
+        );
+      }
+
+      // Monitor process completion
+      this.processManager.once(`process:exit:${processId}`, async ({ code }) => {
+        if (code === 0) {
+          await this.sessionManager.completeSession(session.id);
+          this.queueManager.completeTask(task.id, { sessionId: session.id, exitCode: code });
+        } else {
+          await this.sessionManager.failSession(session.id, new Error(`Process exited with code ${code}`));
+          this.queueManager.failTask(task.id, new Error(`Process exited with code ${code}`));
+        }
+      });
+
+      // Start session
+      await this.sessionManager.startSession(session.id);
+
+    } catch (error) {
+      console.error(`[AppOrchestrator] Failed to execute task ${task.id}:`, error);
+      this.queueManager.failTask(task.id, error);
+    }
+  }
+
+  /**
+   * Register devices with queue manager
+   */
+  async registerDevicesWithQueue() {
+    const devices = await this.scanDevices();
+
+    for (const device of devices) {
+      this.queueManager.registerDevice({
+        id: device.udid,
+        name: device.name,
+        capabilities: ['ios', 'automation'],
+        maxConcurrentTasks: 1
+      });
+    }
+  }
+
+  /**
+   * Get queue statistics
+   * @returns {Object} Queue statistics
+   */
+  getQueueStats() {
+    return this.queueManager.getStats();
+  }
+
+  /**
    * Nettoyer les anciennes sessions
    */
   async cleanup(daysToKeep = 7) {
@@ -370,6 +523,7 @@ class AppOrchestrator {
     // Arrêter les managers
     await this.sessionManager.shutdown();
     await this.processManager.shutdown();
+    await this.queueManager.shutdown();
     await this.stateManager.shutdown();
 
     this.isInitialized = false;

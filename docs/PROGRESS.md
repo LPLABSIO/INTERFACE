@@ -5,22 +5,55 @@
 | Phase | Progression | Status | Dernière MAJ |
 |-------|------------|--------|--------------|
 | **PHASE 1** : Foundation | ██████████ 100% | ✅ Complété | 15/09/2025 |
-| **PHASE 2** : Core Infrastructure | █████████░ 90% | 🟡 En cours | 16/09/2025 |
-| **PHASE 3** : Orchestration Engine | ░░░░░░░░░░ 0% | ⏳ À venir | - |
+| **PHASE 2** : Core Infrastructure | ██████████ 100% | ✅ Complété | 16/09/2025 |
+| **PHASE 3** : Orchestration Engine | ██░░░░░░░░ 20% | 🟡 En cours | 16/09/2025 |
 | **PHASE 4** : Project System | ░░░░░░░░░░ 0% | ⏳ À venir | - |
 | **PHASE 5** : Production Ready | ░░░░░░░░░░ 0% | ⏳ À venir | - |
 | **PHASE 6** : Advanced Features | ░░░░░░░░░░ 0% | ⏳ À venir | - |
 
-**Progression Globale** : █████░░░░░ **50%**
+**Progression Globale** : ██████░░░░ **60%**
 
 ---
 
-## 🚀 Sprint Actuel : Sprint 2.3 (Semaine 4-5)
+## 🚀 Sprint Actuel : Sprint 3.1 (Semaine 5-6)
 
 ### Objectif
-Amélioration de l'expérience utilisateur et fonctionnalités avancées
+Système d'orchestration avancé avec gestion de files d'attente
 
 ### Tâches Complétées (16/09/2025 - Suite)
+
+#### ✅ **Intégration Dashboard-Orchestrator** (16/09/2025 - 22:00)
+- **Durée** : 2h
+- **Description** : Connexion complète entre le Dashboard et l'Orchestrator
+- **Détails techniques** :
+  - IPC handlers pour communication Dashboard ↔ Orchestrator
+  - Sérialisation des objets complexes pour transmission
+  - Détection automatique des appareils iOS
+  - Fallback mode démo quand electronAPI indisponible
+  - Correction des problèmes de timer et destruction d'objets
+- **Fichiers modifiés** :
+  - `src/ui/main/orchestrator-handlers.js` - Handlers IPC
+  - `src/ui/preload/preload.js` - API exposée
+  - `src/ui/renderer/dashboard.js` - Utilisation données réelles
+  - `src/core/AppOrchestrator.js` - Méthode scanDevices
+
+#### ✅ **3.1 Queue Manager** (16/09/2025 - 23:30)
+- **Durée** : 3h
+- **Description** : Système complet de gestion de files d'attente avec priorités
+- **Détails techniques** :
+  - **TaskQueue** : File avec 4 niveaux de priorité (CRITICAL, HIGH, NORMAL, LOW)
+  - **QueueManager** : Orchestration et distribution des tâches
+  - **Stratégies d'allocation** : round-robin, least-loaded, fastest, random
+  - **Retry automatique** : 3 tentatives par défaut
+  - **Dead Letter Queue** : Pour les tâches définitivement échouées
+  - **Scheduling** : Planification de tâches futures
+  - **Monitoring** : Events temps réel et statistiques
+- **Fichiers créés** :
+  - `packages/@shared/queue-manager/` - Module complet
+  - `test-queue.js` - Script de test
+- **Tests** : Queue Manager testé avec succès, détection appareil OK
+
+### Tâches Complétées (16/09/2025)
 
 #### ✅ **2.2.1** - Session Manager
 - **Durée** : 4h
@@ -212,14 +245,22 @@ Amélioration de l'expérience utilisateur et fonctionnalités avancées
 
 | Métrique | Valeur | Objectif | Status |
 |----------|--------|----------|--------|
-| Tâches complétées | 5 | 8 | 🟡 |
+| Tâches complétées | 10 | 8 | ✅ |
 | Code coverage | N/A | 80% | ⏳ |
-| Bugs trouvés | 0 | < 5 | ✅ |
+| Bugs trouvés | 4 | < 5 | ✅ |
 | Performance UI | < 100ms | < 100ms | ✅ |
 
 ---
 
 ## 📅 Historique Détaillé
+
+### 16 Septembre 2025
+
+#### 🎯 **Milestone** : Phase 3 Démarrée - Queue Manager Opérationnel
+- **Heure** : 23:30
+- **Impact** : Système de gestion de files d'attente avec priorités
+- **Capacités** : Distribution automatique sur multiple appareils
+- **Prochaines étapes** : Scheduler et Load Balancer
 
 ### 14 Septembre 2024
 
@@ -284,44 +325,58 @@ device.wdaPort = state.settings.wdaBasePort + index;
 ### Lignes de Code
 | Langage | Lignes | Fichiers |
 |---------|--------|----------|
-| JavaScript | 1,500+ | 3 |
-| CSS | 900+ | 1 |
-| HTML | 250+ | 1 |
-| Markdown | 1,200+ | 6 |
-| **Total** | **3,850+** | **11** |
+| JavaScript | 5,500+ | 25+ |
+| CSS | 1,200+ | 2 |
+| HTML | 400+ | 3 |
+| Markdown | 1,500+ | 7 |
+| **Total** | **8,600+** | **37+** |
 
 ### Temps Investi
 | Activité | Heures | Pourcentage |
 |----------|--------|-------------|
-| Développement UI | 6h | 50% |
-| Architecture | 3h | 25% |
-| Documentation | 2h | 17% |
-| Configuration | 1h | 8% |
-| **Total** | **12h** | **100%** |
+| Développement UI | 12h | 40% |
+| Backend/Services | 10h | 33% |
+| Architecture | 5h | 17% |
+| Documentation | 3h | 10% |
+| **Total** | **30h** | **100%** |
 
 ### Commits Git
-- Total commits : 8
-- Lignes ajoutées : 4,000+
-- Lignes supprimées : 50
-- Fichiers modifiés : 11
+- Total commits : 25+
+- Lignes ajoutées : 9,000+
+- Lignes supprimées : 500+
+- Fichiers modifiés : 40+
 
 ---
 
 ## 🎯 Prochaines Étapes Immédiates
 
-### Sprint 1.1 - Reste à faire (Priorité Haute)
+### Sprint 3.2 - Scheduler (Priorité Haute)
 
-#### 🔲 **1.1.2** - Détection robuste des appareils
-- [ ] Améliorer `listIosDevices()`
-- [ ] Ajouter détection modèle/version iOS
-- [ ] Gestion connexions/déconnexions à chaud
-- [ ] Tests avec vrais appareils
+#### 🔲 **3.2.1** - Task Scheduler avancé
+- [ ] Cron-like scheduling
+- [ ] Recurring tasks
+- [ ] Task dependencies
+- [ ] Conditional execution
 
-#### 🔲 **1.1.3** - Système de logs structurés
-- [ ] Implémenter Winston backend
-- [ ] Rotation automatique des logs
-- [ ] Persistance sur disque
-- [ ] Filtres avancés
+#### 🔲 **3.2.2** - Load Balancer
+- [ ] Métriques de performance par appareil
+- [ ] Distribution intelligente basée sur la charge
+- [ ] Prédiction de temps d'exécution
+- [ ] Auto-scaling virtuel
+
+### Sprint 3.3 - Error Recovery (Priorité Moyenne)
+
+#### 🔲 **3.3.1** - Système de récupération d'erreur
+- [ ] Checkpointing des tâches
+- [ ] Reprise après crash
+- [ ] Sauvegarde d'état distribué
+- [ ] Rollback automatique
+
+#### 🔲 **3.3.2** - Health Monitoring
+- [ ] Heartbeat des appareils
+- [ ] Détection automatique des pannes
+- [ ] Alertes et notifications
+- [ ] Dashboard de santé système
 
 ### Semaine Prochaine (Priorité Moyenne)
 
@@ -424,6 +479,6 @@ Une tâche est considérée terminée quand :
 
 ---
 
-*Dernière mise à jour : 16 Septembre 2025 - 20:30*
+*Dernière mise à jour : 16 Septembre 2025 - 23:45*
 *Auteur : Lucas Pellegrino & Claude*
-*Version : 0.4.0-alpha*
+*Version : 0.5.0-alpha*

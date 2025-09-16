@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue Manager - Gestion des Tâches</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .queue-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            height: calc(100vh - 80px);
+        }
+
+        .queue-panel {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .queue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .queue-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .task-creator {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .priority-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .priority-btn {
+            padding: 8px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .priority-btn.selected {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .priority-btn.critical { color: #ef4444; }
+        .priority-btn.high { color: #f97316; }
+        .priority-btn.normal { color: #3b82f6; }
+        .priority-btn.low { color: #6b7280; }
+
+        .queue-list {
+            height: calc(100vh - 280px);
+            overflow-y: auto;
+        }
+
+        .task-item {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+
+        .task-item.critical { border-left-color: #ef4444; }
+        .task-item.high { border-left-color: #f97316; }
+        .task-item.normal { border-left-color: #3b82f6; }
+        .task-item.low { border-left-color: #6b7280; }
+
+        .task-item.running {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-id {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-family: 'Courier New', monospace;
+        }
+
+        .task-type {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 5px 0;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .task-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .task-btn.cancel {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .task-btn.retry {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .device-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .device-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .device-checkbox:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .device-checkbox input {
+            margin-right: 10px;
+        }
+
+        .device-checkbox.selected {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid var(--primary-color);
+        }
+
+        .batch-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .batch-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .create-batch-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .create-batch-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">
+                    <span class="logo">📋</span>
+                    Queue Manager
+                </h1>
+                <div class="header-actions">
+                    <button id="refresh-queue" class="btn btn-primary">
+                        <span class="icon">🔄</span>
+                        Rafraîchir
+                    </button>
+                    <button id="clear-completed" class="btn btn-secondary">
+                        <span class="icon">🧹</span>
+                        Nettoyer terminées
+                    </button>
+                    <button id="back-btn" class="btn btn-secondary">
+                        <span class="icon">⬅️</span>
+                        Retour
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="queue-container">
+            <!-- Left Panel - Task Creation -->
+            <div class="queue-panel">
+                <div class="queue-header">
+                    <h2 class="queue-title">Créer des Tâches</h2>
+                </div>
+
+                <div class="task-creator">
+                    <!-- Task Type -->
+                    <div class="input-group">
+                        <label>Type de tâche</label>
+                        <select id="task-type">
+                            <option value="bot">Bot Automation</option>
+                            <option value="test">Test</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                    </div>
+
+                    <!-- App Selection -->
+                    <div class="input-group">
+                        <label>Application</label>
+                        <select id="task-app">
+                            <option value="hinge">Hinge</option>
+                            <option value="tinder">Tinder</option>
+                            <option value="bumble">Bumble</option>
+                            <option value="pof">POF</option>
+                        </select>
+                    </div>
+
+                    <!-- Priority Selection -->
+                    <div class="input-group">
+                        <label>Priorité</label>
+                        <div class="priority-selector">
+                            <button class="priority-btn critical" data-priority="4">🔴 Critique</button>
+                            <button class="priority-btn high" data-priority="3">🟠 Élevée</button>
+                            <button class="priority-btn normal selected" data-priority="2">🔵 Normale</button>
+                            <button class="priority-btn low" data-priority="1">⚫ Faible</button>
+                        </div>
+                    </div>
+
+                    <!-- Device Selection -->
+                    <div class="input-group">
+                        <label>Appareils cibles</label>
+                        <div id="device-selector" class="device-selector">
+                            <!-- Devices will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Batch Creation -->
+                    <div class="input-group">
+                        <label>Création par lot</label>
+                        <div class="batch-controls">
+                            <input type="number" id="batch-count" class="batch-input" placeholder="Nombre de comptes" min="1" max="100" value="10">
+                            <button id="create-batch" class="create-batch-btn">
+                                Créer 10 tâches
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Single Task Creation -->
+                    <button id="create-task" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                        ➕ Créer une tâche
+                    </button>
+                </div>
+            </div>
+
+            <!-- Center Panel - Queue List -->
+            <div class="queue-panel">
+                <div class="queue-header">
+                    <h2 class="queue-title">File d'attente</h2>
+                    <span id="queue-count" class="badge">0 tâches</span>
+                </div>
+
+                <div class="queue-list" id="queue-list">
+                    <!-- Tasks will be displayed here -->
+                </div>
+            </div>
+
+            <!-- Right Panel - Statistics -->
+            <div class="queue-panel">
+                <div class="queue-header">
+                    <h2 class="queue-title">Statistiques</h2>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-pending">0</div>
+                        <div class="stat-label">En attente</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-running">0</div>
+                        <div class="stat-label">En cours</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-completed">0</div>
+                        <div class="stat-label">Terminées</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-failed">0</div>
+                        <div class="stat-label">Échouées</div>
+                    </div>
+                </div>
+
+                <div class="queue-header" style="margin-top: 30px;">
+                    <h3 class="queue-title">Utilisation Appareils</h3>
+                </div>
+
+                <div id="device-usage" style="margin-top: 15px;">
+                    <!-- Device usage will be displayed here -->
+                </div>
+
+                <div class="queue-header" style="margin-top: 30px;">
+                    <h3 class="queue-title">Performance</h3>
+                </div>
+
+                <div class="stats-grid" style="margin-top: 15px;">
+                    <div class="stat-card">
+                        <div class="stat-value" id="avg-wait-time">0s</div>
+                        <div class="stat-label">Temps attente moy.</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avg-exec-time">0s</div>
+                        <div class="stat-label">Temps exec. moy.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="queue-manager.js"></script>
+</body>
+</html>

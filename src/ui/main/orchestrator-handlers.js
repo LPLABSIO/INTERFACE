@@ -167,6 +167,68 @@ function setupOrchestratorHandlers(orchestrator, mainWindow) {
     return { success: true };
   });
 
+  // Queue Manager handlers
+  ipcMain.handle('orchestrator:enqueueTask', async (_e, { taskData, options }) => {
+    if (!orchestrator) {
+      return { success: false, error: 'Orchestrator not initialized' };
+    }
+
+    try {
+      const task = orchestrator.enqueueTask(taskData, options);
+      return { success: true, task };
+    } catch (error) {
+      console.error('[Orchestrator] Failed to enqueue task:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('orchestrator:getQueueStats', async () => {
+    if (!orchestrator) {
+      return null;
+    }
+
+    try {
+      const stats = orchestrator.getQueueStats();
+      // Get all tasks from the queue
+      const tasks = [
+        ...orchestrator.queueManager.taskQueue.getTasks({ state: 'pending' }),
+        ...orchestrator.queueManager.taskQueue.getTasks({ state: 'running' }),
+        ...orchestrator.queueManager.taskQueue.getTasks({ state: 'completed' }).slice(-10), // Last 10 completed
+        ...orchestrator.queueManager.taskQueue.getTasks({ state: 'failed' }).slice(-5) // Last 5 failed
+      ];
+      return { ...stats, tasks };
+    } catch (error) {
+      console.error('[Orchestrator] Failed to get queue stats:', error);
+      return null;
+    }
+  });
+
+  ipcMain.handle('orchestrator:cancelTask', async (_e, taskId) => {
+    if (!orchestrator) {
+      return { success: false, error: 'Orchestrator not initialized' };
+    }
+
+    try {
+      orchestrator.queueManager.taskQueue.cancel(taskId);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('orchestrator:clearCompleted', async () => {
+    if (!orchestrator) {
+      return { success: false, error: 'Orchestrator not initialized' };
+    }
+
+    try {
+      orchestrator.queueManager.taskQueue.clear({ state: 'completed' });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
   // Configurer un intervalle pour envoyer les mises à jour de statut
   const updateInterval = setInterval(() => {
     if (orchestrator && mainWindow && !mainWindow.isDestroyed()) {
