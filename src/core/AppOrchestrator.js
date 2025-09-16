@@ -2,6 +2,8 @@ const { SessionManager, SessionState } = require('@shared/session-manager');
 const ProcessManager = require('@shared/process-manager');
 const StateManager = require('@shared/state-manager');
 const { QueueManager, TaskPriority } = require('@shared/queue-manager');
+const ErrorRecovery = require('@shared/error-recovery/src/ErrorRecovery');
+const HealthMonitor = require('@shared/error-recovery/src/HealthMonitor');
 const deviceDiscovery = require('../utils/device-discovery');
 const path = require('path');
 
@@ -38,6 +40,18 @@ class AppOrchestrator {
       enableDeadLetterQueue: true
     });
 
+    this.errorRecovery = new ErrorRecovery({
+      checkpointDir: options.checkpointDir || path.join(process.cwd(), 'data', 'checkpoints'),
+      maxCheckpoints: options.maxCheckpoints || 10,
+      autoCleanup: true
+    });
+
+    this.healthMonitor = new HealthMonitor({
+      checkInterval: options.healthCheckInterval || 30000,
+      cpuThreshold: 80,
+      memoryThreshold: 90
+    });
+
     // Utiliser directement deviceDiscovery pour le moment
     this.deviceManager = deviceDiscovery;
 
@@ -64,6 +78,7 @@ class AppOrchestrator {
       await this.sessionManager.initialize();
       await this.stateManager.initialize();
       await this.queueManager.initialize();
+      await this.errorRecovery.initialize();
       // deviceDiscovery n'a pas de méthode initialize
 
       // Scanner les appareils
@@ -138,9 +153,52 @@ class AppOrchestrator {
       this.broadcastEvent('task:completed', { task, result });
     });
 
-    this.queueManager.on('task:failed', ({ task, error }) => {
+    this.queueManager.on('task:failed', async ({ task, error }) => {
       this.stateManager.set(`tasks.failed.${task.id}`, { task, error, failedAt: new Date() });
       this.broadcastEvent('task:failed', { task, error });
+
+      // Attempt error recovery
+      const recovery = await this.errorRecovery.handleError(task, error);
+      if (recovery && recovery.success) {
+        if (recovery.action === 'retry') {
+          // Re-enqueue task for retry
+          this.enqueueTask(task.data, { priority: task.priority, metadata: { ...task.metadata, retry: true } });
+        } else if (recovery.action === 'rollback' && recovery.checkpoint) {
+          // Restore checkpoint state
+          const restored = await this.errorRecovery.restoreCheckpoint(recovery.checkpoint.id);
+          this.broadcastEvent('task:restored', { task, checkpoint: recovery.checkpoint });
+        }
+      }
+    });
+
+    // ErrorRecovery events
+    this.errorRecovery.on('checkpoint:created', ({ taskId, checkpointId }) => {
+      this.stateManager.set(`checkpoints.${taskId}.${checkpointId}`, { createdAt: new Date() });
+      this.broadcastEvent('checkpoint:created', { taskId, checkpointId });
+    });
+
+    this.errorRecovery.on('recovery:success', (data) => {
+      this.broadcastEvent('recovery:success', data);
+    });
+
+    this.errorRecovery.on('recovery:failed', (data) => {
+      this.broadcastEvent('recovery:failed', data);
+    });
+
+    // HealthMonitor events
+    this.healthMonitor.on('component:unhealthy', (component) => {
+      this.stateManager.set(`health.unhealthy.${component.id}`, component);
+      this.broadcastEvent('component:unhealthy', component);
+    });
+
+    this.healthMonitor.on('component:recovered', (component) => {
+      this.stateManager.delete(`health.unhealthy.${component.id}`);
+      this.broadcastEvent('component:recovered', component);
+    });
+
+    this.healthMonitor.on('alert:triggered', (alert) => {
+      this.stateManager.set(`alerts.${Date.now()}`, alert);
+      this.broadcastEvent('alert:triggered', alert);
     });
 
     // DeviceManager events - Commented out as deviceDiscovery is not an EventEmitter
@@ -341,7 +399,9 @@ class AppOrchestrator {
       metrics: {
         ...this.sessionManager.getMetrics(),
         ...this.processManager.getStats()
-      }
+      },
+      health: this.healthMonitor.getHealthStatus(),
+      recovery: this.errorRecovery.getStats()
     };
   }
 
@@ -385,16 +445,6 @@ class AppOrchestrator {
     return this.queueManager.submitTask(taskData, options);
   }
 
-  /**
-   * Schedule a task for future execution
-   * @param {Object} taskData - Task data
-   * @param {Date|number} when - When to execute
-   * @param {Object} options - Task options
-   * @returns {string} Scheduler ID
-   */
-  scheduleTask(taskData, when, options = {}) {
-    return this.queueManager.scheduleTask(taskData, when, options);
-  }
 
   /**
    * Execute a task (called by queue manager)
@@ -406,9 +456,17 @@ class AppOrchestrator {
       // Notify task started
       this.queueManager.startTask(task.id);
 
+      // Create checkpoint before starting
+      const checkpointId = await this.errorRecovery.createCheckpoint(task.id, {
+        task: task.data,
+        device: device.id,
+        timestamp: new Date()
+      });
+
       // Create session for task
       const session = await this.sessionManager.createSession(device.id, {
         taskId: task.id,
+        checkpointId,
         ...task.data.config
       });
 
@@ -490,6 +548,13 @@ class AppOrchestrator {
         capabilities: ['ios', 'automation'],
         maxConcurrentTasks: 1
       });
+
+      // Register device with health monitor
+      this.healthMonitor.registerDevice(device.udid, {
+        name: device.name,
+        appiumPort: device.appiumPort,
+        wdaPort: device.wdaPort
+      });
     }
   }
 
@@ -524,6 +589,8 @@ class AppOrchestrator {
     await this.sessionManager.shutdown();
     await this.processManager.shutdown();
     await this.queueManager.shutdown();
+    await this.errorRecovery.shutdown();
+    await this.healthMonitor.shutdown();
     await this.stateManager.shutdown();
 
     this.isInitialized = false;

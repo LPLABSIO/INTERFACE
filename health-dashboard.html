@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Dashboard - Automation Platform</title>
+    <link rel="stylesheet" href="styles-fixed.css">
+    <link rel="stylesheet" href="styles-global.css">
+    <style>
+        /* Health-specific styles */
+        .health-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .health-status-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .health-status-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .health-indicator {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .health-indicator-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .health-indicator.healthy .health-indicator-icon {
+            background: rgba(46, 213, 115, 0.2);
+            color: var(--success);
+        }
+
+        .health-indicator.warning .health-indicator-icon {
+            background: rgba(241, 196, 15, 0.2);
+            color: var(--warning);
+        }
+
+        .health-indicator.critical .health-indicator-icon {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--danger);
+        }
+
+        .health-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .health-metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .health-metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .health-metric-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .recovery-timeline {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .recovery-event {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .recovery-event:last-child {
+            border-bottom: none;
+        }
+
+        .recovery-event-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .recovery-event-icon.checkpoint {
+            background: rgba(52, 152, 219, 0.2);
+            color: var(--primary);
+        }
+
+        .recovery-event-icon.retry {
+            background: rgba(241, 196, 15, 0.2);
+            color: var(--warning);
+        }
+
+        .recovery-event-icon.rollback {
+            background: rgba(155, 89, 182, 0.2);
+            color: #9b59b6;
+        }
+
+        .recovery-event-icon.success {
+            background: rgba(46, 213, 115, 0.2);
+            color: var(--success);
+        }
+
+        .recovery-event-icon.failed {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--danger);
+        }
+
+        .recovery-event-content {
+            flex: 1;
+        }
+
+        .recovery-event-title {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .recovery-event-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .recovery-event-time {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .alert-panel {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            border-left: 3px solid var(--danger);
+        }
+
+        .alert-item.warning {
+            border-left-color: var(--warning);
+        }
+
+        .alert-item.info {
+            border-left-color: var(--primary);
+        }
+
+        .alert-icon {
+            font-size: 1.5rem;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-message {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .alert-time {
+            color: var(--text-tertiary);
+            font-size: 0.85rem;
+        }
+
+        .health-chart {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            color: var(--text-primary);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-trend {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .stat-trend.up {
+            color: var(--success);
+        }
+
+        .stat-trend.down {
+            color: var(--danger);
+        }
+
+        .component-list {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .component-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .component-item:last-child {
+            border-bottom: none;
+        }
+
+        .component-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .component-status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .component-status-indicator.healthy {
+            background: var(--success);
+        }
+
+        .component-status-indicator.warning {
+            background: var(--warning);
+        }
+
+        .component-status-indicator.unhealthy {
+            background: var(--danger);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-left">
+                <h1 class="app-title">iOS Automation Platform</h1>
+                <span class="version-badge">v0.2.0</span>
+            </div>
+            <nav class="nav-tabs">
+                <a href="index.html" class="nav-tab">Overview</a>
+                <a href="dashboard.html" class="nav-tab">Dashboard</a>
+                <a href="analytics.html" class="nav-tab">Analytics</a>
+                <a href="queue-manager.html" class="nav-tab">Queue</a>
+                <a href="health-dashboard.html" class="nav-tab active">Health</a>
+            </nav>
+        </header>
+
+        <div class="content">
+            <div class="page-header">
+                <h2 class="page-title">System Health & Recovery</h2>
+                <div class="controls">
+                    <button class="btn btn-secondary" onclick="forceHealthCheck()">
+                        Force Check
+                    </button>
+                    <button class="btn btn-primary" onclick="refreshDashboard()">
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistics Overview -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">System Health</div>
+                    <div class="stat-value" id="systemHealthScore">98%</div>
+                    <div class="stat-trend up">+2% from last hour</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Active Checkpoints</div>
+                    <div class="stat-value" id="activeCheckpoints">24</div>
+                    <div class="stat-trend up">+3 today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Recovery Success Rate</div>
+                    <div class="stat-value" id="recoveryRate">87%</div>
+                    <div class="stat-trend down">-1% from yesterday</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Active Alerts</div>
+                    <div class="stat-value" id="activeAlerts">2</div>
+                    <div class="stat-trend up">+1 new</div>
+                </div>
+            </div>
+
+            <!-- Health Status Grid -->
+            <div class="health-grid">
+                <!-- Device Health -->
+                <div class="health-status-card">
+                    <div class="health-indicator healthy">
+                        <div class="health-indicator-icon">📱</div>
+                        <div>
+                            <h3>Device Health</h3>
+                            <p style="color: var(--success)">All Systems Operational</p>
+                        </div>
+                    </div>
+                    <div class="health-metrics">
+                        <div class="health-metric">
+                            <span class="health-metric-label">Connected</span>
+                            <span class="health-metric-value">4/4</span>
+                        </div>
+                        <div class="health-metric">
+                            <span class="health-metric-label">Response Time</span>
+                            <span class="health-metric-value">125ms</span>
+                        </div>
+                        <div class="health-metric">
+                            <span class="health-metric-label">Battery Avg</span>
+                            <span class="health-metric-value">82%</span>
+                        </div>
+                        <div class="health-metric">
+                            <span class="health-metric-label">Uptime</span>
+                            <span class="health-metric-value">99.8%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Health -->
+                <div class="health-status-card">
+                    <div class="health-indicator warning">
+                        <div class="health-indicator-icon">🔧</div>
+                        <div>
+                            <h3>Service Health</h3>
+                            <p style="color: var(--warning)">Minor Issues Detected</p>
+                        </div>
+                    </div>
+                    <div class="health-metrics">
+                        <div class="health-metric">
+                            <span class="health-metric-label">Appium Status</span>
+                            <span class="health-metric-value">Running</span>
+                        </div>
+                        <div class="health-metric">
+                            <span class="health-metric-label">WDA Status</span>
+                            <span class="health-metric-value">Warning</span>
+                        </div>
+                        <div class="health-metric">
+                            <span class="health-metric-label">API Health</span>
+                            <span class="health-metric-value">Healthy</span>
+                        </div>
+                        <div class="health-metric">
+                            <span class="health-metric-label">Queue Status</span>
+                            <span class="health-metric-value">Active</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resource Health -->
+                <div class="health-status-card">
+                    <div class="health-indicator healthy">
+                        <div class="health-indicator-icon">💻</div>
+                        <div>
+                            <h3>Resource Health</h3>
+                            <p style="color: var(--success)">Resources Normal</p>
+                        </div>
+                    </div>
+                    <div class="health-metrics">
+                        <div class="health-metric">
+                            <span class="health-metric-label">CPU Usage</span>
+                            <span class="health-metric-value">42%</span>
+                        </div>
+                        <div class="health-metric">
+                            <span class="health-metric-label">Memory</span>
+                            <span class="health-metric-value">3.2GB</span>
+                        </div>
+                        <div class="health-metric">
+                            <span class="health-metric-label">Disk Space</span>
+                            <span class="health-metric-value">124GB</span>
+                        </div>
+                        <div class="health-metric">
+                            <span class="health-metric-label">Network</span>
+                            <span class="health-metric-value">Stable</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Component Status List -->
+            <div class="section">
+                <h3 class="section-title">Component Status</h3>
+                <div class="component-list">
+                    <div class="component-item">
+                        <div class="component-info">
+                            <div class="component-status-indicator healthy"></div>
+                            <div>
+                                <div style="font-weight: 600;">iPhone 12 Pro</div>
+                                <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                                    UDID: af5afd94...
+                                </div>
+                            </div>
+                        </div>
+                        <div style="color: var(--text-secondary);">
+                            Last check: 2 min ago
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <div class="component-info">
+                            <div class="component-status-indicator warning"></div>
+                            <div>
+                                <div style="font-weight: 600;">WebDriverAgent Port 8100</div>
+                                <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                                    Response time elevated
+                                </div>
+                            </div>
+                        </div>
+                        <div style="color: var(--text-secondary);">
+                            Last check: 1 min ago
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <div class="component-info">
+                            <div class="component-status-indicator healthy"></div>
+                            <div>
+                                <div style="font-weight: 600;">Appium Server</div>
+                                <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                                    Port 1265 - Running
+                                </div>
+                            </div>
+                        </div>
+                        <div style="color: var(--text-secondary);">
+                            Last check: 30 sec ago
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <div class="component-info">
+                            <div class="component-status-indicator healthy"></div>
+                            <div>
+                                <div style="font-weight: 600;">Queue Manager</div>
+                                <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                                    3 tasks processing
+                                </div>
+                            </div>
+                        </div>
+                        <div style="color: var(--text-secondary);">
+                            Last check: 45 sec ago
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2col">
+                <!-- Recovery Timeline -->
+                <div class="recovery-timeline">
+                    <h3 class="section-title">Recovery Events</h3>
+                    <div id="recoveryTimeline">
+                        <div class="recovery-event">
+                            <div class="recovery-event-icon checkpoint">💾</div>
+                            <div class="recovery-event-content">
+                                <div class="recovery-event-title">Checkpoint Created</div>
+                                <div class="recovery-event-description">
+                                    Task bot-001 state saved after profile completion
+                                </div>
+                                <div class="recovery-event-time">10 minutes ago</div>
+                            </div>
+                        </div>
+                        <div class="recovery-event">
+                            <div class="recovery-event-icon retry">🔄</div>
+                            <div class="recovery-event-content">
+                                <div class="recovery-event-title">Retry Attempted</div>
+                                <div class="recovery-event-description">
+                                    Network timeout recovered with retry strategy
+                                </div>
+                                <div class="recovery-event-time">25 minutes ago</div>
+                            </div>
+                        </div>
+                        <div class="recovery-event">
+                            <div class="recovery-event-icon rollback">⏪</div>
+                            <div class="recovery-event-content">
+                                <div class="recovery-event-title">Rollback Executed</div>
+                                <div class="recovery-event-description">
+                                    Task bot-002 rolled back to checkpoint after error
+                                </div>
+                                <div class="recovery-event-time">1 hour ago</div>
+                            </div>
+                        </div>
+                        <div class="recovery-event">
+                            <div class="recovery-event-icon success">✅</div>
+                            <div class="recovery-event-content">
+                                <div class="recovery-event-title">Recovery Successful</div>
+                                <div class="recovery-event-description">
+                                    Process crash recovered with restart strategy
+                                </div>
+                                <div class="recovery-event-time">2 hours ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Alerts -->
+                <div class="alert-panel">
+                    <h3 class="section-title">Active Alerts</h3>
+                    <div id="alertList">
+                        <div class="alert-item warning">
+                            <div class="alert-icon">⚠️</div>
+                            <div class="alert-content">
+                                <div class="alert-title">High Memory Usage</div>
+                                <div class="alert-message">
+                                    Process bot-003 using 85% of allocated memory
+                                </div>
+                            </div>
+                            <div class="alert-time">5 min ago</div>
+                        </div>
+                        <div class="alert-item info">
+                            <div class="alert-icon">ℹ️</div>
+                            <div class="alert-content">
+                                <div class="alert-title">WDA Response Time</div>
+                                <div class="alert-message">
+                                    WebDriverAgent response time above threshold (>2s)
+                                </div>
+                            </div>
+                            <div class="alert-time">12 min ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Chart Placeholder -->
+            <div class="section">
+                <h3 class="section-title">Health Metrics Over Time</h3>
+                <div class="health-chart">
+                    <p>Chart visualization would go here (requires charting library)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulated real-time updates
+        function refreshDashboard() {
+            console.log('Refreshing health dashboard...');
+            // In production, this would fetch real data from the backend
+
+            // Simulate updating values
+            document.getElementById('systemHealthScore').textContent =
+                Math.floor(95 + Math.random() * 5) + '%';
+            document.getElementById('activeCheckpoints').textContent =
+                Math.floor(20 + Math.random() * 10);
+            document.getElementById('recoveryRate').textContent =
+                Math.floor(85 + Math.random() * 10) + '%';
+            document.getElementById('activeAlerts').textContent =
+                Math.floor(Math.random() * 5);
+        }
+
+        function forceHealthCheck() {
+            console.log('Forcing health check on all components...');
+            // In production, this would trigger a backend health check
+            alert('Health check initiated for all components');
+            setTimeout(refreshDashboard, 2000);
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(refreshDashboard, 30000);
+
+        // Initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Health Dashboard loaded');
+        });
+    </script>
+</body>
+</html>

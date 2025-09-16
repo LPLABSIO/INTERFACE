@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 
 /**
  * Queue Manager orchestrates task distribution across multiple devices
- * Handles task scheduling, device allocation, and load balancing
+ * Handles task distribution, device allocation, and load balancing
  */
 class QueueManager extends EventEmitter {
   constructor(options = {}) {
@@ -38,13 +38,12 @@ class QueueManager extends EventEmitter {
     this.activeTasks = new Map();
     this.taskTimers = new Map();
 
-    // Schedulers
-    this.schedulers = new Map();
+    // Processing interval
     this.processingInterval = null;
 
     // Statistics
     this.stats = {
-      tasksScheduled: 0,
+      tasksSubmitted: 0,
       tasksCompleted: 0,
       tasksFailed: 0,
       averageQueueTime: 0,
@@ -154,63 +153,13 @@ class QueueManager extends EventEmitter {
       timeout: options.timeout || this.taskTimeout
     });
 
-    this.stats.tasksScheduled++;
+    this.stats.tasksSubmitted++;
 
     console.log(`[QueueManager] Task submitted: ${task.id} (priority: ${task.priority})`);
 
     return task;
   }
 
-  /**
-   * Schedule a task for future execution
-   * @param {Object} taskData - Task data
-   * @param {Date|number} when - When to execute (Date or delay in ms)
-   * @param {Object} options - Task options
-   * @returns {string} Scheduler ID
-   */
-  scheduleTask(taskData, when, options = {}) {
-    const schedulerId = uuidv4();
-    let delay;
-
-    if (when instanceof Date) {
-      delay = when.getTime() - Date.now();
-    } else {
-      delay = when;
-    }
-
-    if (delay < 0) {
-      throw new Error('Cannot schedule task in the past');
-    }
-
-    const timer = setTimeout(() => {
-      this.submitTask(taskData, options);
-      this.schedulers.delete(schedulerId);
-    }, delay);
-
-    this.schedulers.set(schedulerId, {
-      id: schedulerId,
-      taskData,
-      scheduledFor: new Date(Date.now() + delay),
-      timer
-    });
-
-    this.emit('task:scheduled', { schedulerId, scheduledFor: new Date(Date.now() + delay) });
-
-    return schedulerId;
-  }
-
-  /**
-   * Cancel a scheduled task
-   * @param {string} schedulerId - Scheduler ID
-   */
-  cancelScheduledTask(schedulerId) {
-    const scheduler = this.schedulers.get(schedulerId);
-    if (scheduler) {
-      clearTimeout(scheduler.timer);
-      this.schedulers.delete(schedulerId);
-      this.emit('task:schedule-cancelled', schedulerId);
-    }
-  }
 
   /**
    * Process the next task in queue
@@ -516,8 +465,7 @@ class QueueManager extends EventEmitter {
       devices: deviceUtilization,
       global: {
         ...this.stats,
-        activeTasksCount: this.activeTasks.size,
-        scheduledTasksCount: this.schedulers.size
+        activeTasksCount: this.activeTasks.size
       }
     };
   }
@@ -530,17 +478,6 @@ class QueueManager extends EventEmitter {
     return Array.from(this.activeTasks.values());
   }
 
-  /**
-   * Get scheduled tasks
-   * @returns {Array} Scheduled tasks
-   */
-  getScheduledTasks() {
-    return Array.from(this.schedulers.values()).map(s => ({
-      id: s.id,
-      taskData: s.taskData,
-      scheduledFor: s.scheduledFor
-    }));
-  }
 
   /**
    * Clear all queues
@@ -554,10 +491,6 @@ class QueueManager extends EventEmitter {
     // Clear all timers
     this.taskTimers.forEach(timer => clearTimeout(timer));
     this.taskTimers.clear();
-
-    // Cancel all scheduled tasks
-    this.schedulers.forEach(scheduler => clearTimeout(scheduler.timer));
-    this.schedulers.clear();
 
     // Clear queues
     this.taskQueue.clear();
