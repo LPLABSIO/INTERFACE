@@ -5,22 +5,65 @@
 | Phase | Progression | Status | Dernière MAJ |
 |-------|------------|--------|--------------|
 | **PHASE 1** : Foundation | ██████████ 100% | ✅ Complété | 15/09/2025 |
-| **PHASE 2** : Core Infrastructure | ██░░░░░░░░ 20% | 🟡 En cours | 15/09/2025 |
+| **PHASE 2** : Core Infrastructure | ██████░░░░ 60% | 🟡 En cours | 16/09/2025 |
 | **PHASE 3** : Orchestration Engine | ░░░░░░░░░░ 0% | ⏳ À venir | - |
 | **PHASE 4** : Project System | ░░░░░░░░░░ 0% | ⏳ À venir | - |
 | **PHASE 5** : Production Ready | ░░░░░░░░░░ 0% | ⏳ À venir | - |
 | **PHASE 6** : Advanced Features | ░░░░░░░░░░ 0% | ⏳ À venir | - |
 
-**Progression Globale** : ████░░░░░░ **20%**
+**Progression Globale** : ████░░░░░░ **35%**
 
 ---
 
-## 🚀 Sprint Actuel : Sprint 1.1 (Semaine 1)
+## 🚀 Sprint Actuel : Sprint 2.1 (Semaine 3)
 
 ### Objectif
-Finaliser l'interface actuelle et améliorer la détection des appareils
+Architecture modulaire et support multi-appareils
 
-### Tâches Complétées Aujourd'hui (14/09/2024)
+### Tâches Complétées (16/09/2025)
+
+#### ✅ **2.1.4** - Multi-Device Selection UI
+- **Durée** : 3h
+- **Description** : Implémentation de la sélection multiple d'appareils
+- **Détails techniques** :
+  - Checkboxes pour chaque appareil
+  - État géré avec Set pour les sélections
+  - Bouton dynamique affichant le nombre d'appareils sélectionnés
+  - Feedback visuel avec bordure colorée
+- **Fichiers modifiés** :
+  - `src/ui/renderer/renderer-fixed.js` - Logique de sélection
+  - `src/ui/renderer/styles.css` - Styles visuels
+
+#### ✅ **2.1.5** - Real-time Status Updates
+- **Durée** : 2h
+- **Description** : Mise à jour automatique des statuts
+- **Détails techniques** :
+  - Polling toutes les 2 secondes
+  - Fonction checkServicesStatus dans main.js
+  - Mise à jour des cartes Script/Appium/WDA
+- **Fichiers modifiés** :
+  - `src/ui/main/main.js` - Handler checkServicesStatus
+  - `src/ui/preload/preload.js` - API exposée
+  - `src/ui/renderer/renderer-fixed.js` - Polling et mise à jour UI
+
+### Bugs Corrigés (16/09/2025)
+
+#### 🐛 **Session Appium terminée prématurément**
+- **Problème** : terminateApp sur Preferences fermait toute la session
+- **Solution** : Remplacé par pressButton home
+- **Fichier** : `src/bot/src/crane.js`
+
+#### 🐛 **Erreur de syntaxe dans bot.js**
+- **Problème** : Anciennes configurations non commentées correctement
+- **Solution** : Commenté toutes les configurations legacy
+- **Fichier** : `src/bot/bot.js`
+
+#### 🐛 **Port WDA incorrect**
+- **Problème** : Port 8205 au lieu de 8100
+- **Solution** : Correction du port par défaut
+- **Fichier** : `src/ui/main/main.js`
+
+### Tâches Complétées Précédemment (14/09/2024)
 
 #### ✅ **1.1.1.a** - Création de l'interface moderne
 - **Durée** : 2h30
@@ -292,6 +335,6 @@ Une tâche est considérée terminée quand :
 
 ---
 
-*Dernière mise à jour : 14 Septembre 2024 - 19:30*
+*Dernière mise à jour : 16 Septembre 2025 - 06:15*
 *Auteur : Lucas Pellegrino & Claude*
-*Version : 0.1.0-alpha*
+*Version : 0.2.0-alpha*

@@ -110,6 +110,17 @@ Créer une plateforme professionnelle d'automatisation iOS multi-appareils, modu
   └── package.json
   ```
 
+- [x] **2.1.4** Multi-Device Selection UI ✅ (16/09)
+  - [x] Checkboxes pour sélection multiple
+  - [x] Lancement simultané de plusieurs appareils
+  - [x] Feedback visuel des appareils sélectionnés
+  - [x] Texte dynamique du bouton de lancement
+
+- [x] **2.1.5** Real-time Status Updates ✅ (16/09)
+  - [x] Mise à jour automatique des cartes de statut
+  - [x] Polling toutes les 2 secondes
+  - [x] Indicateurs visuels pour Script/Appium/WDA
+
 ### Sprint 2.2 : Session Management (Semaine 4)
 - [ ] **2.2.1** Session Manager
   - [ ] Création/destruction de sessions
