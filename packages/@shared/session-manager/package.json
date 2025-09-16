@@ -1,0 +1,17 @@
+{
+  "name": "@shared/session-manager",
+  "version": "1.0.0",
+  "description": "Session management for multi-device automation",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {
+    "sqlite3": "^5.1.6",
+    "events": "^3.3.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.6.0"
+  }
+}

@@ -45,6 +45,20 @@ document.addEventListener('DOMContentLoaded', () => {
         window.UIEnhancements.initializeNotifications();
     }
 
+    // Initialiser les améliorations de logs
+    if (window.LogsEnhancer) {
+        console.log('Initializing logs enhancements...');
+        window.logsEnhancer = new window.LogsEnhancer();
+        window.logsEnhancer.initialize();
+    }
+
+    // Initialiser les actions multiples
+    if (window.MultiActions) {
+        console.log('Initializing multi-actions...');
+        window.multiActions = new window.MultiActions();
+        window.multiActions.initialize();
+    }
+
     console.log('Initializing event listeners...');
     initializeEventListeners();
     console.log('Initializing IPC...');
@@ -73,6 +87,22 @@ function initializeEventListeners() {
     if (elements.settingsBtn) {
         elements.settingsBtn.addEventListener('click', () => {
             showModal('settings-modal');
+        });
+    }
+
+    // Dashboard button
+    const dashboardBtn = document.getElementById('dashboard-btn');
+    if (dashboardBtn) {
+        dashboardBtn.addEventListener('click', () => {
+            window.location.href = 'dashboard.html';
+        });
+    }
+
+    // Analytics button
+    const analyticsBtn = document.getElementById('analytics-btn');
+    if (analyticsBtn) {
+        analyticsBtn.addEventListener('click', () => {
+            window.location.href = 'analytics.html';
         });
     }
 
@@ -589,13 +619,25 @@ function appendLogToView(logEntry) {
     if (!logsContainer) return;
 
     const logElement = document.createElement('div');
-    logElement.className = `log-entry log-${logEntry.level}`;
+    logElement.className = `log-entry log-${logEntry.level} new-entry`;
+
+    // Utiliser le formateur amélioré si disponible
+    let formattedMessage = logEntry.message;
+    if (window.logsEnhancer) {
+        formattedMessage = window.logsEnhancer.formatLogMessage(logEntry.message);
+    }
+
     logElement.innerHTML = `
         <span class="log-time">${logEntry.timestamp}</span>
-        <span class="log-message">${logEntry.message}</span>
+        <span class="log-message">${formattedMessage}</span>
     `;
 
     logsContainer.appendChild(logElement);
+
+    // Retirer la classe d'animation après un court délai
+    setTimeout(() => {
+        logElement.classList.remove('new-entry');
+    }, 500);
 
     // Auto-scroll si activé avec un léger délai pour voir l'animation
     if (elements.autoScrollCheckbox && elements.autoScrollCheckbox.checked) {
@@ -606,6 +648,11 @@ function appendLogToView(logEntry) {
                 behavior: 'smooth'
             });
         });
+    }
+
+    // Appliquer les filtres si le module est disponible
+    if (window.logsEnhancer) {
+        window.logsEnhancer.applyFilters();
     }
 }
 

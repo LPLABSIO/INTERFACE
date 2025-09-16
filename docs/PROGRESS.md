@@ -5,22 +5,111 @@
 | Phase | Progression | Status | Dernière MAJ |
 |-------|------------|--------|--------------|
 | **PHASE 1** : Foundation | ██████████ 100% | ✅ Complété | 15/09/2025 |
-| **PHASE 2** : Core Infrastructure | ██████░░░░ 60% | 🟡 En cours | 16/09/2025 |
+| **PHASE 2** : Core Infrastructure | █████████░ 90% | 🟡 En cours | 16/09/2025 |
 | **PHASE 3** : Orchestration Engine | ░░░░░░░░░░ 0% | ⏳ À venir | - |
 | **PHASE 4** : Project System | ░░░░░░░░░░ 0% | ⏳ À venir | - |
 | **PHASE 5** : Production Ready | ░░░░░░░░░░ 0% | ⏳ À venir | - |
 | **PHASE 6** : Advanced Features | ░░░░░░░░░░ 0% | ⏳ À venir | - |
 
-**Progression Globale** : ████░░░░░░ **35%**
+**Progression Globale** : █████░░░░░ **50%**
 
 ---
 
-## 🚀 Sprint Actuel : Sprint 2.1 (Semaine 3)
+## 🚀 Sprint Actuel : Sprint 2.3 (Semaine 4-5)
 
 ### Objectif
-Architecture modulaire et support multi-appareils
+Amélioration de l'expérience utilisateur et fonctionnalités avancées
 
-### Tâches Complétées (16/09/2025)
+### Tâches Complétées (16/09/2025 - Suite)
+
+#### ✅ **2.2.1** - Session Manager
+- **Durée** : 4h
+- **Description** : Système complet de gestion de sessions avec lifecycle
+- **Détails techniques** :
+  - États: IDLE, STARTING, RUNNING, PAUSED, ERROR, COMPLETED, TERMINATED
+  - Persistance SQLite avec SessionStore
+  - Métriques de performance (SessionMetrics)
+  - Recovery après crash avec retry logic
+  - EventEmitter pour notifications
+- **Fichiers créés** :
+  - `packages/@shared/session-manager/` - Module complet
+
+#### ✅ **2.2.2** - Process Manager
+- **Durée** : 3h
+- **Description** : Gestionnaire de processus avec monitoring
+- **Détails techniques** :
+  - Monitoring CPU/RAM avec pidusage
+  - Auto-restart sur crash avec limite
+  - Graceful shutdown avec tree-kill
+  - Logs en temps réel
+- **Fichiers créés** :
+  - `packages/@shared/process-manager/` - Module complet
+
+#### ✅ **2.2.3** - State Management
+- **Durée** : 2h
+- **Description** : Store centralisé avec persistance
+- **Détails techniques** :
+  - Utilisation d'immer pour immutabilité
+  - Undo/Redo avec historique
+  - Auto-save toutes les 30 secondes
+  - Système de subscription pour UI
+- **Fichiers créés** :
+  - `packages/@shared/state-manager/` - Module complet
+
+#### ✅ **Dashboard UI** (Bonus)
+- **Durée** : 3h
+- **Description** : Interface de monitoring avancée
+- **Détails techniques** :
+  - Vue temps réel des sessions
+  - Grille de sélection multi-appareils
+  - Métriques de performance
+  - Logs système intégrés
+- **Fichiers créés** :
+  - `src/ui/renderer/dashboard.html`
+  - `src/ui/renderer/dashboard.js`
+- **Note** : Mode démo fonctionnel, intégration complète à finaliser
+
+#### ✅ **Amélioration des Logs** (16/09/2025 - 18:00)
+- **Durée** : 2h
+- **Description** : Système avancé de gestion et filtrage des logs
+- **Détails techniques** :
+  - Filtrage par niveau (Info, Success, Warning, Error)
+  - Recherche en temps réel avec surlignage
+  - Coloration syntaxique (URLs, strings, nombres, mots-clés)
+  - Animation slide-in pour nouveaux logs
+  - Raccourci Ctrl/Cmd+F pour recherche rapide
+- **Fichiers créés** :
+  - `src/ui/renderer/logs-enhanced.js`
+
+#### ✅ **Mode Batch et Actions Groupées** (16/09/2025 - 19:00)
+- **Durée** : 2h
+- **Description** : Mode de contrôle simultané de plusieurs appareils
+- **Détails techniques** :
+  - Toggle switch pour activer le mode batch
+  - Checkboxes de sélection multiple
+  - Actions groupées : Tout démarrer/arrêter/redémarrer
+  - Compteur d'appareils sélectionnés
+  - Raccourcis clavier (Ctrl+A, Ctrl+Shift+S/X)
+  - Animations et feedback visuel
+- **Fichiers créés** :
+  - `src/ui/renderer/multi-actions.js`
+
+#### ✅ **Analytics Dashboard** (16/09/2025 - 20:00)
+- **Durée** : 2h
+- **Description** : Dashboard complet de visualisation des données et métriques
+- **Détails techniques** :
+  - 6 KPIs principaux (sessions, taux succès, temps, appareils, comptes, CPU)
+  - 4 graphiques Chart.js (timeline, succès, appareils, performance)
+  - Tableau d'historique des sessions avec recherche
+  - Feed d'activité en temps réel
+  - Filtres temporels (aujourd'hui, 7j, 30j, tout)
+  - Export des données en JSON
+  - Auto-refresh toutes les 30 secondes
+- **Fichiers créés** :
+  - `src/ui/renderer/analytics.html`
+  - `src/ui/renderer/analytics.js`
+- **Dépendance ajoutée** :
+  - `chart.js` pour les graphiques
 
 #### ✅ **2.1.4** - Multi-Device Selection UI
 - **Durée** : 3h
@@ -335,6 +424,6 @@ Une tâche est considérée terminée quand :
 
 ---
 
-*Dernière mise à jour : 16 Septembre 2025 - 06:15*
+*Dernière mise à jour : 16 Septembre 2025 - 20:30*
 *Auteur : Lucas Pellegrino & Claude*
-*Version : 0.2.0-alpha*
+*Version : 0.4.0-alpha*

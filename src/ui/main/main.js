@@ -7,6 +7,11 @@ const { spawn, spawnSync } = require('child_process');
 const axios = require('axios');
 const net = require('net');
 const deviceDiscovery = require('../../utils/device-discovery');
+const AppOrchestrator = require('../../core/AppOrchestrator');
+const setupOrchestratorHandlers = require('./orchestrator-handlers');
+
+// Initialiser l'orchestrateur
+let orchestrator = null;
 
 let mainWindow = null;
 let replayChild = null;
@@ -94,8 +99,29 @@ function createWindow() {
   });
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   createWindow();
+
+  // Initialiser l'orchestrateur après la création de la fenêtre
+  try {
+    orchestrator = new AppOrchestrator({
+      dbPath: path.join(app.getPath('userData'), 'sessions.db'),
+      statePath: path.join(app.getPath('userData'), 'state.json')
+    });
+    await orchestrator.initialize();
+    console.log('[Main] AppOrchestrator initialized successfully');
+
+    // Configurer les handlers IPC pour l'orchestrateur
+    setupOrchestratorHandlers(orchestrator, mainWindow);
+
+    // Envoyer le statut initial à l'interface
+    if (mainWindow) {
+      const status = orchestrator.getGlobalStatus();
+      mainWindow.webContents.send('orchestrator:status', status);
+    }
+  } catch (error) {
+    console.error('[Main] Failed to initialize AppOrchestrator:', error);
+  }
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

@@ -46,6 +46,7 @@
     "@fast-csv/format": "^5.0.5",
     "@turf/turf": "^7.2.0",
     "axios": "^1.9.0",
+    "chart.js": "^4.5.0",
     "csv-parser": "^3.2.0",
     "dotenv": "^17.2.2",
     "electron": "^31.3.0",
