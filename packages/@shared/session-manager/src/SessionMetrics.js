@@ -9,10 +9,11 @@ class SessionMetrics {
       failedSessions: 0,
       averageDuration: 0,
       successRate: 0,
-      deviceMetrics: new Map(),
-      errorCounts: new Map(),
       lastUpdated: null
     };
+    // Initialiser les Maps directement sur la classe
+    this.deviceMetrics = new Map();
+    this.errorCounts = new Map();
   }
 
   /**
@@ -127,15 +128,15 @@ class SessionMetrics {
   getMetrics() {
     return {
       ...this.metrics,
-      deviceMetrics: Array.from(this.deviceMetrics.entries()).map(([id, metrics]) => ({
+      deviceMetrics: this.deviceMetrics ? Array.from(this.deviceMetrics.entries()).map(([id, metrics]) => ({
         deviceId: id,
         ...metrics
-      })),
-      errorDistribution: Array.from(this.errorCounts.entries()).map(([type, count]) => ({
+      })) : [],
+      errorDistribution: this.errorCounts ? Array.from(this.errorCounts.entries()).map(([type, count]) => ({
         type,
         count,
-        percentage: (count / this.metrics.failedSessions) * 100
-      }))
+        percentage: this.metrics.failedSessions > 0 ? (count / this.metrics.failedSessions) * 100 : 0
+      })) : []
     };
   }
 
@@ -195,10 +196,10 @@ class SessionMetrics {
       failedSessions: 0,
       averageDuration: 0,
       successRate: 0,
-      deviceMetrics: new Map(),
-      errorCounts: new Map(),
       lastUpdated: null
     };
+    this.deviceMetrics = new Map();
+    this.errorCounts = new Map();
   }
 
   /**
@@ -216,11 +217,10 @@ class SessionMetrics {
    * Importer les métriques depuis JSON
    */
   fromJSON(data) {
-    this.metrics = {
-      ...data,
-      deviceMetrics: new Map(Object.entries(data.deviceMetrics || {})),
-      errorCounts: new Map(Object.entries(data.errorCounts || {}))
-    };
+    const { deviceMetrics, errorCounts, ...metrics } = data;
+    this.metrics = metrics;
+    this.deviceMetrics = new Map(Object.entries(deviceMetrics || {}));
+    this.errorCounts = new Map(Object.entries(errorCounts || {}));
   }
 }
 

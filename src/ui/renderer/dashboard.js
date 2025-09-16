@@ -40,8 +40,8 @@ async function refreshDashboard() {
         document.getElementById('refreshBtn').classList.add('spinning');
 
         // Check if electronAPI is available
-        if (!window.electronAPI || !window.electronAPI.invoke) {
-            console.warn('electronAPI not available, using mock data');
+        if (!window.electronAPI || typeof window.electronAPI.invoke !== 'function') {
+            console.warn('electronAPI not fully available, using mock data');
             // Use mock data for testing
             const mockStatus = {
                 devices: { total: 1, connected: 1, busy: 0 },
@@ -234,7 +234,7 @@ async function launchNewSession() {
     }
 
     // Check if API is available
-    if (!window.electronAPI || !window.electronAPI.invoke) {
+    if (!window.electronAPI || typeof window.electronAPI.invoke !== 'function') {
         addLog('Fonction non disponible en mode démo', 'warning');
         return;
     }
@@ -365,7 +365,7 @@ function stopAutoRefresh() {
 // Subscribe to real-time updates
 function subscribeToUpdates() {
     // Check if API is available
-    if (!window.electronAPI || !window.electronAPI.on) {
+    if (!window.electronAPI || typeof window.electronAPI.on !== 'function') {
         console.warn('Cannot subscribe to updates - electronAPI not available');
         return;
     }

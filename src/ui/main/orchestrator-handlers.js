@@ -17,7 +17,22 @@ function setupOrchestratorHandlers(orchestrator, mainWindow) {
     if (!orchestrator) {
       return [];
     }
-    return orchestrator.sessionManager.getActiveSessions();
+    try {
+      const sessions = orchestrator.sessionManager.getActiveSessions();
+      // Convertir en objets simples sérialisables
+      return sessions.map(session => ({
+        id: session.id,
+        deviceId: session.deviceId,
+        state: session.state,
+        startTime: session.startTime,
+        endTime: session.endTime,
+        retries: session.retries || 0,
+        error: session.error || null
+      }));
+    } catch (error) {
+      console.error('[Orchestrator] Error getting sessions:', error);
+      return [];
+    }
   });
 
   // Lancer une session avec l'orchestrateur
@@ -29,10 +44,23 @@ function setupOrchestratorHandlers(orchestrator, mainWindow) {
     try {
       const sessions = await orchestrator.launchSession(deviceIds, config);
 
-      // Envoyer la mise à jour à l'interface
-      mainWindow?.webContents.send('orchestrator:sessions-updated', sessions);
+      // Convertir les sessions en objets simples sérialisables
+      const serializedSessions = sessions.map(session => ({
+        id: session.id,
+        deviceId: session.deviceId,
+        state: session.state,
+        startTime: session.startTime,
+        endTime: session.endTime,
+        retries: session.retries || 0,
+        error: session.error || null
+      }));
 
-      return { success: true, sessions };
+      // Envoyer la mise à jour à l'interface
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('orchestrator:sessions-updated', serializedSessions);
+      }
+
+      return { success: true, sessions: serializedSessions };
     } catch (error) {
       console.error('[Main] Failed to launch session:', error);
       return { success: false, error: error.message };
@@ -140,12 +168,25 @@ function setupOrchestratorHandlers(orchestrator, mainWindow) {
   });
 
   // Configurer un intervalle pour envoyer les mises à jour de statut
-  setInterval(() => {
-    if (orchestrator && mainWindow) {
-      const status = orchestrator.getGlobalStatus();
-      mainWindow.webContents.send('orchestrator:status-update', status);
+  const updateInterval = setInterval(() => {
+    if (orchestrator && mainWindow && !mainWindow.isDestroyed()) {
+      try {
+        const status = orchestrator.getGlobalStatus();
+        mainWindow.webContents.send('orchestrator:status-update', status);
+      } catch (error) {
+        // La fenêtre a été fermée, nettoyer l'intervalle
+        console.log('[Orchestrator] Window closed, stopping status updates');
+        clearInterval(updateInterval);
+      }
     }
   }, 5000); // Toutes les 5 secondes
+
+  // Nettoyer l'intervalle quand la fenêtre est fermée
+  if (mainWindow) {
+    mainWindow.on('closed', () => {
+      clearInterval(updateInterval);
+    });
+  }
 }
 
 module.exports = setupOrchestratorHandlers;

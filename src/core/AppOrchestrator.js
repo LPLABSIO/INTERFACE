@@ -116,7 +116,9 @@ class AppOrchestrator {
       this.stateManager.set(`processes.${id}`, process);
     });
 
-    // DeviceManager events
+    // DeviceManager events - Commented out as deviceDiscovery is not an EventEmitter
+    // TODO: Wrap deviceDiscovery in an EventEmitter class for proper event handling
+    /*
     this.deviceManager.on('device:connected', (device) => {
       this.stateManager.set(`devices.${device.udid}`, device);
       this.broadcastEvent('device:connected', device);
@@ -130,17 +132,44 @@ class AppOrchestrator {
       }
       this.broadcastEvent('device:disconnected', udid);
     });
+    */
   }
 
   /**
    * Scanner les appareils iOS connectés
    */
   async scanDevices() {
-    const devices = this.deviceManager.listIosDevices();
+    // Pour l'instant, utiliser une méthode simple pour lister les appareils
+    // En production, cela devrait être intégré avec le vrai système de détection
+    const { spawnSync } = require('child_process');
+    const devices = [];
 
-    // Mettre à jour l'état
-    for (const device of devices) {
-      this.stateManager.set(`devices.${device.udid}`, device);
+    try {
+      // Essayer avec idevice_id
+      const ideviceIdPath = '/opt/homebrew/bin/idevice_id';
+      const res = spawnSync(ideviceIdPath, ['-l'], { encoding: 'utf8' });
+
+      if (res && res.status === 0 && res.stdout) {
+        const udids = res.stdout.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+
+        for (const udid of udids) {
+          let name = 'iPhone';
+          try {
+            const info = spawnSync('/opt/homebrew/bin/ideviceinfo', ['-u', udid, '-k', 'DeviceName'], { encoding: 'utf8' });
+            if (info && info.status === 0 && info.stdout) {
+              name = info.stdout.trim() || name;
+            }
+          } catch (e) {
+            // Ignorer l'erreur
+          }
+
+          const device = { type: 'ios', name, udid };
+          devices.push(device);
+          this.stateManager.set(`devices.${udid}`, device);
+        }
+      }
+    } catch (error) {
+      console.warn('[AppOrchestrator] Could not scan devices:', error.message);
     }
 
     return devices;

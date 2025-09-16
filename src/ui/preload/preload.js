@@ -63,6 +63,14 @@ contextBridge.exposeInMainWorld('state', {
 
 // Nouvelles API pour l'interface redesignée
 contextBridge.exposeInMainWorld('electronAPI', {
+    // Generic invoke for flexible API calls
+    invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args),
+
+    // Generic event listener
+    on: (channel, callback) => {
+        ipcRenderer.on(channel, (event, ...args) => callback(...args));
+    },
+
     // Device management
     scanDevices: () => ipcRenderer.invoke('scan-devices'),
     onDeviceUpdate: (callback) => ipcRenderer.on('device-update', (_event, data) => callback(data)),
@@ -88,12 +96,21 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onAppiumLog: (callback) => ipcRenderer.on('appium-log', (event, data) => callback(data)),
     onSystemLog: (callback) => ipcRenderer.on('system-log', (event, data) => callback(data)),
 
-    // Status updates
-    onStatusUpdate: (callback) => ipcRenderer.on('status-update', (event, data) => callback(data)),
-    onStatsUpdate: (callback) => ipcRenderer.on('stats-update', (event, data) => callback(data)),
-
     // Settings
     saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
     loadSettings: () => ipcRenderer.invoke('load-settings'),
+
+    // Orchestrator API
+    getOrchestratorStatus: () => ipcRenderer.invoke('orchestrator:getStatus'),
+    getOrchestratorSessions: () => ipcRenderer.invoke('orchestrator:getSessions'),
+    launchOrchestratorSession: (data) => ipcRenderer.invoke('orchestrator:launchSession', data),
+    stopOrchestratorSession: (id) => ipcRenderer.invoke('orchestrator:stopSession', id),
+    getSessionMetrics: (id) => ipcRenderer.invoke('orchestrator:getSessionMetrics', id),
+    getProcessLogs: (id) => ipcRenderer.invoke('orchestrator:getProcessLogs', id),
+    getDeviceStatus: (id) => ipcRenderer.invoke('orchestrator:getDeviceStatus', id),
+    scanOrchestratorDevices: () => ipcRenderer.invoke('orchestrator:scanDevices'),
+    cleanupSessions: (days) => ipcRenderer.invoke('orchestrator:cleanup', days),
+    restartProcess: (id) => ipcRenderer.invoke('orchestrator:restartProcess', id),
+    subscribeToState: (path) => ipcRenderer.invoke('orchestrator:subscribe', path),
 });
 

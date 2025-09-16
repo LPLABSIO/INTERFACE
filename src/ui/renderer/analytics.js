@@ -69,16 +69,37 @@ class AnalyticsDashboard {
     }
 
     /**
-     * Charge les données (utilise mock data pour l'instant)
+     * Charge les données depuis l'Orchestrator ou utilise mock data
      */
     async loadData() {
         try {
-            // En production, on chargerait depuis SessionManager
-            // Pour l'instant, on utilise des données mock
-            this.sessionsData = this.mockData.sessions;
-            console.log('Data loaded successfully');
+            // Vérifier si l'API Electron est disponible
+            if (window.electronAPI && typeof window.electronAPI.invoke === 'function') {
+                try {
+                    // Charger les vraies données depuis l'Orchestrator
+                    const sessions = await window.electronAPI.invoke('orchestrator:getSessions');
+                    const status = await window.electronAPI.invoke('orchestrator:getStatus');
+
+                    if (sessions && !sessions.error) {
+                        this.sessionsData = sessions;
+                        console.log('Real data loaded from Orchestrator');
+                    } else {
+                        // Fallback vers mock data si erreur
+                        this.sessionsData = this.mockData.sessions;
+                        console.log('Using mock data (Orchestrator error)');
+                    }
+                } catch (error) {
+                    console.warn('Failed to load from Orchestrator, using mock data:', error);
+                    this.sessionsData = this.mockData.sessions;
+                }
+            } else {
+                // Utiliser mock data si electronAPI non disponible
+                this.sessionsData = this.mockData.sessions;
+                console.log('Using mock data (electronAPI not available)');
+            }
         } catch (error) {
             console.error('Error loading data:', error);
+            this.sessionsData = this.mockData.sessions;
         }
     }
 
