@@ -1,15 +1,74 @@
 {
-  "name": "appium-ui-standalone",
-  "version": "1.0.0",
-  "description": "UI Electron pour piloter Appium et lancer un script Node externe",
-  "main": "index.js",
+  "name": "ios-automation-platform",
+  "version": "0.2.0",
+  "description": "Plateforme professionnelle d'automatisation iOS multi-appareils",
+  "main": "src/ui/main/main.js",
   "scripts": {
-    "ui": "electron ./electron/main.js",
-    "build:mac": "electron-builder --mac"
+    "ui": "electron src/ui/main/main.js",
+    "bot": "node src/bot/bot.js",
+    "multi": "node src/bot/multi.js",
+    "dev": "electron src/ui/main/main.js --dev",
+    "build:mac": "electron-builder --mac --config config/build/electron-builder.yml",
+    "build:win": "electron-builder --win --config config/build/electron-builder.yml",
+    "test": "echo \"Tests à implémenter\"",
+    "clean": "rm -rf dist build node_modules",
+    "clean:old": "rm -rf AppiumUI electron",
+    "lint": "eslint src/",
+    "format": "prettier --write \"src/**/*.{js,json,css,html}\"",
+    "setup": "npm install && node scripts/setup.js",
+    "appium": "sh scripts/start_appium.sh"
+  },
+  "keywords": [
+    "ios",
+    "automation",
+    "appium",
+    "electron",
+    "multi-device",
+    "webdriver"
+  ],
+  "author": "Automation Platform Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LPLABSIO/INTERFACE.git"
   },
   "dependencies": {
+    "@fast-csv/format": "^5.0.5",
+    "@turf/turf": "^7.2.0",
+    "axios": "^1.9.0",
+    "csv-parser": "^3.2.0",
+    "dotenv": "^17.2.2",
     "electron": "^31.3.0",
+    "fs-extra": "^11.3.1",
+    "imapflow": "^1.0.195",
+    "mailparser": "^3.7.4",
+    "path": "^0.12.7",
+    "uuid": "^13.0.0",
+    "webdriverio": "^9.19.2",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
     "electron-builder": "^24.13.3",
-    "axios": "^1.9.0"
+    "eslint": "^8.50.0",
+    "prettier": "^3.0.3"
+  },
+  "build": {
+    "appId": "com.automation.ios.platform",
+    "productName": "iOS Automation Platform",
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "icon": "assets/icon.icns"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    }
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }
