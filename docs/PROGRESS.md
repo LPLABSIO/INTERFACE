@@ -6,7 +6,7 @@
 |-------|------------|--------|--------------|
 | **PHASE 1** : Foundation | ██████████ 100% | ✅ Complété | 15/09/2025 |
 | **PHASE 2** : Core Infrastructure | ██████████ 100% | ✅ Complété | 16/09/2025 |
-| **PHASE 3** : Orchestration Engine | ██░░░░░░░░ 20% | 🟡 En cours | 16/09/2025 |
+| **PHASE 3** : Orchestration Engine | ████░░░░░░ 40% | 🟡 En cours | 17/09/2025 |
 | **PHASE 4** : Project System | ░░░░░░░░░░ 0% | ⏳ À venir | - |
 | **PHASE 5** : Production Ready | ░░░░░░░░░░ 0% | ⏳ À venir | - |
 | **PHASE 6** : Advanced Features | ░░░░░░░░░░ 0% | ⏳ À venir | - |
@@ -15,10 +15,29 @@
 
 ---
 
-## 🚀 Sprint Actuel : Sprint 3.1 (Semaine 5-6)
+## 🚀 Sprint Actuel : Sprint 3.3 (Semaine 6)
 
 ### Objectif
-Système d'orchestration avancé avec gestion de files d'attente
+Système de récupération d'erreurs et monitoring de santé
+
+### Tâches Complétées (17/09/2025)
+
+#### ✅ **3.3 Error Recovery & Health Monitoring** (17/09/2025 - 00:30)
+- **Durée** : 4h
+- **Description** : Système complet de récupération d'erreurs et monitoring de santé
+- **Détails techniques** :
+  - **ErrorRecovery** : Checkpointing, rollback, retry, skip strategies
+  - **HealthMonitor** : Surveillance appareils, services et ressources
+  - **Intégration AppOrchestrator** : Hooks automatiques sur erreurs
+  - **Dashboard Health** : Interface temps réel avec métriques et alertes
+  - **Persistance** : Sauvegarde checkpoints sur disque
+  - **Recovery Timeline** : Historique des récupérations
+- **Fichiers créés** :
+  - `packages/@shared/error-recovery/src/ErrorRecovery.js`
+  - `packages/@shared/error-recovery/src/HealthMonitor.js`
+  - `src/ui/renderer/health-dashboard.html`
+  - `test-recovery.js`
+- **UI** : Dashboard professionnel avec thème sombre unifié
 
 ### Tâches Complétées (16/09/2025 - Suite)
 

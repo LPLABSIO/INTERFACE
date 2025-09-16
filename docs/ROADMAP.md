@@ -222,18 +222,18 @@ Créer une plateforme professionnelle d'automatisation iOS multi-appareils, modu
   - [ ] Parallel/Sequential execution
   - [ ] Rollback capabilities
 
-### Sprint 3.3 : Error Recovery & Monitoring (Semaine 6) ⏳ À VENIR
-- [ ] **3.3.1** Système de Récupération
-  - [ ] Checkpointing des tâches
-  - [ ] Reprise après crash
-  - [ ] Sauvegarde d'état distribué
-  - [ ] Rollback automatique
+### Sprint 3.3 : Error Recovery & Monitoring (Semaine 6) ✅ COMPLÉTÉ (17/09)
+- [x] **3.3.1** Système de Récupération
+  - [x] Checkpointing des tâches
+  - [x] Reprise après crash
+  - [x] Sauvegarde d'état distribué
+  - [x] Rollback automatique
 
-- [ ] **3.3.2** Health Monitoring
-  - [ ] Heartbeat des appareils
-  - [ ] Détection automatique des pannes
-  - [ ] Alertes et notifications
-  - [ ] Dashboard de santé système
+- [x] **3.3.2** Health Monitoring
+  - [x] Heartbeat des appareils
+  - [x] Détection automatique des pannes
+  - [x] Alertes et notifications
+  - [x] Dashboard de santé système
 
 ### Sprint 3.4 : API & Communication (Semaine 6) ⏳ À VENIR
 - [ ] **3.2.1** REST API
