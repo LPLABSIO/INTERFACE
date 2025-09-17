@@ -1,5 +1,50 @@
+# Dependencies
 node_modules/
+package-lock.json
+
+# Logs
 *.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
 dist/
 build/
+out/
+
+# System files
 .DS_Store
+Thumbs.db
+
+# Test files
+test-*.js
+test-*.html
+*.test.js
+tests/
+
+# Data & state
+data/state.json
+config/app/appium_servers.json
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+temp/
+tmp/
+
+# Coverage
+coverage/
+.nyc_output/
