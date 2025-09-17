@@ -203,24 +203,11 @@ Créer une plateforme professionnelle d'automatisation iOS multi-appareils, modu
   - [x] Gestion des timeouts
   - [x] Statistiques détaillées
 
-### Sprint 3.2 : Scheduler & Load Balancer (Semaine 5-6) ⏳ À VENIR
-- [ ] **3.2.1** Task Scheduler Avancé
-  - [ ] Cron-like scheduling
-  - [ ] Recurring tasks
-  - [ ] Task dependencies
-  - [ ] Conditional execution
-
-- [ ] **3.2.2** Load Balancer Intelligent
-  - [ ] Métriques de performance par appareil
-  - [ ] Distribution basée sur la charge CPU/RAM
-  - [ ] Prédiction de temps d'exécution
-  - [ ] Auto-scaling virtuel
-
-- [ ] **3.2.3** Workflow Engine
-  - [ ] Définition des workflows en YAML/JSON
-  - [ ] Étapes conditionnelles
-  - [ ] Parallel/Sequential execution
-  - [ ] Rollback capabilities
+### Sprint 3.2 : Scheduler & Load Balancer (Semaine 5-6) ⏭️ SKIPPED
+- [x] **Décision** : Sprint non nécessaire pour MVP
+- [x] **Justification** : Les fonctionnalités actuelles (Queue Manager + API) suffisent pour l'usage prévu
+- [x] **Alternative** : Implémentation future si besoin spécifique identifié
+- [x] **Impact** : Aucun - Phase 3 considérée comme complète
 
 ### Sprint 3.3 : Error Recovery & Monitoring (Semaine 6) ✅ COMPLÉTÉ (17/09)
 - [x] **3.3.1** Système de Récupération
