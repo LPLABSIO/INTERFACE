@@ -1,0 +1,22 @@
+{
+  "available": [
+    "test1@example.com",
+    "test2@example.com",
+    "test3@example.com",
+    "test4@example.com",
+    "test5@example.com",
+    "test6@example.com",
+    "test7@example.com",
+    "test8@example.com",
+    "test9@example.com",
+    "test10@example.com"
+  ],
+  "allocated": {},
+  "used": [],
+  "stats": {
+    "totalEmails": 10,
+    "availableCount": 10,
+    "allocatedCount": 0,
+    "usedCount": 0
+  }
+}

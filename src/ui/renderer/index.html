@@ -954,9 +954,15 @@
                             <div class="resource-bar">
                                 <span class="resource-name">📍 Locations</span>
                                 <div class="resource-usage">
-                                    <span class="resource-count" id="location-count">0/0</span>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span class="resource-count" id="location-count">0/0</span>
+                                        <button id="reset-locations-btn" onclick="resetLocations()" style="padding: 2px 6px; font-size: 14px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;" title="Recycler toutes les villes">♻️</button>
+                                    </div>
                                     <div class="resource-bar-track">
                                         <div class="resource-bar-fill" id="location-bar" style="width: 0%;"></div>
+                                    </div>
+                                    <div style="margin-top: 4px; font-size: 11px; color: #999;">
+                                        <span id="locations-details">En test: 0 | Utilisées: 0 | Blacklist: 0</span>
                                     </div>
                                 </div>
                             </div>
@@ -1694,6 +1700,66 @@
             // Update other stats as needed
         }
 
+        // Resource Management Functions
+        async function updateResourceStats() {
+            try {
+                const stats = await window.electronAPI.getResourceStats();
+
+                // Update Locations
+                if (stats && stats.locations) {
+                    const available = stats.locations.availableCount || 0;
+                    const total = stats.locations.totalLocations || 0;
+                    const used = stats.locations.usedCount || 0;
+                    const testing = stats.locations.testingCount || 0;
+                    const blacklisted = stats.locations.blacklistedCount || 0;
+
+                    document.getElementById('location-count').textContent = `${available}/${total}`;
+                    document.getElementById('locations-details').textContent =
+                        `En test: ${testing} | Utilisées: ${used} | Blacklist: ${blacklisted}`;
+
+                    const percentage = total > 0 ? ((total - available) / total * 100) : 0;
+                    document.getElementById('location-bar').style.width = `${percentage}%`;
+                }
+
+                // Update Emails
+                if (stats && stats.emails) {
+                    const available = stats.emails.availableCount || 0;
+                    const total = stats.emails.totalEmails || 0;
+
+                    document.getElementById('email-count').textContent = `${available}/${total}`;
+                    const percentage = total > 0 ? ((total - available) / total * 100) : 0;
+                    document.getElementById('email-bar').style.width = `${percentage}%`;
+                }
+            } catch (error) {
+                console.error('Failed to update resource stats:', error);
+            }
+        }
+
+        async function resetLocations() {
+            if (!confirm('Voulez-vous recycler toutes les villes ?')) return;
+
+            const resetBtn = document.getElementById('reset-locations-btn');
+            const originalText = resetBtn.innerHTML;
+            resetBtn.innerHTML = '⏳';
+            resetBtn.disabled = true;
+
+            try {
+                const result = await window.electronAPI.resetLocations();
+                if (result.success) {
+                    addLog('success', 'Villes recyclées avec succès');
+                    await updateResourceStats();
+                } else {
+                    addLog('error', 'Erreur lors du recyclage des villes');
+                }
+            } catch (error) {
+                console.error('Reset locations error:', error);
+                addLog('error', `Erreur: ${error.message}`);
+            } finally {
+                resetBtn.innerHTML = originalText;
+                resetBtn.disabled = false;
+            }
+        }
+
         // Actions
         async function stopAll() {
             if (!confirm('Stop all productions?')) return;
@@ -1755,6 +1821,10 @@
             // Initial scan
             scanDevices();
             updateSelectedCount();
+            updateResourceStats();
+
+            // Update resource stats every 5 seconds
+            setInterval(updateResourceStats, 5000);
 
             // Set up event listeners if Electron API is available
             if (window.electronAPI) {

@@ -100,6 +100,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
     loadSettings: () => ipcRenderer.invoke('load-settings'),
 
+    // Resource management
+    getResourceStats: () => ipcRenderer.invoke('get-resource-stats'),
+    resetLocations: () => ipcRenderer.invoke('reset-locations'),
+
     // Orchestrator API
     getOrchestratorStatus: () => ipcRenderer.invoke('orchestrator:getStatus'),
     getOrchestratorSessions: () => ipcRenderer.invoke('orchestrator:getSessions'),

@@ -1,0 +1,186 @@
+{
+  "available": [
+    {
+      "CountryCode": "us",
+      "state": "D.C.",
+      "city": "Washington D.C.",
+      "lat": "38.9072",
+      "lon": "-77.0369",
+      "area_code": "202",
+      "zip_code": "20001"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Nevada",
+      "city": "North Las Vegas",
+      "lat": "36.1989",
+      "lon": "-115.1175",
+      "area_code": "702",
+      "zip_code": "89030"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Missouri",
+      "city": "St. Louis",
+      "lat": "38.627",
+      "lon": "-90.1994",
+      "area_code": "314",
+      "zip_code": "63101"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Thousand Oaks",
+      "lat": "34.1706",
+      "lon": "-118.8376",
+      "area_code": "805",
+      "zip_code": "91360"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Utah",
+      "city": "St. George",
+      "lat": "37.0967",
+      "lon": "-113.5765",
+      "area_code": "435",
+      "zip_code": "84770"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Missouri",
+      "city": "O'Fallon",
+      "lat": "38.8104",
+      "lon": "-90.6983",
+      "area_code": "636",
+      "zip_code": "63366"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Kentucky",
+      "city": "Hopkinsville",
+      "lat": "36.8657",
+      "lon": "-87.4871",
+      "area_code": "270",
+      "zip_code": "42240"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Iowa",
+      "city": "Ankeny",
+      "lat": "41.7311",
+      "lon": "-93.6025",
+      "area_code": "515",
+      "zip_code": "50021"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Minnesota",
+      "city": "St. Cloud",
+      "lat": "45.5577",
+      "lon": "-94.1632",
+      "area_code": "320",
+      "zip_code": "56301"
+    },
+    {
+      "CountryCode": "us",
+      "state": "South Dakota",
+      "city": "Watertown",
+      "lat": "44.898",
+      "lon": "-97.1197",
+      "area_code": "605",
+      "zip_code": "57201"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Turlock",
+      "lat": "37.4947",
+      "lon": "-120.8463",
+      "area_code": "209",
+      "zip_code": "95380"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Michigan",
+      "city": "Novi",
+      "lat": "42.4818",
+      "lon": "-83.4755",
+      "area_code": "248",
+      "zip_code": "48374"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Minnesota",
+      "city": "Eagan",
+      "lat": "44.8092",
+      "lon": "-93.1668",
+      "area_code": "651",
+      "zip_code": "55121"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Oregon",
+      "city": "McMinnville",
+      "lat": "45.2045",
+      "lon": "-123.202",
+      "area_code": "503",
+      "zip_code": "97128"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Illinois",
+      "city": "Grayslake",
+      "lat": "42.3455",
+      "lon": "-88.0214",
+      "area_code": "847",
+      "zip_code": "60030"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Oklahoma",
+      "city": "Norman",
+      "lat": "35.2226",
+      "lon": "-97.4395",
+      "area_code": "405",
+      "zip_code": "73069"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Minnesota",
+      "city": "Woodbury",
+      "lat": "44.9233",
+      "lon": "-92.997",
+      "area_code": "651",
+      "zip_code": "55125"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Texas",
+      "city": "Flower Mound",
+      "lat": "33.0216",
+      "lon": "-97.0957",
+      "area_code": "972",
+      "zip_code": "75027"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Lompoc",
+      "lat": "34.6391",
+      "lon": "-120.4579",
+      "area_code": "805",
+      "zip_code": "93436"
+    }
+  ],
+  "testing": {},
+  "used": [],
+  "blacklisted": [],
+  "failures": {},
+  "stats": {
+    "totalLocations": 19,
+    "availableCount": 19,
+    "usedCount": 0,
+    "blacklistedCount": 0,
+    "testingCount": 0
+  }
+}
