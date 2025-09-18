@@ -9,9 +9,15 @@ const net = require('net');
 const deviceDiscovery = require('../../utils/device-discovery');
 const AppOrchestrator = require('../../core/AppOrchestrator');
 const setupOrchestratorHandlers = require('./orchestrator-handlers');
+const LocationManager = require('../../core/LocationManager');
+const ResourceManager = require('../../core/ResourceManager');
 
 // Initialiser l'orchestrateur
 let orchestrator = null;
+
+// Initialiser les gestionnaires de ressources
+let locationManager = null;
+let resourceManager = null;
 
 let mainWindow = null;
 let replayChild = null;
@@ -101,6 +107,19 @@ function createWindow() {
 
 app.whenReady().then(async () => {
   createWindow();
+
+  // Initialiser les gestionnaires de ressources
+  try {
+    locationManager = new LocationManager();
+    await locationManager.initialize();
+    console.log('[Main] LocationManager initialized');
+
+    resourceManager = new ResourceManager();
+    await resourceManager.initialize();
+    console.log('[Main] ResourceManager initialized');
+  } catch (error) {
+    console.error('[Main] Error initializing resource managers:', error);
+  }
 
   // Initialiser l'orchestrateur après la création de la fenêtre
   try {
@@ -908,6 +927,47 @@ ipcMain.handle('start-bot', async (_e, config) => {
       });
     }
 
+    // Allouer les ressources pour cet appareil
+    let allocatedEmail = null;
+    let allocatedLocation = null;
+
+    if (app === 'hinge') {
+      try {
+        // Allouer un email
+        if (resourceManager) {
+          allocatedEmail = await resourceManager.allocateEmail(udid);
+          if (!allocatedEmail) {
+            mainWindow?.webContents.send('system-log', {
+              message: `⚠️ Aucun email disponible pour ${deviceName}`,
+              level: 'warning'
+            });
+          }
+        }
+
+        // Allouer une ville
+        if (locationManager) {
+          allocatedLocation = await locationManager.allocate(udid);
+          if (!allocatedLocation) {
+            mainWindow?.webContents.send('system-log', {
+              message: `⚠️ Aucune ville disponible pour ${deviceName}`,
+              level: 'warning'
+            });
+          } else {
+            mainWindow?.webContents.send('system-log', {
+              message: `📍 Ville allouée: ${allocatedLocation.city} pour ${deviceName}`,
+              level: 'info'
+            });
+          }
+        }
+      } catch (error) {
+        console.error('[Main] Error allocating resources:', error);
+        mainWindow?.webContents.send('system-log', {
+          message: `Erreur allocation ressources: ${error.message}`,
+          level: 'error'
+        });
+      }
+    }
+
     // Démarrer le bot via le système existant
     const projectRoot = path.resolve(__dirname, '../../..');
   const hingeRoot = path.join(projectRoot, 'src', 'bot');
@@ -930,7 +990,11 @@ ipcMain.handle('start-bot', async (_e, config) => {
       BOT_ACCOUNTS: String(accountsNumber || 1),
       PROXY_PROVIDER: proxyProvider || 'marsproxies',
       NODE_NO_WARNINGS: '1',
-      FORCE_COLOR: '0'  // Désactiver les couleurs pour éviter les caractères spéciaux
+      FORCE_COLOR: '0',  // Désactiver les couleurs pour éviter les caractères spéciaux
+      // Passer les ressources allouées
+      HINGE_EMAIL: allocatedEmail || '',
+      HINGE_LOCATION: allocatedLocation ? JSON.stringify(allocatedLocation) : '',
+      DEVICE_ID: udid
     };
 
     const child = spawn(nodeBin, args, {
@@ -970,8 +1034,38 @@ ipcMain.handle('start-bot', async (_e, config) => {
       });
     });
 
-    child.on('close', (code) => {
+    child.on('close', async (code) => {
       perDeviceChildren.delete(udid);
+
+      // Gérer les ressources selon le résultat
+      if (app === 'hinge') {
+        try {
+          if (code === 0) {
+            // Succès : marquer les ressources comme utilisées
+            if (resourceManager && allocatedEmail) {
+              await resourceManager.markEmailUsed(udid);
+              console.log(`[Main] Email marked as used for ${udid}`);
+            }
+            if (locationManager && allocatedLocation) {
+              await locationManager.markUsed(udid, allocatedLocation);
+              console.log(`[Main] Location ${allocatedLocation.city} marked as used for ${udid}`);
+            }
+          } else {
+            // Échec : libérer les ressources pour réutilisation
+            if (resourceManager && allocatedEmail) {
+              await resourceManager.releaseEmail(udid);
+              console.log(`[Main] Email released for ${udid}`);
+            }
+            if (locationManager && allocatedLocation) {
+              await locationManager.release(udid, allocatedLocation);
+              console.log(`[Main] Location ${allocatedLocation.city} released for ${udid}`);
+            }
+          }
+        } catch (error) {
+          console.error('[Main] Error managing resources on close:', error);
+        }
+      }
+
       mainWindow?.webContents.send('status-update', {
         deviceId: udid,
         status: code === 0 ? 'online' : 'error'

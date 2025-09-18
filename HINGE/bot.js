@@ -331,11 +331,26 @@ async function main() {
         ? `locations_${country}_pof.csv`
         : `locations_${country}_tinder.csv`;
 
-    // Load locations from CSV file
-    if (appArg === "pof") {
-      var locations = await loadLocations(path.join(__dirname, location_file));
-    } else {
-      var locations = await loadLocations(path.join(__dirname, location_file));
+    // Vérifier si on a une location depuis l'environnement (nouveau système multi-appareils)
+    let locations = [];
+    if (process.env.HINGE_LOCATION) {
+      try {
+        const envLocation = JSON.parse(process.env.HINGE_LOCATION);
+        log(`📍 Using location from environment: ${envLocation.city}, ${envLocation.state}`);
+        locations = [envLocation]; // Une seule location depuis l'env
+      } catch (e) {
+        log('Error parsing HINGE_LOCATION, falling back to CSV');
+      }
+    }
+
+    // Si pas de location depuis env, charger depuis CSV (ancien système)
+    if (locations.length === 0) {
+      log('Loading locations from CSV file...');
+      if (appArg === "pof") {
+        locations = await loadLocations(path.join(__dirname, location_file));
+      } else {
+        locations = await loadLocations(path.join(__dirname, location_file));
+      }
     }
 
     // Iterate through each location
@@ -417,11 +432,15 @@ async function main() {
         await runApp(client, proxyInfo, location, phone);
       }
 
-      // Remove the processed location and reload the updated list
-      locations = await saveLocations(
-        location.city,
-        path.join(__dirname, location_file)
-      );
+      // Remove the processed location ONLY if not using env system
+      if (!process.env.HINGE_LOCATION) {
+        locations = await saveLocations(
+          location.city,
+          path.join(__dirname, location_file)
+        );
+      } else {
+        log('Using environment location, not removing from CSV');
+      }
 
       await new Promise((resolve) => setTimeout(resolve, 10000));
     }

@@ -65,12 +65,23 @@ async function runHingeApp(client, location, phone, proxyInfo) {
     log('Entered first name');
     await findAndClickWithPolling(client, '-ios predicate string:name == "Next"');
 
-    // No thanks, puis email (email_hinge.txt)
+    // No thanks, puis email (depuis env ou fichier)
     await findAndClickWithPolling(client, '-ios predicate string:name == "No thanks" AND label == "No thanks" AND value == "No thanks"');
-    const email = await getAndRemoveEmail('email_hinge.txt');
+
+    // Utiliser l'email depuis l'environnement si disponible, sinon fallback sur l'ancien système
+    let email = process.env.HINGE_EMAIL;
+    if (!email) {
+      log('No email in env, using file system');
+      email = await getAndRemoveEmail('email_hinge.txt');
+    } else {
+      log('Using email from environment variable');
+    }
+
     if (email) {
       await findAndTypeCharByChar(client, email);
-      log('Entered email');
+      log(`Entered email: ${email.substring(0, 3)}***`);
+    } else {
+      log('Warning: No email available');
     }
     await findAndClickWithPolling(client, '-ios predicate string:name == "Next"');
     // Code email via Gmail (fallback 0000 si indispo)
