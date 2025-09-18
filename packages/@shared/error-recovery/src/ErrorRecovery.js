@@ -55,7 +55,7 @@ class ErrorRecovery extends EventEmitter {
     // Load existing checkpoints
     await this.loadCheckpoints();
 
-    console.log('[ErrorRecovery] Initialized with', this.checkpoints.size, 'checkpoints');
+    // console.log('[ErrorRecovery] Initialized with', this.checkpoints.size, 'checkpoints');
   }
 
   /**
@@ -524,7 +524,7 @@ class ErrorRecovery extends EventEmitter {
       }
     }
 
-    console.log('[ErrorRecovery] Cleaned up old checkpoints');
+    // console.log('[ErrorRecovery] Cleaned up old checkpoints');
   }
 
   /**
@@ -541,7 +541,7 @@ class ErrorRecovery extends EventEmitter {
     // Clear memory
     this.checkpoints.clear();
 
-    console.log('[ErrorRecovery] Cleared all checkpoints');
+    // console.log('[ErrorRecovery] Cleared all checkpoints');
   }
 
   /**
@@ -569,7 +569,7 @@ class ErrorRecovery extends EventEmitter {
    * Shutdown the error recovery system
    */
   async shutdown() {
-    console.log('[ErrorRecovery] Shutting down...');
+    // console.log('[ErrorRecovery] Shutting down...');
 
     // Stop cleanup timer
     if (this.cleanupTimer) {
@@ -579,7 +579,7 @@ class ErrorRecovery extends EventEmitter {
     // Clear in-progress recoveries
     this.recoveryInProgress.clear();
 
-    console.log('[ErrorRecovery] Shutdown complete');
+    // console.log('[ErrorRecovery] Shutdown complete');
   }
 }
 
