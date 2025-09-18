@@ -15,6 +15,7 @@ const { getSMSProvider } = require("./src/sms-provider");
 const { findAndClickWithPolling } = require("./src/utils");
 const { runHingeApp } = require("./src/hinge");
 const { setupGeraniumApp } = require("./src/geranium");
+const QueueAdapter = require("./src/queue-adapter");
 
 const path = require("path");
 
@@ -303,8 +304,61 @@ if (!runApp) {
 log(`Selected device: ${deviceArg}`);
 log(`Selected app: ${appArg}`);
 
+/**
+ * Traite une tâche de la queue
+ */
+async function processTask(client, task) {
+  const { config } = task;
+  const appFunc = appFunctionMap[config.app || 'hinge'];
+
+  if (!appFunc) {
+    throw new Error(`Unknown app: ${config.app}`);
+  }
+
+  // Charger une location depuis le CSV
+  const location_file = `locations_${country}_tinder.csv`;
+  let locations = await loadLocations(path.join(__dirname, location_file));
+
+  if (locations.length === 0) {
+    throw new Error('No locations available');
+  }
+
+  const location = locations[0];
+  log(`📍 Processing location: ${location.city}, ${location.state}`);
+
+  // Générer le proxy
+  const proxyInfo = await generateProxyInfo(location.city, config.proxyProvider || 'marsproxies');
+  if (!proxyInfo || !proxyInfo.proxy) {
+    throw new Error(`Failed to get proxy for ${location.city}`);
+  }
+
+  // Obtenir un numéro de téléphone
+  const provider = config.smsProvider || 'api21k';
+  const smsService = getSMSProvider(provider);
+  log(`Getting phone number from ${provider}...`);
+
+  const phone = await smsService.getNumber();
+  if (!phone || !phone.number) {
+    throw new Error('Failed to get phone number');
+  }
+
+  // Exécuter l'application
+  await appFunc(client, proxyInfo, location, phone);
+
+  // Sauvegarder la location utilisée
+  await saveLocations(location.city, path.join(__dirname, location_file));
+}
+
 async function main() {
   let client;
+  let queueAdapter = null;
+
+  // Mode queue si activé
+  if (QueueAdapter.isQueueMode()) {
+    log("🔄 Queue mode activated");
+    queueAdapter = new QueueAdapter();
+  }
+
   try {
     log("Starting bot session...");
     // Préflight: log et check /status Appium pour éviter les hangs silencieux
@@ -326,6 +380,34 @@ async function main() {
       new Promise((_, reject) => setTimeout(() => reject(new Error(`SessionTimeout after ${sessionTimeoutMs}ms`)), sessionTimeoutMs))
     ]);
     log("Successfully connected to WebDriver");
+
+    // En mode queue, boucler sur les tâches
+    if (queueAdapter) {
+      while (true) {
+        const task = await queueAdapter.getNextTask();
+        if (!task) {
+          log("✅ No more tasks in queue, exiting");
+          break;
+        }
+
+        log(`📋 Processing task #${task.id} (attempt ${task.attempts}/${task.maxAttempts})`);
+
+        try {
+          await processTask(client, task);
+          await queueAdapter.markCompleted({ success: true });
+          log(`✅ Task #${task.id} completed successfully`);
+        } catch (error) {
+          log(`❌ Task #${task.id} failed: ${error.message}`);
+          await queueAdapter.markFailed(error.message);
+        }
+
+        // Petit délai entre les tâches
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+      return; // Sortir après avoir traité toutes les tâches
+    }
+
+    // Mode normal (sans queue)
     const location_file =
       appArg === "pof"
         ? `locations_${country}_pof.csv`

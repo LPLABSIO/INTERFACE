@@ -11,6 +11,7 @@ const AppOrchestrator = require('../../core/AppOrchestrator');
 const setupOrchestratorHandlers = require('./orchestrator-handlers');
 const LocationManager = require('../../core/LocationManager');
 const ResourceManager = require('../../core/ResourceManager');
+const QueueManager = require('../../core/QueueManager');
 
 // Initialiser l'orchestrateur
 let orchestrator = null;
@@ -18,6 +19,7 @@ let orchestrator = null;
 // Initialiser les gestionnaires de ressources
 let locationManager = null;
 let resourceManager = null;
+let queueManager = null;
 
 let mainWindow = null;
 let replayChild = null;
@@ -117,6 +119,10 @@ app.whenReady().then(async () => {
     resourceManager = new ResourceManager();
     await resourceManager.initialize();
     console.log('[Main] ResourceManager initialized');
+
+    queueManager = new QueueManager();
+    await queueManager.initialize();
+    console.log('[Main] QueueManager initialized');
   } catch (error) {
     console.error('[Main] Error initializing resource managers:', error);
   }
@@ -765,6 +771,13 @@ function startDeviceBot(_e, payload = {}) {
       env.BOT_SESSION_TIMEOUT_MS = '120000';
     }
   } catch (_) {}
+
+  // Passer le mode queue si spécifié
+  if (payload.useQueue) {
+    env.USE_QUEUE = 'true';
+    env.QUEUE_DEVICE_ID = udid;
+  }
+
   const child = spawn(nodeBin, args, { cwd: hingeRoot, env });
   perDeviceChildren.set(udid, child);
   mainWindow?.webContents.send('deviceRun:output', { udid, line: `[ui] Start bot.js for ${deviceLabel || deviceName || udid}` });
@@ -1112,6 +1125,106 @@ ipcMain.handle('reset-locations', async () => {
     return { success: false, error: 'LocationManager not initialized' };
   } catch (error) {
     console.error('[Main] Error resetting locations:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+// ===== Queue Management Handlers =====
+
+// Ajouter des tâches à la queue
+ipcMain.handle('queue:addBatch', async (_e, count, config) => {
+  try {
+    if (!queueManager) {
+      return { success: false, error: 'QueueManager not initialized' };
+    }
+    const tasks = await queueManager.addBatch(count, config);
+    return { success: true, tasks };
+  } catch (error) {
+    console.error('[Main] Error adding batch to queue:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+// Récupérer la prochaine tâche pour un appareil
+ipcMain.handle('queue:getNext', async (_e, deviceId) => {
+  try {
+    if (!queueManager) {
+      return { success: false, error: 'QueueManager not initialized' };
+    }
+    const task = await queueManager.getNextTask(deviceId);
+    return { success: true, task };
+  } catch (error) {
+    console.error('[Main] Error getting next task:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+// Marquer une tâche comme complétée
+ipcMain.handle('queue:markCompleted', async (_e, deviceId, taskId, result) => {
+  try {
+    if (!queueManager) {
+      return { success: false, error: 'QueueManager not initialized' };
+    }
+    await queueManager.markCompleted(deviceId, taskId, result);
+    return { success: true };
+  } catch (error) {
+    console.error('[Main] Error marking task completed:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+// Marquer une tâche comme échouée
+ipcMain.handle('queue:markFailed', async (_e, deviceId, taskId, error) => {
+  try {
+    if (!queueManager) {
+      return { success: false, error: 'QueueManager not initialized' };
+    }
+    await queueManager.markFailed(deviceId, taskId, error);
+    return { success: true };
+  } catch (error) {
+    console.error('[Main] Error marking task failed:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+// Obtenir les statistiques de la queue
+ipcMain.handle('queue:getStats', async () => {
+  try {
+    if (!queueManager) {
+      return { success: false, error: 'QueueManager not initialized' };
+    }
+    const stats = queueManager.getStats();
+    return { success: true, stats };
+  } catch (error) {
+    console.error('[Main] Error getting queue stats:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+// Obtenir toutes les tâches
+ipcMain.handle('queue:getTasks', async () => {
+  try {
+    if (!queueManager) {
+      return { success: false, error: 'QueueManager not initialized' };
+    }
+    const tasks = queueManager.getTasks();
+    return { success: true, tasks };
+  } catch (error) {
+    console.error('[Main] Error getting tasks:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+// Vider la queue
+ipcMain.handle('queue:clear', async () => {
+  try {
+    if (!queueManager) {
+      return { success: false, error: 'QueueManager not initialized' };
+    }
+    await queueManager.clearQueue();
+    return { success: true };
+  } catch (error) {
+    console.error('[Main] Error clearing queue:', error);
     return { success: false, error: error.message };
   }
 });

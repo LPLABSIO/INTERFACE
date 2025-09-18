@@ -104,6 +104,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getResourceStats: () => ipcRenderer.invoke('get-resource-stats'),
     resetLocations: () => ipcRenderer.invoke('reset-locations'),
 
+    // Queue management
+    queueAddBatch: (count, config) => ipcRenderer.invoke('queue:addBatch', count, config),
+    queueGetNext: (deviceId) => ipcRenderer.invoke('queue:getNext', deviceId),
+    queueMarkCompleted: (deviceId, taskId, result) => ipcRenderer.invoke('queue:markCompleted', deviceId, taskId, result),
+    queueMarkFailed: (deviceId, taskId, error) => ipcRenderer.invoke('queue:markFailed', deviceId, taskId, error),
+    queueGetStats: () => ipcRenderer.invoke('queue:getStats'),
+    queueGetTasks: () => ipcRenderer.invoke('queue:getTasks'),
+    queueClear: () => ipcRenderer.invoke('queue:clear'),
+
     // Orchestrator API
     getOrchestratorStatus: () => ipcRenderer.invoke('orchestrator:getStatus'),
     getOrchestratorSessions: () => ipcRenderer.invoke('orchestrator:getSessions'),
