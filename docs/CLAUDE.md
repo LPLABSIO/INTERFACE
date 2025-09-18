@@ -4,75 +4,151 @@ Ce fichier fournit des indications à Claude Code (claude.ai/code) lors du trava
 
 ## Vue d'ensemble du projet
 
-Ce dépôt contient deux systèmes intégrés :
-- **HINGE** : Système de bot d'automatisation d'applications de rencontre iOS utilisant Appium/WebDriverIO
-- **AppiumUI** : Interface Electron pour gérer les serveurs Appium et l'orchestration des bots
+Ce dépôt contient une **plateforme d'automatisation iOS multi-appareils** professionnelle :
+- **INTERFACE** : Application Electron pour la gestion et le monitoring des appareils
+- **HINGE** : Module de bot d'automatisation pour applications (Hinge, Tinder, POF)
+- **Production System** : Système de production multi-appareils avec gestion des ressources
+
+## Architecture Actuelle
+
+```
+INTERFACE/
+├── src/
+│   ├── ui/                      # Interface Electron
+│   │   ├── main/main.js        # Process principal avec IPC
+│   │   ├── renderer/            # Pages HTML/JS
+│   │   │   ├── index.html      # Interface principale avec logs multi-appareils
+│   │   │   ├── production.html # Page de production avec ResourceManager
+│   │   │   └── production.js   # Gestion des ressources et allocation
+│   │   └── preload/            # Bridge sécurisé
+│   ├── core/                   # Orchestration
+│   │   └── AppOrchestrator.js # Coordination multi-appareils
+│   └── bot/                    # Scripts d'exécution
+├── HINGE/                      # Module bot autonome
+│   ├── bot.js                  # Point d'entrée principal
+│   └── src/
+│       ├── hinge.js           # Automatisation Hinge
+│       ├── email.js           # Gestion emails (getAndRemoveEmail)
+│       └── locations.js       # Gestion locations (loadLocations)
+├── config/app/                 # Configuration centralisée
+│   ├── data.json              # Config principale
+│   ├── devices.json           # UUIDs des appareils
+│   ├── state.json             # État de progression
+│   └── appium_servers.json    # Mapping ports Appium
+└── data/resources/            # Pools de ressources
+    ├── emails.txt             # Liste d'emails
+    └── locations.txt          # Liste de locations
+```
 
 ## Commandes courantes
 
-### Développement et exécution
+### Interface de Production
 
 ```bash
-# Interface AppiumUI
-npm run ui                     # Lancer l'interface de gestion Electron
-npm run build:mac             # Construire l'application Mac
+# Lancer l'interface Electron
+npm run ui
 
-# Système de bot HINGE
+# Scanner les appareils iOS connectés
+npm run scan:devices
+
+# Démarrer la production multi-appareils
+# (Via l'interface graphique - onglet Production)
+```
+
+### Système de Bot HINGE
+
+```bash
+# Exécution manuelle d'un bot
 cd HINGE
-npm run devices:scan          # Scanner et sauvegarder les appareils iOS connectés dans config/devices.json
-npm run multi                 # Exécuter l'orchestration multi-appareils
-node bot.js <device> <app>    # Exécuter un bot unique (ex: node bot.js iphonex hinge)
-./start_appium.sh             # Démarrer les serveurs Appium (ports 4723-4733)
+node bot.js <device> <app>    # Ex: node bot.js iphonex hinge
+
+# Variables d'environnement requises
+APPIUM_HOST=127.0.0.1
+APPIUM_PORT=1265
+APPIUM_UDID=<device-udid>
+WDA_PORT=8100
 ```
 
-### Tests et débogage
+## Flux de Production Multi-Appareils
 
-```bash
-# Tester la connexion Appium
-node -e "console.log(require('./HINGE/src/deviceManager').getDevices())"
+### 1. Détection et Configuration
+- L'interface scanne les appareils iOS via `idevice_id`
+- Allocation dynamique des ports (Appium: 1265+, WDA: 8100+)
+- Configuration stockée dans `config/app/devices.json`
 
-# Vérifier la connectivité proxy
-node -e "require('./HINGE/src/proxy').testProxy('host', port, 'user', 'pass')"
-```
-
-## Architecture et modèles clés
-
-### Flux d'orchestration multi-appareils
-1. `multi.js` lit les configurations d'appareils depuis `config/data.json` et `config/devices.json`
-2. Lance des processus `bot.js` individuels pour chaque appareil avec des ports Appium spécifiques
-3. Chaque instance de bot se connecte à son serveur Appium assigné (mapping des ports dans config)
-4. La gestion d'état suit la progression à travers les appareils dans `config/state.json`
-
-### Modèle d'exécution du bot
-Tous les modules d'applications de rencontre (`hinge.js`, `tinder.js`, `pof.js`) suivent ce modèle :
+### 2. Gestion des Ressources
 ```javascript
-async function main(driver, device, smsProvider, emailProvider, proxy) {
-    // 1. Configuration proxy/VPN via les modules shadowrocket/ghost/crane
-    // 2. Navigation dans l'app avec les commandes WebDriverIO
-    // 3. Gestion de la vérification via les fournisseurs SMS/email
-    // 4. Exécution des tâches d'automatisation
-    // 5. Retour du statut succès/échec
+// Production.js - ResourceManager
+class ResourceManager {
+    allocateResources(deviceId) {
+        return {
+            email: this.getNextEmail(),
+            location: this.getNextLocation(),
+            proxy: this.getNextProxy()
+        };
+    }
 }
 ```
 
-### Architecture de gestion des proxies
-Le système utilise une approche de proxy en couches :
-1. **Proxy.js** valide et établit les connexions SOCKS5
-2. **Applications VPN** (shadowrocket, ghost, crane, orbit, geranium) configurent les proxies sur l'appareil
-3. **Vérificateur de fraude** valide la qualité de l'IP avant utilisation
-4. **Services de localisation** s'assurent que la localisation du proxy correspond à celle de l'application
+### 3. Lancement des Bots
+- Appium démarre pour chaque appareil
+- Variables d'environnement passées au bot
+- Logs temps réel via IPC
 
-### Fichiers de configuration critiques
+### 4. Communication IPC
+```javascript
+// Canaux principaux
+'scan-devices'        // Détection appareils
+'start-production'    // Lancer production
+'appium-log'         // Logs Appium
+'script-log'         // Logs du bot
+'system-log'         // Logs système
+```
 
-**HINGE/config/data.json** - Configuration principale :
-- `devices` : Tableau de configurations d'appareils avec ports Appium/WDA
-- `proxyProvider` : Identifiants du service proxy (marsproxies, etc.)
-- `smsProvider` : Clés API du service SMS (api21k, daisysms, smspool)
-- `emailSettings` : Configuration IMAP pour la vérification Gmail
+## Problème Actuel : Gestion des Ressources
 
-**HINGE/config/devices.json** - UUIDs des appareils connectés (auto-généré par `npm run devices:scan`)
+### Conflit Multi-Appareils
+Le bot HINGE utilise actuellement :
+```javascript
+// ❌ Problème : accès concurrent aux fichiers
+const email = await getAndRemoveEmail('email_hinge.txt');
+const location = await loadLocations('locations.csv');
+```
 
-**HINGE/config/appium_servers.json** - Mapping des ports des serveurs Appium
+### Solution Proposée
+Utiliser le ResourceManager de production.js :
+```javascript
+// ✅ Solution : allocation via ResourceManager
+const resources = await resourceManager.allocate(deviceId);
+const email = resources.email;
+const location = resources.location;
+```
+
+## Fichiers de Configuration
+
+### config/app/data.json
+```json
+{
+  "devices": [],
+  "settings": {
+    "appiumBasePort": 1265,
+    "wdaBasePort": 8100
+  }
+}
+```
+
+### config/app/state.json
+```json
+{
+  "devices": {
+    "<udid>": {
+      "created": 0,
+      "target": 10,
+      "status": "idle"
+    }
+  }
+}
+```
 
 ## Considérations techniques clés
 
