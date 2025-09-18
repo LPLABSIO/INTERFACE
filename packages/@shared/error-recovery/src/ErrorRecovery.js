@@ -70,7 +70,7 @@ class ErrorRecovery extends EventEmitter {
         return { success: false, reason: 'Max retries exceeded' };
       }
 
-      console.log(`[ErrorRecovery] Retrying task ${task.id} (attempt ${retryCount + 1}/${maxRetries})`);
+      // console.log(`[ErrorRecovery] Retrying task ${task.id} (attempt ${retryCount + 1}/${maxRetries})`);
 
       // Wait with exponential backoff
       const delay = Math.min(1000 * Math.pow(2, retryCount), 30000);
@@ -91,7 +91,7 @@ class ErrorRecovery extends EventEmitter {
         return { success: false, reason: 'No checkpoint available' };
       }
 
-      console.log(`[ErrorRecovery] Rolling back task ${task.id} to checkpoint ${checkpoint.id}`);
+      // console.log(`[ErrorRecovery] Rolling back task ${task.id} to checkpoint ${checkpoint.id}`);
 
       return {
         success: true,
@@ -104,7 +104,7 @@ class ErrorRecovery extends EventEmitter {
     this.registerStrategy('skip', async (context) => {
       const { task } = context;
 
-      console.log(`[ErrorRecovery] Skipping failed task ${task.id}`);
+      // console.log(`[ErrorRecovery] Skipping failed task ${task.id}`);
 
       return {
         success: true,
@@ -116,7 +116,7 @@ class ErrorRecovery extends EventEmitter {
     this.registerStrategy('restart', async (context) => {
       const { task } = context;
 
-      console.log(`[ErrorRecovery] Restarting task ${task.id} from beginning`);
+      // console.log(`[ErrorRecovery] Restarting task ${task.id} from beginning`);
 
       // Clear task state
       const cleanTask = {
@@ -139,7 +139,7 @@ class ErrorRecovery extends EventEmitter {
    */
   registerStrategy(name, handler) {
     this.recoveryStrategies.set(name, handler);
-    console.log(`[ErrorRecovery] Registered strategy: ${name}`);
+      // console.log(`[ErrorRecovery] Registered strategy: ${name}`);
   }
 
   /**
@@ -175,7 +175,7 @@ class ErrorRecovery extends EventEmitter {
     this.stats.checkpointsSaved++;
     this.emit('checkpoint:created', { taskId, checkpointId });
 
-    console.log(`[ErrorRecovery] Created checkpoint ${checkpointId} for task ${taskId}`);
+      // console.log(`[ErrorRecovery] Created checkpoint ${checkpointId} for task ${taskId}`);
 
     return checkpointId;
   }
@@ -216,7 +216,7 @@ class ErrorRecovery extends EventEmitter {
       state
     });
 
-    console.log(`[ErrorRecovery] Restored checkpoint ${checkpointId}`);
+      // console.log(`[ErrorRecovery] Restored checkpoint ${checkpointId}`);
 
     return {
       taskId: checkpoint.taskId,
@@ -236,7 +236,7 @@ class ErrorRecovery extends EventEmitter {
 
     // Check if already recovering this task
     if (this.recoveryInProgress.has(task.id)) {
-      console.log(`[ErrorRecovery] Recovery already in progress for task ${task.id}`);
+      // console.log(`[ErrorRecovery] Recovery already in progress for task ${task.id}`);
       return null;
     }
 
@@ -247,7 +247,7 @@ class ErrorRecovery extends EventEmitter {
       // Determine recovery strategy
       const strategy = options.strategy || this.determineStrategy(task, error);
 
-      console.log(`[ErrorRecovery] Attempting ${strategy} recovery for task ${task.id}`);
+      // console.log(`[ErrorRecovery] Attempting ${strategy} recovery for task ${task.id}`);
 
       // Get recovery handler
       const handler = this.recoveryStrategies.get(strategy);
