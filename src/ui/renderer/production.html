@@ -467,13 +467,21 @@
             <div class="resource-card">
                 <div class="resource-header">
                     <span class="resource-title">📍 Locations</span>
-                    <div>
-                        <span class="resource-available" id="locations-available">0</span>
-                        <span class="resource-total">/ <span id="locations-total">0</span></span>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div>
+                            <span class="resource-available" id="locations-available">0</span>
+                            <span class="resource-total">/ <span id="locations-total">0</span></span>
+                        </div>
+                        <button id="reset-locations-btn" class="btn-small" style="padding: 2px 8px; font-size: 11px; background: #4CAF50;" title="Recycler toutes les villes">
+                            ♻️
+                        </button>
                     </div>
                 </div>
                 <div class="resource-usage-bar">
                     <div class="resource-usage-fill" id="locations-usage" style="width: 0%"></div>
+                </div>
+                <div style="margin-top: 5px; font-size: 11px; color: var(--text-secondary);">
+                    <span id="locations-details">En test: 0 | Utilisées: 0 | Blacklist: 0</span>
                 </div>
             </div>
             <div class="resource-card">

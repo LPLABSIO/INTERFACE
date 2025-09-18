@@ -1082,6 +1082,40 @@ ipcMain.handle('start-bot', async (_e, config) => {
   }
 });
 
+// Obtenir les statistiques des ressources
+ipcMain.handle('get-resource-stats', async () => {
+  try {
+    const locationStats = locationManager ? locationManager.getStats() : null;
+    const emailStats = resourceManager ? resourceManager.getStats() : null;
+
+    return {
+      locations: locationStats,
+      emails: emailStats
+    };
+  } catch (error) {
+    console.error('[Main] Error getting resource stats:', error);
+    return { locations: null, emails: null };
+  }
+});
+
+// Reset des villes
+ipcMain.handle('reset-locations', async () => {
+  try {
+    if (locationManager) {
+      await locationManager.reset();
+      mainWindow?.webContents.send('system-log', {
+        message: '♻️ Toutes les villes ont été recyclées',
+        level: 'success'
+      });
+      return { success: true };
+    }
+    return { success: false, error: 'LocationManager not initialized' };
+  } catch (error) {
+    console.error('[Main] Error resetting locations:', error);
+    return { success: false, error: error.message };
+  }
+});
+
 // Arrêter le bot
 ipcMain.handle('stop-bot', async (_e, config) => {
   try {

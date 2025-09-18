@@ -458,6 +458,34 @@ class ProductionManager {
                 this.filterLogs();
             });
         });
+
+        // Reset locations button
+        const resetBtn = document.getElementById('reset-locations-btn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', async () => {
+                if (confirm('Êtes-vous sûr de vouloir recycler toutes les villes ? Cela remettra toutes les villes (utilisées et blacklistées) dans la liste disponible.')) {
+                    try {
+                        resetBtn.disabled = true;
+                        resetBtn.textContent = '⏳';
+
+                        const result = await window.electronAPI.resetLocations();
+
+                        if (result.success) {
+                            this.log('success', 'System', '♻️ Toutes les villes ont été recyclées');
+                            // Rafraîchir les stats
+                            await this.updateResourceStatus();
+                        } else {
+                            this.log('error', 'System', `Erreur lors du recyclage: ${result.error}`);
+                        }
+                    } catch (error) {
+                        this.log('error', 'System', `Erreur lors du recyclage: ${error.message}`);
+                    } finally {
+                        resetBtn.disabled = false;
+                        resetBtn.textContent = '♻️';
+                    }
+                }
+            });
+        }
     }
 
     setupIPCListeners() {
@@ -521,6 +549,14 @@ class ProductionManager {
                 }
             });
         }, 1000);
+
+        // Update resource stats every 5 seconds
+        setInterval(() => {
+            this.updateResourceStatus();
+        }, 5000);
+
+        // Initial resource update
+        this.updateResourceStatus();
     }
 
     updateUI() {
@@ -548,16 +584,48 @@ class ProductionManager {
         this.updateResourceStatus();
     }
 
-    updateResourceStatus() {
-        // Emails
+    async updateResourceStatus() {
+        try {
+            // Récupérer les stats depuis le backend
+            const stats = await window.electronAPI.getResourceStats();
+
+            // Emails
+            if (stats.emails) {
+                const emailsAvailable = stats.emails.availableCount;
+                const emailsTotal = stats.emails.totalEmails;
+                const emailsUsed = stats.emails.usedCount;
+
+                document.getElementById('emails-available').textContent = emailsAvailable;
+                document.getElementById('emails-total').textContent = emailsTotal;
+                document.getElementById('emails-usage').style.width =
+                    `${emailsTotal > 0 ? ((emailsUsed + stats.emails.allocatedCount) / emailsTotal) * 100 : 0}%`;
+            }
+
+            // Locations
+            if (stats.locations) {
+                const locationsAvailable = stats.locations.availableCount;
+                const locationsTotal = stats.locations.totalLocations;
+                const locationsUsed = stats.locations.usedCount;
+                const locationsTesting = stats.locations.testingCount;
+                const locationsBlacklisted = stats.locations.blacklistedCount;
+
+                document.getElementById('locations-available').textContent = locationsAvailable;
+                document.getElementById('locations-total').textContent = locationsTotal;
+                document.getElementById('locations-usage').style.width =
+                    `${locationsTotal > 0 ? ((locationsUsed + locationsTesting) / locationsTotal) * 100 : 0}%`;
+
+                // Détails supplémentaires
+                document.getElementById('locations-details').textContent =
+                    `En test: ${locationsTesting} | Utilisées: ${locationsUsed} | Blacklist: ${locationsBlacklisted}`;
+            }
+        } catch (error) {
+            console.error('Failed to update resource status:', error);
+        }
+
+        // Legacy code for local display (keep as fallback)
         const emailsUsed = this.resourcePools.usedEmails.size;
         const emailsTotal = this.resourcePools.emails.length;
         const emailsAvailable = emailsTotal - emailsUsed;
-
-        document.getElementById('emails-available').textContent = emailsAvailable;
-        document.getElementById('emails-total').textContent = emailsTotal;
-        document.getElementById('emails-usage').style.width =
-            `${emailsTotal > 0 ? (emailsUsed / emailsTotal) * 100 : 0}%`;
 
         // Locations
         const locationsUsed = this.resourcePools.usedLocations.size;
