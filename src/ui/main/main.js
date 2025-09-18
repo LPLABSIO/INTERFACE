@@ -375,12 +375,24 @@ async function startAppiumAndWDA({ port = 1265, basePath = '/wd/hub', udid } = {
   const cfg = readDataJson() || {};
   const desiredPort = Number(port || cfg.baseAppiumPort || 1265);
 
+  // Get device name if udid is provided
+  let deviceName = 'Device';
+  if (udid) {
+    const devices = listIosDevices();
+    const device = devices.find(d => d.udid === udid);
+    if (device && device.name) {
+      deviceName = device.name;
+    }
+  }
+
   // Configuration pour lancement automatique de WDA
   if (udid) {
     console.log('[Main] Configuration de WebDriverAgent...');
-    mainWindow?.webContents.send('log', {
+    mainWindow?.webContents.send('system-log', {
       message: '📱 Préparation de WebDriverAgent (lancement automatique)...',
-      level: 'info'
+      level: 'info',
+      udid: udid,
+      deviceName: deviceName
     });
 
     // Configurer le tunnel iproxy pour WDA
@@ -400,9 +412,11 @@ async function startAppiumAndWDA({ port = 1265, basePath = '/wd/hub', udid } = {
         console.error('[Main] Erreur tunnel iproxy:', error);
       } else {
         console.log('[Main] Tunnel iproxy créé sur port', wdaPort);
-        mainWindow?.webContents.send('log', {
+        mainWindow?.webContents.send('system-log', {
           message: `✅ Tunnel iproxy configuré sur port ${wdaPort}`,
-          level: 'info'
+          level: 'info',
+          udid: udid,
+          deviceName: deviceName
         });
       }
     });
@@ -410,9 +424,11 @@ async function startAppiumAndWDA({ port = 1265, basePath = '/wd/hub', udid } = {
     // Attendre un peu pour que le tunnel soit prêt
     await new Promise(r => setTimeout(r, 1000));
 
-    mainWindow?.webContents.send('log', {
+    mainWindow?.webContents.send('system-log', {
       message: '🚀 WebDriverAgent sera lancé automatiquement par Appium',
-      level: 'info'
+      level: 'info',
+      udid: udid,
+      deviceName: deviceName
     });
   }
 
@@ -461,12 +477,22 @@ async function startAppiumAndWDA({ port = 1265, basePath = '/wd/hub', udid } = {
   appiumChild.stdout.on('data', (d) => {
     const message = d.toString();
     mainWindow?.webContents.send('appium:output', message);
-    mainWindow?.webContents.send('appium-log', { message, level: 'info' });
+    mainWindow?.webContents.send('appium-log', {
+      message,
+      level: 'info',
+      udid: udid || '',
+      deviceName: deviceName || 'Device'
+    });
   });
   appiumChild.stderr.on('data', (d) => {
     const message = d.toString();
     mainWindow?.webContents.send('appium:output', message);
-    mainWindow?.webContents.send('appium-log', { message, level: 'error' });
+    mainWindow?.webContents.send('appium-log', {
+      message,
+      level: 'error',
+      udid: udid || '',
+      deviceName: deviceName || 'Device'
+    });
   });
   appiumChild.on('close', (code) => {
     mainWindow?.webContents.send('appium:exit', code);
@@ -693,7 +719,7 @@ ipcMain.handle('deviceRun:list', () => {
   return { devices };
 });
 
-ipcMain.handle('deviceRun:start', (_e, payload = {}) => {
+function startDeviceBot(_e, payload = {}) {
   const { udid, deviceName, deviceLabel, deviceArgs } = payload;
   if (!udid) return { error: 'UDID manquant' };
   if (perDeviceChildren.has(udid)) {
@@ -723,13 +749,42 @@ ipcMain.handle('deviceRun:start', (_e, payload = {}) => {
   const child = spawn(nodeBin, args, { cwd: hingeRoot, env });
   perDeviceChildren.set(udid, child);
   mainWindow?.webContents.send('deviceRun:output', { udid, line: `[ui] Start bot.js for ${deviceLabel || deviceName || udid}` });
-  child.stdout.on('data', (d) => mainWindow?.webContents.send('deviceRun:output', { udid, line: d.toString() }));
-  child.stderr.on('data', (d) => mainWindow?.webContents.send('deviceRun:output', { udid, line: d.toString() }));
+  // Capturer les logs du script avec meilleure gestion du buffering
+  child.stdout.setEncoding('utf8');
+  child.stderr.setEncoding('utf8');
+
+  child.stdout.on('data', (data) => {
+    const lines = data.split('\n').filter(line => line.trim());
+    lines.forEach(message => {
+      mainWindow?.webContents.send('script-log', {
+        message,
+        level: 'info',
+        udid: udid,
+        deviceName: deviceName || deviceLabel || udid
+      });
+    });
+  });
+
+  child.stderr.on('data', (data) => {
+    const lines = data.split('\n').filter(line => line.trim());
+    lines.forEach(message => {
+      mainWindow?.webContents.send('script-log', {
+        message,
+        level: 'error',
+        udid: udid,
+        deviceName: deviceName || deviceLabel || udid
+      });
+    });
+  });
   child.on('close', (code) => {
     perDeviceChildren.delete(udid);
     mainWindow?.webContents.send('deviceRun:exit', { udid, code });
   });
   return { ok: true };
+}
+
+ipcMain.handle('deviceRun:start', (_e, payload = {}) => {
+  return startDeviceBot(_e, payload);
 });
 
 ipcMain.handle('deviceRun:stop', (_e, udid) => {
@@ -751,7 +806,7 @@ ipcMain.handle('deviceRun:startFull', async (_e, payload = {}) => {
     await startAppiumAndWDA({ udid });
     // Lancer le bot une fois Appium prêt
     await new Promise((r) => setTimeout(r, 1000));
-    return await ipcMain.handle('deviceRun:start').call(null, _e, payload);
+    return startDeviceBot(_e, payload);
   } catch (e) {
     return { error: e?.message || String(e) };
   }
@@ -860,7 +915,7 @@ ipcMain.handle('start-bot', async (_e, config) => {
     const scriptPath = path.join(hingeRoot, 'bot.js');
 
     // Arguments pour le bot
-    const args = [scriptPath, 'iphonex', app || 'hinge'];
+    const args = [scriptPath, 'iphonex', app || 'hinge', String(accountsNumber || 1), proxyProvider || 'marsproxies'];
 
     // Variables d'environnement
     const env = {
@@ -870,6 +925,7 @@ ipcMain.handle('start-bot', async (_e, config) => {
       APPIUM_BASEPATH: '/wd/hub',
       APPIUM_UDID: udid,
       WDA_PORT: String(discoveredWdaPort),
+      // Ne PAS passer WDA_URL pour laisser Appium installer et gérer WDA
       // WDA_URL: wdaUrl,  // Commenté pour laisser Appium gérer WDA
       BOT_ACCOUNTS: String(accountsNumber || 1),
       PROXY_PROVIDER: proxyProvider || 'marsproxies',
@@ -893,14 +949,24 @@ ipcMain.handle('start-bot', async (_e, config) => {
     child.stdout.on('data', (data) => {
       const lines = data.split('\n').filter(line => line.trim());
       lines.forEach(message => {
-        mainWindow?.webContents.send('script-log', { message, level: 'info' });
+        mainWindow?.webContents.send('script-log', {
+          message,
+          level: 'info',
+          udid: udid,
+          deviceName: device
+        });
       });
     });
 
     child.stderr.on('data', (data) => {
       const lines = data.split('\n').filter(line => line.trim());
       lines.forEach(message => {
-        mainWindow?.webContents.send('script-log', { message, level: 'error' });
+        mainWindow?.webContents.send('script-log', {
+          message,
+          level: 'error',
+          udid: udid,
+          deviceName: device
+        });
       });
     });
 

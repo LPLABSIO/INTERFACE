@@ -30,6 +30,15 @@
 - ✅ Dashboard UI (mode démo fonctionnel)
 - ⏸️ Intégration complète Dashboard-Orchestrator (à finaliser plus tard)
 
+### Sprint 2.2.5: Production Multi-Appareils (✅ Complété - 18/09/2025)
+- ✅ Page Production avec sélection multiple
+- ✅ Lancement dynamique Appium/WDA par appareil
+- ✅ Système de logs avancé (3 types par appareil)
+- ✅ Conservation état interface (tabs, scroll)
+- ✅ Nettoyage codes ANSI et timestamps
+- ✅ Support 500 logs stockés, 100 affichés
+- ✅ Optimisation sans re-render complet
+
 ### Sprint 2.3: Configuration avancée (🔄 Prochaine priorité)
 - ⬜ Sauvegarde des configurations par appareil
 - ⬜ Profils de configuration réutilisables

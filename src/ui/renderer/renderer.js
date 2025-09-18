@@ -172,6 +172,20 @@ function initializeEventListeners() {
                 window.location.href = 'queue-manager.html';
             });
         }
+
+        const healthBtn = document.getElementById('health-btn');
+        if (healthBtn) {
+            healthBtn.addEventListener('click', () => {
+                window.location.href = 'health-dashboard.html';
+            });
+        }
+
+        const productionBtn = document.getElementById('production-btn');
+        if (productionBtn) {
+            productionBtn.addEventListener('click', () => {
+                window.location.href = 'production.html';
+            });
+        }
     } catch (navError) {
         console.warn('Navigation buttons setup error:', navError);
     }

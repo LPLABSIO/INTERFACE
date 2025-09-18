@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iOS Automation Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-card: #1a1a1a;
+            --bg-hover: #252525;
+            --text-primary: #ffffff;
+            --text-secondary: #9ca3af;
+            --text-dim: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Layout */
+        .app-container {
+            display: grid;
+            grid-template-columns: 60px 1fr;
+            height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .nav-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .nav-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .nav-btn .tooltip {
+            position: absolute;
+            left: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            border: 1px solid var(--border);
+            z-index: 1000;
+        }
+
+        .nav-btn:hover .tooltip {
+            opacity: 1;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            overflow: auto;
+            padding: 25px;
+        }
+
+        /* Page Sections */
+        .page {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        /* Stat Cards */
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-change.positive {
+            color: var(--success);
+        }
+
+        .stat-change.negative {
+            color: var(--danger);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #333;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Device Grid */
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .device-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .device-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .device-card.selected {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, var(--bg-card), rgba(59, 130, 246, 0.1));
+        }
+
+        .device-card.running {
+            border-color: var(--success);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .device-info {
+            flex: 1;
+        }
+
+        .device-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .device-details {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .device-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .device-status.idle {
+            background: var(--bg-hover);
+            color: var(--text-secondary);
+        }
+
+        .device-status.running {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .device-status.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .device-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .metric-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-hover);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            transition: width 0.3s;
+        }
+
+        /* Production Control Panel */
+        .control-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 20px;
+            align-items: end;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .control-input {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .control-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Live Monitor */
+        .monitor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .monitor-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .monitor-card.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--success);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .monitor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .monitor-device {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .monitor-step {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        /* Logs */
+        .logs-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            font-family: 'Monaco', monospace;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            padding: 4px 0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .log-time {
+            color: var(--text-dim);
+        }
+
+        .log-device {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .log-message {
+            color: var(--text-secondary);
+            flex: 1;
+        }
+
+        .log-entry.success .log-message {
+            color: var(--success);
+        }
+
+        .log-entry.error .log-message {
+            color: var(--danger);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quick-action {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-action:hover {
+            background: var(--bg-hover);
+            transform: translateY(-2px);
+        }
+
+        .quick-action-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .quick-action-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: 18px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .empty-state-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-hover);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <button class="nav-btn active" data-page="devices" onclick="switchPage('devices')">
+                📱
+                <span class="tooltip">Devices</span>
+            </button>
+            <button class="nav-btn" data-page="production" onclick="switchPage('production')">
+                🚀
+                <span class="tooltip">Production</span>
+            </button>
+            <button class="nav-btn" data-page="monitor" onclick="switchPage('monitor')">
+                📊
+                <span class="tooltip">Monitor</span>
+            </button>
+            <div style="flex: 1;"></div>
+            <button class="nav-btn" onclick="refreshAll()">
+                🔄
+                <span class="tooltip">Refresh</span>
+            </button>
+            <button class="nav-btn" onclick="openSettings()">
+                ⚙️
+                <span class="tooltip">Settings</span>
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-title">
+                    <span id="page-icon">📱</span>
+                    <span id="page-title">Devices</span>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary btn-icon" onclick="refreshAll()">🔄</button>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Devices Page -->
+                <div id="devices-page" class="page active">
+                    <!-- Quick Stats -->
+                    <div class="grid-4" style="margin-bottom: 25px;">
+                        <div class="stat-card">
+                            <div class="stat-value" id="total-devices">0</div>
+                            <div class="stat-label">Total Devices</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="active-devices">0</div>
+                            <div class="stat-label">Active</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="accounts-today">0</div>
+                            <div class="stat-label">Accounts Today</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="success-rate">0%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <div class="quick-action" onclick="scanDevices()">
+                            <div class="quick-action-icon">🔍</div>
+                            <div class="quick-action-label">Scan Devices</div>
+                        </div>
+                        <div class="quick-action" onclick="selectAllDevices()">
+                            <div class="quick-action-icon">✅</div>
+                            <div class="quick-action-label">Select All</div>
+                        </div>
+                        <div class="quick-action" onclick="switchPage('production')">
+                            <div class="quick-action-icon">🚀</div>
+                            <div class="quick-action-label">Start Production</div>
+                        </div>
+                        <div class="quick-action" onclick="stopAll()">
+                            <div class="quick-action-icon">⏹️</div>
+                            <div class="quick-action-label">Stop All</div>
+                        </div>
+                    </div>
+
+                    <!-- Devices Grid -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Connected Devices</h3>
+                            <button class="btn btn-primary" onclick="scanDevices()">
+                                Scan Devices
+                            </button>
+                        </div>
+                        <div id="device-grid" class="device-grid">
+                            <!-- Devices will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Production Page -->
+                <div id="production-page" class="page">
+                    <!-- Control Panel -->
+                    <div class="control-panel">
+                        <h3 style="margin-bottom: 20px;">Production Configuration</h3>
+                        <div class="control-grid">
+                            <div class="control-group">
+                                <label class="control-label">Selected Devices</label>
+                                <div id="selected-devices-count" style="font-size: 24px; font-weight: 600;">
+                                    0 devices selected
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Application</label>
+                                <select class="control-input" id="app-select">
+                                    <option value="hinge">Hinge</option>
+                                    <option value="tinder" disabled>Tinder (Soon)</option>
+                                    <option value="bumble" disabled>Bumble (Soon)</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Accounts per Device</label>
+                                <input type="number" class="control-input" id="accounts-per-device" value="1" min="1" max="10">
+                            </div>
+                            <div class="control-group">
+                                <button class="btn btn-success" style="height: 42px; font-size: 16px;" onclick="startProduction()">
+                                    ▶️ Start Production
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resources Status -->
+                    <div class="grid-3" style="margin-bottom: 25px;">
+                        <div class="stat-card">
+                            <div class="stat-value" id="emails-available">0</div>
+                            <div class="stat-label">📧 Emails Available</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="emails-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="locations-available">0</div>
+                            <div class="stat-label">📍 Locations Available</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="locations-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="proxies-available">∞</div>
+                            <div class="stat-label">🔌 Proxies Available</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Production Monitor -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Active Productions</h3>
+                            <div>
+                                <button class="btn btn-secondary" onclick="pauseAll()">⏸️ Pause All</button>
+                                <button class="btn btn-danger" onclick="stopAll()">⏹️ Stop All</button>
+                            </div>
+                        </div>
+                        <div id="monitor-grid" class="monitor-grid">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🎯</div>
+                                <div class="empty-state-title">No Active Productions</div>
+                                <div class="empty-state-desc">Select devices and start production to see them here</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monitor Page -->
+                <div id="monitor-page" class="page">
+                    <!-- Tabs -->
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab('realtime')">Real-time</button>
+                        <button class="tab" onclick="switchTab('history')">History</button>
+                        <button class="tab" onclick="switchTab('analytics')">Analytics</button>
+                    </div>
+
+                    <!-- Real-time Tab -->
+                    <div id="realtime-tab" class="tab-content active">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Live Activity</h3>
+                                <button class="btn btn-secondary" onclick="clearLogs()">Clear</button>
+                            </div>
+                            <div class="logs-container" id="live-logs">
+                                <!-- Logs will appear here -->
+                            </div>
+                        </div>
+
+                        <!-- Device Status Grid -->
+                        <div class="card">
+                            <h3 class="card-title" style="margin-bottom: 20px;">Device Status</h3>
+                            <div id="status-grid" class="monitor-grid">
+                                <!-- Device status cards will appear here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- History Tab -->
+                    <div id="history-tab" class="tab-content">
+                        <div class="card">
+                            <h3 class="card-title">Production History</h3>
+                            <div id="history-content">
+                                <!-- History will appear here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Tab -->
+                    <div id="analytics-tab" class="tab-content">
+                        <div class="grid-2">
+                            <div class="card">
+                                <h3 class="card-title">Performance Metrics</h3>
+                                <!-- Analytics content -->
+                            </div>
+                            <div class="card">
+                                <h3 class="card-title">Success Rates</h3>
+                                <!-- Analytics content -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        let state = {
+            devices: new Map(),
+            selectedDevices: new Set(),
+            activeProductions: new Map(),
+            logs: [],
+            resources: {
+                emails: { total: 0, used: 0 },
+                locations: { total: 0, used: 0 }
+            }
+        };
+
+        // Page Navigation
+        function switchPage(pageName) {
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.page === pageName);
+            });
+
+            // Update pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(`${pageName}-page`).classList.add('active');
+
+            // Update header
+            const titles = {
+                devices: { icon: '📱', title: 'Devices' },
+                production: { icon: '🚀', title: 'Production Center' },
+                monitor: { icon: '📊', title: 'Monitor & Analytics' }
+            };
+
+            const pageInfo = titles[pageName];
+            if (pageInfo) {
+                document.getElementById('page-icon').textContent = pageInfo.icon;
+                document.getElementById('page-title').textContent = pageInfo.title;
+            }
+        }
+
+        // Tab Navigation
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            event.target.classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+
+        // Device Management
+        async function scanDevices() {
+            // Simulate device scan
+            const mockDevices = [
+                { udid: 'device1', name: "iPhone 13 Pro", model: "iPhone14,2", ios: "16.7", status: 'idle' },
+                { udid: 'device2', name: "iPhone 12", model: "iPhone13,2", ios: "16.5", status: 'idle' }
+            ];
+
+            state.devices.clear();
+            mockDevices.forEach(device => {
+                state.devices.set(device.udid, device);
+            });
+
+            renderDevices();
+            updateStats();
+            addLog('system', 'Scan complete: ' + mockDevices.length + ' devices found');
+        }
+
+        function renderDevices() {
+            const grid = document.getElementById('device-grid');
+            grid.innerHTML = '';
+
+            if (state.devices.size === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-state-icon">📱</div>
+                        <div class="empty-state-title">No Devices Found</div>
+                        <div class="empty-state-desc">Click "Scan Devices" to detect connected iOS devices</div>
+                    </div>
+                `;
+                return;
+            }
+
+            state.devices.forEach((device, udid) => {
+                const isSelected = state.selectedDevices.has(udid);
+                const isRunning = state.activeProductions.has(udid);
+
+                const card = document.createElement('div');
+                card.className = `device-card ${isSelected ? 'selected' : ''} ${isRunning ? 'running' : ''}`;
+                card.onclick = () => toggleDevice(udid);
+
+                card.innerHTML = `
+                    <div class="device-header">
+                        <div class="device-info">
+                            <div class="device-name">${device.name}</div>
+                            <div class="device-details">${device.model} • iOS ${device.ios}</div>
+                        </div>
+                        <div class="device-status ${device.status}">${device.status}</div>
+                    </div>
+                    <div class="device-metrics">
+                        <div class="metric">
+                            <div class="metric-value">0</div>
+                            <div class="metric-label">Created</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">0</div>
+                            <div class="metric-label">Failed</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">0%</div>
+                            <div class="metric-label">Success</div>
+                        </div>
+                    </div>
+                    ${isRunning ? `
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%"></div>
+                        </div>
+                    ` : ''}
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        function toggleDevice(udid) {
+            if (state.selectedDevices.has(udid)) {
+                state.selectedDevices.delete(udid);
+            } else {
+                state.selectedDevices.add(udid);
+            }
+            renderDevices();
+            updateSelectedCount();
+        }
+
+        function selectAllDevices() {
+            state.devices.forEach((device, udid) => {
+                state.selectedDevices.add(udid);
+            });
+            renderDevices();
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const count = state.selectedDevices.size;
+            const element = document.getElementById('selected-devices-count');
+            if (element) {
+                element.textContent = count === 0 ? 'No devices selected' :
+                                     count === 1 ? '1 device selected' :
+                                     `${count} devices selected`;
+            }
+        }
+
+        // Production Management
+        function startProduction() {
+            if (state.selectedDevices.size === 0) {
+                alert('Please select at least one device');
+                return;
+            }
+
+            const app = document.getElementById('app-select').value;
+            const accountsPerDevice = document.getElementById('accounts-per-device').value;
+
+            state.selectedDevices.forEach(udid => {
+                state.activeProductions.set(udid, {
+                    app,
+                    accounts: accountsPerDevice,
+                    progress: 0,
+                    status: 'running',
+                    startTime: Date.now()
+                });
+
+                const device = state.devices.get(udid);
+                if (device) {
+                    device.status = 'running';
+                }
+            });
+
+            renderDevices();
+            renderActiveProductions();
+            addLog('system', `Started production on ${state.selectedDevices.size} devices`);
+
+            // Clear selection
+            state.selectedDevices.clear();
+            updateSelectedCount();
+
+            // Switch to monitor page
+            switchPage('production');
+        }
+
+        function renderActiveProductions() {
+            const grid = document.getElementById('monitor-grid');
+            grid.innerHTML = '';
+
+            if (state.activeProductions.size === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-state-icon">🎯</div>
+                        <div class="empty-state-title">No Active Productions</div>
+                        <div class="empty-state-desc">Select devices and start production to see them here</div>
+                    </div>
+                `;
+                return;
+            }
+
+            state.activeProductions.forEach((production, udid) => {
+                const device = state.devices.get(udid);
+                if (!device) return;
+
+                const card = document.createElement('div');
+                card.className = 'monitor-card active';
+                card.innerHTML = `
+                    <div class="monitor-header">
+                        <div class="monitor-device">${device.name}</div>
+                        <div class="device-status running">running</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${production.progress}%"></div>
+                    </div>
+                    <div class="monitor-step">Creating account 1/${production.accounts}...</div>
+                    <div class="device-metrics" style="margin-top: 10px;">
+                        <div class="metric">
+                            <div class="metric-value">0</div>
+                            <div class="metric-label">Complete</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">0</div>
+                            <div class="metric-label">Failed</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">0:00</div>
+                            <div class="metric-label">Time</div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Logging
+        function addLog(source, message, level = 'info') {
+            const log = {
+                time: new Date().toLocaleTimeString(),
+                source,
+                message,
+                level
+            };
+
+            state.logs.unshift(log);
+            if (state.logs.length > 100) {
+                state.logs = state.logs.slice(0, 100);
+            }
+
+            renderLogs();
+        }
+
+        function renderLogs() {
+            const container = document.getElementById('live-logs');
+            if (!container) return;
+
+            container.innerHTML = state.logs.map(log => `
+                <div class="log-entry ${log.level}">
+                    <span class="log-time">${log.time}</span>
+                    <span class="log-device">[${log.source}]</span>
+                    <span class="log-message">${log.message}</span>
+                </div>
+            `).join('');
+        }
+
+        function clearLogs() {
+            state.logs = [];
+            renderLogs();
+        }
+
+        // Stats
+        function updateStats() {
+            document.getElementById('total-devices').textContent = state.devices.size;
+            document.getElementById('active-devices').textContent = state.activeProductions.size;
+            // Update other stats as needed
+        }
+
+        // Actions
+        function stopAll() {
+            if (!confirm('Stop all productions?')) return;
+
+            state.activeProductions.clear();
+            state.devices.forEach(device => {
+                device.status = 'idle';
+            });
+
+            renderDevices();
+            renderActiveProductions();
+            addLog('system', 'All productions stopped', 'warning');
+        }
+
+        function pauseAll() {
+            addLog('system', 'All productions paused', 'warning');
+        }
+
+        function refreshAll() {
+            scanDevices();
+        }
+
+        function openSettings() {
+            alert('Settings page coming soon');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            scanDevices();
+            updateSelectedCount();
+        });
+    </script>
+</body>
+</html>

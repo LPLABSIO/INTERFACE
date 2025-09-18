@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Manager - Interface Professionnelle</title>
+    <link rel="stylesheet" href="styles-fixed.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-brand">
+                    <h1 class="app-title">Bot Manager</h1>
+                </div>
+
+                <nav class="header-nav">
+                    <button class="nav-button active" data-view="main">
+                        Principal
+                    </button>
+                    <button id="dashboard-btn" class="nav-button" data-view="dashboard">
+                        Dashboard
+                    </button>
+                    <button id="analytics-btn" class="nav-button" data-view="analytics">
+                        Analytics
+                    </button>
+                    <button id="queue-btn" class="nav-button" data-view="queue">
+                        Queue
+                    </button>
+                    <button id="health-btn" class="nav-button" data-view="health">
+                        Health
+                    </button>
+                    <button id="production-btn" class="nav-button" data-view="production">
+                        Production
+                    </button>
+                </nav>
+
+                <div class="header-actions">
+                    <button id="scan-devices" class="btn btn--primary">
+                        Scanner appareils
+                    </button>
+                    <button id="settings-btn" class="btn btn--secondary">
+                        Paramètres
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2>Appareils connectés</h2>
+                    <span id="device-count" class="badge badge--primary">0</span>
+                </div>
+                <div id="device-list" class="device-list">
+                    <!-- Les appareils seront ajoutés dynamiquement ici -->
+                </div>
+            </aside>
+
+            <!-- Device Panel -->
+            <section class="device-panel">
+                <!-- No Device Selected State -->
+                <div id="no-device-selected" class="empty-state">
+                    <div class="empty-state__content">
+                        <div class="empty-state__icon"></div>
+                        <h3 class="empty-state__title">Aucun appareil sélectionné</h3>
+                        <p class="empty-state__description">
+                            Sélectionnez un appareil dans la liste pour voir ses détails
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Device Detail View -->
+                <div id="device-detail" class="device-detail" style="display: none;">
+                    <!-- Device Header -->
+                    <div class="device-detail__header">
+                        <div class="device-detail__info">
+                            <h2 id="device-name">iPhone</h2>
+                            <div class="device-detail__meta">
+                                <span id="device-udid" class="text--muted">UDID: </span>
+                                <div id="device-status" class="device-status">
+                                    <span class="status-indicator"></span>
+                                    <span class="status-text">Déconnecté</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="device-detail__actions">
+                            <button id="start-bot" class="btn btn--success">
+                                Démarrer le bot
+                            </button>
+                            <button id="stop-bot" class="btn btn--danger" style="display: none;">
+                                Arrêter le bot
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Status Cards Grid -->
+                    <div class="status-grid">
+                        <!-- Script Status -->
+                        <div class="status-card">
+                            <div class="status-card__header">
+                                <span class="status-card__icon"></span>
+                                <h3 class="status-card__title">Script</h3>
+                            </div>
+                            <div class="status-card__body">
+                                <span id="script-status" class="badge badge--inactive">Inactif</span>
+                                <div id="script-details" class="status-card__details">
+                                    <small>Aucun script en cours</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Appium Status -->
+                        <div class="status-card">
+                            <div class="status-card__header">
+                                <span class="status-card__icon"></span>
+                                <h3 class="status-card__title">Appium</h3>
+                            </div>
+                            <div class="status-card__body">
+                                <span id="appium-status" class="badge badge--inactive">Arrêté</span>
+                                <div class="status-card__details">
+                                    <small>Port: <span id="appium-port">-</span></small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- WebDriverAgent Status -->
+                        <div class="status-card">
+                            <div class="status-card__header">
+                                <span class="status-card__icon"></span>
+                                <h3 class="status-card__title">WebDriverAgent</h3>
+                            </div>
+                            <div class="status-card__body">
+                                <span id="wda-status" class="badge badge--inactive">Arrêté</span>
+                                <div class="status-card__details">
+                                    <small>Port: <span id="wda-port">-</span></small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Statistics -->
+                        <div class="status-card">
+                            <div class="status-card__header">
+                                <span class="status-card__icon"></span>
+                                <h3 class="status-card__title">Statistiques</h3>
+                            </div>
+                            <div class="status-card__body">
+                                <div class="stats-grid">
+                                    <div class="stat">
+                                        <span id="accounts-created" class="stat__value">0</span>
+                                        <span class="stat__label">Comptes</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span id="success-rate" class="stat__value">-</span>
+                                        <span class="stat__label">Succès</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Logs Section -->
+                    <div class="logs-section">
+                        <!-- Logs Header -->
+                        <div class="logs-header">
+                            <div class="logs-tabs">
+                                <button class="tab-btn active" data-tab="system">
+                                    Système
+                                </button>
+                                <button class="tab-btn" data-tab="script">
+                                    Script
+                                </button>
+                                <button class="tab-btn" data-tab="appium">
+                                    Appium
+                                </button>
+                            </div>
+
+                            <div class="logs-controls">
+                                <input type="text"
+                                       id="log-search"
+                                       class="input input--small"
+                                       placeholder="Rechercher...">
+
+                                <select id="log-level-filter" class="select select--small">
+                                    <option value="all">Tous</option>
+                                    <option value="info">Info</option>
+                                    <option value="success">Succès</option>
+                                    <option value="warning">Warning</option>
+                                    <option value="error">Erreur</option>
+                                </select>
+
+                                <button id="clear-logs" class="btn btn--small btn--ghost">
+                                    Effacer
+                                </button>
+
+                                <button id="export-logs" class="btn btn--small btn--ghost">
+                                    Exporter
+                                </button>
+
+                                <label class="checkbox">
+                                    <input type="checkbox" id="auto-scroll" checked>
+                                    <span>Auto-scroll</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Logs Container -->
+                        <div id="logs-container" class="logs-container">
+                            <!-- Les logs apparaîtront ici -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal">
+            <div class="modal__backdrop"></div>
+            <div class="modal__content">
+                <div class="modal__header">
+                    <h2 class="modal__title">Paramètres</h2>
+                    <button class="modal__close">&times;</button>
+                </div>
+
+                <div class="modal__body">
+                    <!-- Appium Configuration -->
+                    <div class="form-section">
+                        <h3 class="form-section__title">Configuration Appium</h3>
+                        <div class="form-group">
+                            <label class="form-label" for="appium-base-port">
+                                Port de base Appium
+                            </label>
+                            <input type="number"
+                                   id="appium-base-port"
+                                   class="input"
+                                   value="4723">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="wda-base-port">
+                                Port de base WDA
+                            </label>
+                            <input type="number"
+                                   id="wda-base-port"
+                                   class="input"
+                                   value="8100">
+                        </div>
+                    </div>
+
+                    <!-- Bot Configuration -->
+                    <div class="form-section">
+                        <h3 class="form-section__title">Configuration du Bot</h3>
+                        <div class="form-group">
+                            <label class="form-label" for="app-select">
+                                Application
+                            </label>
+                            <select id="app-select" class="select">
+                                <option value="hinge">Hinge</option>
+                                <option value="tinder">Tinder</option>
+                                <option value="pof">POF</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="accounts-number">
+                                Nombre de comptes
+                            </label>
+                            <input type="number"
+                                   id="accounts-number"
+                                   class="input"
+                                   value="1"
+                                   min="1"
+                                   max="10">
+                        </div>
+                    </div>
+
+                    <!-- Proxy Configuration -->
+                    <div class="form-section">
+                        <h3 class="form-section__title">Configuration Proxy</h3>
+                        <div class="form-group">
+                            <label class="form-label" for="proxy-provider">
+                                Fournisseur
+                            </label>
+                            <select id="proxy-provider" class="select">
+                                <option value="marsproxies">Mars Proxies</option>
+                                <option value="none">Aucun</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal__footer">
+                    <button class="btn btn--ghost" id="cancel-settings">
+                        Annuler
+                    </button>
+                    <button class="btn btn--primary" id="save-settings">
+                        Sauvegarder
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Container -->
+        <div id="notification-container" class="notification-container"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="ui-enhancements.js"></script>
+    <script src="logs-enhanced.js"></script>
+    <script src="multi-actions.js"></script>
+    <script src="renderer.js"></script>
+
+    <!-- Navigation Enhancement Script -->
+    <script>
+        // Navigation system that maintains consistency
+        document.addEventListener('DOMContentLoaded', () => {
+            const navButtons = document.querySelectorAll('.nav-button');
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    // Update active state
+                    navButtons.forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+
+                    // Trigger navigation if needed
+                    const view = e.target.dataset.view;
+                    if (view === 'dashboard') {
+                        const dashboardBtn = document.getElementById('dashboard-btn');
+                        if (dashboardBtn && window.location) {
+                            window.location.href = 'dashboard.html';
+                        }
+                    } else if (view === 'analytics') {
+                        const analyticsBtn = document.getElementById('analytics-btn');
+                        if (analyticsBtn && window.location) {
+                            window.location.href = 'analytics.html';
+                        }
+                    } else if (view === 'queue') {
+                        const queueBtn = document.getElementById('queue-btn');
+                        if (queueBtn && window.location) {
+                            window.location.href = 'queue-manager.html';
+                        }
+                    }
+                });
+            });
+
+            // Log filter functionality
+            const logLevelFilter = document.getElementById('log-level-filter');
+            const logSearch = document.getElementById('log-search');
+
+            if (logLevelFilter) {
+                logLevelFilter.addEventListener('change', filterLogs);
+            }
+
+            if (logSearch) {
+                logSearch.addEventListener('input', searchLogs);
+            }
+
+            function filterLogs() {
+                const level = logLevelFilter.value;
+                const entries = document.querySelectorAll('.log-entry');
+
+                entries.forEach(entry => {
+                    if (level === 'all' || entry.dataset.level === level) {
+                        entry.style.display = '';
+                    } else {
+                        entry.style.display = 'none';
+                    }
+                });
+            }
+
+            function searchLogs() {
+                const term = logSearch.value.toLowerCase();
+                const entries = document.querySelectorAll('.log-entry');
+
+                entries.forEach(entry => {
+                    const text = entry.textContent.toLowerCase();
+                    if (text.includes(term)) {
+                        entry.style.display = '';
+                    } else {
+                        entry.style.display = 'none';
+                    }
+                });
+            }
+
+            // Tab functionality for logs
+            const tabButtons = document.querySelectorAll('.tab-btn');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const tab = e.target.dataset.tab;
+
+                    // Update active state
+                    tabButtons.forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+
+                    // Switch log type (this should integrate with existing code)
+                    if (window.switchTab) {
+                        window.switchTab(tab);
+                    }
+                });
+            });
+
+            // Modal functionality
+            const settingsBtn = document.getElementById('settings-btn');
+            const settingsModal = document.getElementById('settings-modal');
+            const modalClose = settingsModal?.querySelector('.modal__close');
+            const modalBackdrop = settingsModal?.querySelector('.modal__backdrop');
+            const cancelSettings = document.getElementById('cancel-settings');
+
+            function openModal() {
+                if (settingsModal) {
+                    settingsModal.classList.add('modal--active');
+                }
+            }
+
+            function closeModal() {
+                if (settingsModal) {
+                    settingsModal.classList.remove('modal--active');
+                }
+            }
+
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', openModal);
+            }
+
+            if (modalClose) {
+                modalClose.addEventListener('click', closeModal);
+            }
+
+            if (modalBackdrop) {
+                modalBackdrop.addEventListener('click', closeModal);
+            }
+
+            if (cancelSettings) {
+                cancelSettings.addEventListener('click', closeModal);
+            }
+        });
+
+        // Notification system
+        window.showNotification = function(message, type = 'info', duration = 5000) {
+            const container = document.getElementById('notification-container');
+            if (!container) return;
+
+            const notification = document.createElement('div');
+            notification.className = `notification notification--${type}`;
+            notification.innerHTML = `
+                <div class="notification__content">${message}</div>
+                <button class="notification__close" onclick="this.parentElement.remove()">×</button>
+            `;
+
+            container.appendChild(notification);
+
+            // Auto-remove after duration
+            setTimeout(() => {
+                notification.classList.add('notification--leaving');
+                setTimeout(() => notification.remove(), 300);
+            }, duration);
+        };
+    </script>
+</body>
+</html>

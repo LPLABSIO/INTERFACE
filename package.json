@@ -26,7 +26,11 @@
     "packages:install": "lerna bootstrap --hoist",
     "packages:build": "lerna run build",
     "packages:test": "lerna run test",
-    "packages:publish": "lerna publish"
+    "packages:publish": "lerna publish",
+    "test:projects": "jest src/projects/__tests__",
+    "generate:project": "node src/projects/generator/cli.js",
+    "projects:list": "node scripts/list-projects.js",
+    "projects:validate": "node scripts/validate-projects.js"
   },
   "workspaces": [
     "packages/@shared/*",
