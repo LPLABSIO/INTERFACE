@@ -26,7 +26,7 @@ class QueueManager {
    * Initialise le gestionnaire de queue
    */
   async initialize() {
-    console.log('[QueueManager] Initializing...');
+    // console.log('[QueueManager] Initializing...');
 
     try {
       // Créer le dossier si nécessaire
@@ -39,9 +39,9 @@ class QueueManager {
       // Nettoyer les tâches abandonnées
       await this.cleanupAbandonedTasks();
 
-      console.log('[QueueManager] Initialized with', this.state.tasks.length, 'tasks');
+      // console.log('[QueueManager] Initialized with', this.state.tasks.length, 'tasks');
     } catch (error) {
-      console.error('[QueueManager] Initialization error:', error);
+      // console.error('[QueueManager] Initialization error:', error);
       throw error;
     }
   }
@@ -53,10 +53,10 @@ class QueueManager {
     try {
       const data = await fs.readFile(this.configPath, 'utf8');
       this.state = JSON.parse(data);
-      console.log('[QueueManager] State loaded from file');
+      // console.log('[QueueManager] State loaded from file');
     } catch (error) {
       if (error.code === 'ENOENT') {
-        console.log('[QueueManager] No existing state, starting fresh');
+        // console.log('[QueueManager] No existing state, starting fresh');
         await this.saveState();
       } else {
         throw error;
@@ -104,7 +104,7 @@ class QueueManager {
     this.updateStats();
     await this.saveState();
 
-    console.log(`[QueueManager] Added ${count} tasks to queue`);
+    // console.log(`[QueueManager] Added ${count} tasks to queue`);
     return newTasks;
   }
 
@@ -141,7 +141,7 @@ class QueueManager {
     this.updateStats();
     await this.saveState();
 
-    console.log(`[QueueManager] Task ${task.id} assigned to ${deviceId}`);
+    // console.log(`[QueueManager] Task ${task.id} assigned to ${deviceId}`);
     return task;
   }
 
@@ -178,7 +178,7 @@ class QueueManager {
     this.updateStats();
     await this.saveState();
 
-    console.log(`[QueueManager] Task ${taskId} completed by ${deviceId}`);
+    // console.log(`[QueueManager] Task ${taskId} completed by ${deviceId}`);
   }
 
   /**
@@ -220,7 +220,7 @@ class QueueManager {
     this.updateStats();
     await this.saveState();
 
-    console.log(`[QueueManager] Task ${taskId} failed (attempt ${task.attempts}/${task.maxAttempts})`);
+    // console.log(`[QueueManager] Task ${taskId} failed (attempt ${task.attempts}/${task.maxAttempts})`);
   }
 
   /**
@@ -246,7 +246,7 @@ class QueueManager {
     if (cleaned > 0) {
       this.updateStats();
       await this.saveState();
-      console.log(`[QueueManager] Cleaned up ${cleaned} abandoned tasks`);
+      // console.log(`[QueueManager] Cleaned up ${cleaned} abandoned tasks`);
     }
   }
 
@@ -301,7 +301,7 @@ class QueueManager {
     this.state.deviceAssignments = {};
     this.updateStats();
     await this.saveState();
-    console.log('[QueueManager] Queue cleared');
+    // console.log('[QueueManager] Queue cleared');
   }
 
   /**

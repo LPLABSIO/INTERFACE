@@ -1,5 +1,19 @@
 'use strict';
 
+// Capturer les erreurs EPIPE pour éviter les crashes
+process.stdout.on('error', function (err) {
+  if (err.code === 'EPIPE') return;
+});
+process.stderr.on('error', function (err) {
+  if (err.code === 'EPIPE') return;
+});
+
+// Capturer les exceptions non gérées pour éviter les crashes
+process.on('uncaughtException', (error) => {
+  if (error.code === 'EPIPE') return;
+  console.error('Uncaught Exception:', error);
+});
+
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
