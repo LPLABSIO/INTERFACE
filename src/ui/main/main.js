@@ -772,11 +772,9 @@ function startDeviceBot(_e, payload = {}) {
     }
   } catch (_) {}
 
-  // Passer le mode queue si spécifié
-  if (payload.useQueue) {
-    env.USE_QUEUE = 'true';
-    env.QUEUE_DEVICE_ID = udid;
-  }
+  // Mode queue activé par défaut
+  env.USE_QUEUE = 'true';
+  env.QUEUE_DEVICE_ID = udid;
 
   const child = spawn(nodeBin, args, { cwd: hingeRoot, env });
   perDeviceChildren.set(udid, child);

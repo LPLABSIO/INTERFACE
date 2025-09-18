@@ -920,8 +920,9 @@
                             </div>
 
                             <div class="form-group">
-                                <label class="form-label">Accounts per Device</label>
-                                <input type="number" class="form-input" id="accounts-per-device" value="1" min="1" max="10">
+                                <label class="form-label">Total Accounts to Create</label>
+                                <input type="number" class="form-input" id="total-accounts" value="10" min="1" max="1000">
+                                <small style="color: #999; font-size: 11px;">Will be automatically distributed across selected devices</small>
                             </div>
 
                             <div class="form-group">
@@ -937,8 +938,40 @@
                             </button>
                         </div>
 
-                        <!-- Resource Status -->
+                        <!-- Queue Status -->
                         <div class="card">
+                            <h3 class="card-title">📋 Queue Status</h3>
+                            <div class="resource-bar">
+                                <span class="resource-name">Total Tasks</span>
+                                <div class="resource-usage">
+                                    <span class="resource-count" id="queue-total">0</span>
+                                </div>
+                            </div>
+                            <div class="resource-bar">
+                                <span class="resource-name">⏳ Pending</span>
+                                <div class="resource-usage">
+                                    <span class="resource-count" id="queue-pending">0</span>
+                                </div>
+                            </div>
+                            <div class="resource-bar">
+                                <span class="resource-name">🔄 In Progress</span>
+                                <div class="resource-usage">
+                                    <span class="resource-count" id="queue-progress">0</span>
+                                </div>
+                            </div>
+                            <div class="resource-bar">
+                                <span class="resource-name">✅ Completed</span>
+                                <div class="resource-usage">
+                                    <span class="resource-count" id="queue-completed">0</span>
+                                </div>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <button class="btn btn-secondary" onclick="clearQueue()" style="width: 100%;">🗑️ Clear Queue</button>
+                            </div>
+                        </div>
+
+                        <!-- Resource Status -->
+                        <div class="card" style="margin-top: 20px;">
                             <h3 class="card-title">Resources</h3>
 
                             <div class="resource-bar">
@@ -1288,10 +1321,30 @@
             }
 
             const app = document.getElementById('app-select').value;
-            const accountsPerDevice = parseInt(document.getElementById('accounts-per-device').value);
+            const totalAccounts = parseInt(document.getElementById('total-accounts').value);
             const proxyProvider = document.getElementById('proxy-provider').value;
 
-            addLog('system', `Starting production: ${selectedCount} devices, ${accountsPerDevice} accounts each`);
+            addLog('system', `Starting production: ${selectedCount} devices, ${totalAccounts} total accounts`);
+
+            // Ajouter les comptes à la queue
+            try {
+                if (window.electronAPI && window.electronAPI.queueAddBatch) {
+                    const result = await window.electronAPI.queueAddBatch(totalAccounts, {
+                        app: app,
+                        proxyProvider: proxyProvider
+                    });
+
+                    if (result.success) {
+                        addLog('success', `✅ Added ${totalAccounts} accounts to queue`);
+                    } else {
+                        addLog('error', `Failed to add accounts to queue: ${result.error}`);
+                        return;
+                    }
+                }
+            } catch (error) {
+                addLog('error', `Queue error: ${error.message}`);
+                return;
+            }
 
             // Debug: Check available APIs
             console.log('Checking APIs...');
@@ -1700,6 +1753,43 @@
             // Update other stats as needed
         }
 
+        // Queue Management Functions
+        async function updateQueueStats() {
+            try {
+                if (window.electronAPI && window.electronAPI.queueGetStats) {
+                    const result = await window.electronAPI.queueGetStats();
+                    if (result.success && result.stats) {
+                        const stats = result.stats;
+                        document.getElementById('queue-total').textContent = stats.total || 0;
+                        document.getElementById('queue-pending').textContent = stats.pending || 0;
+                        document.getElementById('queue-progress').textContent = stats.inProgress || 0;
+                        document.getElementById('queue-completed').textContent = stats.completed || 0;
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to update queue stats:', error);
+            }
+        }
+
+        async function clearQueue() {
+            if (!confirm('Clear all tasks from the queue?')) return;
+
+            try {
+                if (window.electronAPI && window.electronAPI.queueClear) {
+                    const result = await window.electronAPI.queueClear();
+                    if (result.success) {
+                        addLog('success', '✅ Queue cleared');
+                        await updateQueueStats();
+                    } else {
+                        addLog('error', 'Failed to clear queue');
+                    }
+                }
+            } catch (error) {
+                console.error('Clear queue error:', error);
+                addLog('error', `Error: ${error.message}`);
+            }
+        }
+
         // Resource Management Functions
         async function updateResourceStats() {
             try {
@@ -1822,9 +1912,13 @@
             scanDevices();
             updateSelectedCount();
             updateResourceStats();
+            updateQueueStats();
 
-            // Update resource stats every 5 seconds
-            setInterval(updateResourceStats, 5000);
+            // Update stats every 5 seconds
+            setInterval(() => {
+                updateResourceStats();
+                updateQueueStats();
+            }, 5000);
 
             // Set up event listeners if Electron API is available
             if (window.electronAPI) {
