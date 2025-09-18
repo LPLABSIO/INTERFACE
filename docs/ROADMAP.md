@@ -616,14 +616,56 @@ main
 
 ## 🎯 PROCHAINES PRIORITÉS IMMÉDIATES (18/09/2025)
 
-### 🔴 Priorité 1 : Adaptation Multi-Appareils du Bot HINGE
-**Problème critique** : Le bot HINGE utilise `getAndRemoveEmail()` qui crée des conflits en multi-appareils
+### 🔴 Sprint URGENT : Adaptation Multi-Appareils du Bot HINGE
+**Problème critique** : Conflits d'accès aux ressources en exécution parallèle
 
-**Actions requises** :
-1. **Intégrer ResourceManager** avec le bot HINGE
-2. **Passer les ressources via environnement** au lieu de lire les fichiers
-3. **Système de verrouillage** pour éviter les accès concurrents
-4. **Tests multi-appareils** avec allocation de ressources
+#### Phase 1 : Backend - Gestionnaires de Ressources (18/09)
+- [ ] **1.1 LocationManager**
+  - [ ] Classe pour gérer l'allocation des villes
+  - [ ] Fichier de tracking persistant `config/app/locations-state.json`
+  - [ ] Méthodes : allocate(), release(), markUsed(), reset()
+  - [ ] Gestion des états : available, testing, used, blacklisted
+  - [ ] Reset automatique quand liste vide + reset manuel
+
+- [ ] **1.2 ResourceManager (Emails)**
+  - [ ] Classe pour gérer l'allocation des emails
+  - [ ] Fichier de tracking `config/app/emails-state.json`
+  - [ ] Distribution atomique sans conflits
+  - [ ] Pas de recyclage (emails uniques)
+
+- [ ] **1.3 Intégration dans main.js**
+  - [ ] Initialiser les managers au démarrage
+  - [ ] Allocation des ressources avant lancement bot
+  - [ ] Passage via variables d'environnement
+  - [ ] Libération des ressources après usage
+
+- [ ] **1.4 Adaptation de hinge.js**
+  - [ ] Lire les ressources depuis env variables
+  - [ ] Fallback sur ancien système si env vide
+  - [ ] Suppression des appels directs aux fichiers
+
+#### Phase 2 : Interface - Monitoring des Ressources (19/09)
+- [ ] **2.1 Compteur de Villes**
+  - [ ] Afficher "X/Y villes disponibles"
+  - [ ] Mise à jour temps réel
+  - [ ] Indicateur visuel (vert/orange/rouge)
+
+- [ ] **2.2 Bouton Reset**
+  - [ ] Bouton "♻️ Recycler toutes les villes"
+  - [ ] Confirmation avant reset
+  - [ ] IPC handler pour déclencher le reset
+  - [ ] Notification de succès
+
+- [ ] **2.3 Dashboard Ressources**
+  - [ ] Widget emails disponibles
+  - [ ] Widget villes par statut
+  - [ ] Historique des allocations
+
+#### Phase 3 : Tests et Validation (19/09)
+- [ ] Tests avec 3+ appareils simultanés
+- [ ] Vérification absence de conflits
+- [ ] Test du système de recyclage
+- [ ] Documentation du nouveau flux
 
 ### 🟠 Priorité 2 : Finalisation Phase 4
 - [ ] Terminer Sprint 4.2 : Migration HINGE
