@@ -637,19 +637,126 @@ main
 - [x] **Mode queue** : Activé par défaut
 - [x] **Tests validés** : Multi-appareils sans conflits
 
-### 🟠 Priorité 1 : Analytics Dashboard (Phase 6 - Sprint 6.1)
+---
+
+## 🚀 PHASE 7 : Optimisation Script HINGE (Priorité HAUTE)
+> **Objectif** : Finaliser et optimiser le script d'automatisation Hinge
+
+### 🔴 Sprint 7.1 : Complétion du Script (Immédiat)
+**Problème** : Script incomplet, s'arrête après le premier prompt
+
+#### **7.1.1 Finalisation du Flow**
+- [ ] **Compléter les 3 prompts** : Ajouter prompts 2 et 3 avec réponses variées
+- [ ] **Permissions finales** : Gérer notifications et localisation
+- [ ] **Validation compte** : Vérifier que le profil est bien créé
+- [ ] **Capture des données** : Sauvegarder username/ID du compte créé
+
+#### **7.1.2 Configuration Dynamique**
+- [ ] **profiles.json** : Créer fichier de configuration avec variations
+  ```json
+  {
+    "names": ["Chloe", "Emma", "Sarah", "Jessica", "Olivia"],
+    "prompts": {
+      "sunday": ["Brunch and chill", "Hiking trails", "Beach day"],
+      "fact": ["I speak 3 languages", "I can cook amazing pasta"],
+      "goal": ["Travel the world", "Start my own business"]
+    }
+  }
+  ```
+- [ ] **Randomisation intelligente** : Varier les réponses pour chaque compte
+- [ ] **Templates de profils** : Créer 5-10 personas différentes
+- [ ] **Rotation des photos** : Banque d'images variées
+
+### 🟠 Sprint 7.2 : Robustesse et Fiabilité
+**Objectif** : Réduire les échecs et améliorer la stabilité
+
+#### **7.2.1 Gestion d'Erreurs Avancée**
+- [ ] **Retry intelligent** : Réessayer les étapes critiques avec backoff
+  ```javascript
+  async retryStep(func, maxRetries = 3, stepName = '')
+  ```
+- [ ] **Checkpoints de session** : Sauvegarder l'état pour reprendre en cas d'échec
+- [ ] **Recovery automatique** : Reprendre depuis le dernier checkpoint valide
+- [ ] **Logging détaillé** : Un log par étape avec timing
+
+#### **7.2.2 Sélecteurs Robustes**
+- [ ] **Multi-sélecteurs** : Fallback sur plusieurs stratégies
+  ```javascript
+  selectors: {
+    createAccount: [
+      '-ios predicate string:name == "Create account"',
+      '-ios class chain:**/XCUIElementTypeButton[`label == "Create account"`]',
+      '~Create account'
+    ]
+  }
+  ```
+- [ ] **Détection dynamique** : S'adapter aux changements UI mineurs
+- [ ] **Validation visuelle** : Vérifier que l'élément est bien visible
+- [ ] **Timeout adaptatif** : Ajuster selon la performance de l'appareil
+
+### 🟡 Sprint 7.3 : Optimisations Performance
+**Objectif** : Réduire le temps de création de compte de 30%
+
+#### **7.3.1 Parallélisation**
+- [ ] **Préchargement ressources** : Phone, email, proxy en parallèle
+  ```javascript
+  const [phone, email, proxy] = await Promise.all([...])
+  ```
+- [ ] **Batch operations** : Grouper les clics similaires
+- [ ] **Préparation asynchrone** : Préparer l'étape suivante pendant l'actuelle
+
+#### **7.3.2 Performance Techniques**
+- [ ] **Cache des éléments** : Éviter les recherches répétitives
+- [ ] **Réduction des waits** : Utiliser waitForElement au lieu de sleep
+- [ ] **Polling optimisé** : Timeout courts sur éléments optionnels (1s vs 3s)
+- [ ] **Skip intelligent** : Détecter et passer les étapes déjà complétées
+
+### 🟢 Sprint 7.4 : Monitoring et Analytics
+**Objectif** : Visibilité complète sur le processus
+
+#### **7.4.1 Métriques de Performance**
+- [ ] **Temps par étape** : Mesurer chaque phase du processus
+- [ ] **Taux de succès** : Par étape et global
+- [ ] **Points de blocage** : Identifier les étapes problématiques
+- [ ] **Dashboard temps réel** : Visualisation dans l'interface
+
+#### **7.4.2 Debugging Tools**
+- [ ] **Mode debug** : Screenshots à chaque étape
+- [ ] **Replay de session** : Rejouer une session échouée
+- [ ] **Diagnostic automatique** : Identifier la cause des échecs
+- [ ] **Export de rapport** : Générer un rapport détaillé par session
+
+### 📊 Métriques de Succès Sprint 7
+| Métrique | Actuel | Objectif | Priorité |
+|----------|--------|----------|----------|
+| Taux de complétion | ~60% | >95% | 🔴 Haute |
+| Temps moyen création | 15 min | <10 min | 🟠 Moyenne |
+| Échecs récupérables | 0% | >80% | 🔴 Haute |
+| Variabilité profils | 1 | 10+ | 🟡 Moyenne |
+| Logs exploitables | Basic | Détaillé | 🟢 Basse |
+
+### 🛠️ Stack Technique
+- **Config** : JSON pour profiles et variations
+- **State** : Checkpoints en JSON pour recovery
+- **Retry** : Exponential backoff avec jitter
+- **Monitoring** : EventEmitter pour métriques temps réel
+- **Cache** : Map pour éléments UI fréquents
+
+---
+
+### 🟠 Priorité 2 : Analytics Dashboard (Phase 6 - Sprint 6.1)
 - [ ] **Graphiques temps réel** : Success rate, performance
 - [ ] **Export CSV/JSON** : Données de production
 - [ ] **Rapports automatiques** : Résumés journaliers
 - [ ] **Métriques avancées** : ROI, efficacité par appareil
 
-### 🟡 Priorité 2 : Optimisations (Phase 6 - Sprint 6.2)
+### 🟡 Priorité 3 : Optimisations Système (Phase 6 - Sprint 6.2)
 - [ ] **Cache des ressources** : Réduire latence
 - [ ] **Compression des logs** : Économie d'espace
 - [ ] **Mode failover** : Bascule automatique sur backup
 - [ ] **Performance** : Profiling et optimisation
 
-### 🟢 Priorité 3 : Intégrations (Phase 6 - Sprint 6.3)
+### 🟢 Priorité 4 : Intégrations (Phase 6 - Sprint 6.3)
 - [ ] **API publique** : Documentation OpenAPI
 - [ ] **Webhooks** : Notifications d'événements
 - [ ] **Discord/Telegram** : Alertes en temps réel
