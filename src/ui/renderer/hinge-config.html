@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hinge Profile Configuration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #000000;
+            color: #e5e5e7;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            background: #1c1c1e;
+            padding: 0 20px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #38383a;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px;
+            height: 40px;
+            background: transparent;
+            border: none;
+            color: #8e8e93;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-btn:hover {
+            background: #2c2c2e;
+            color: #ffffff;
+        }
+
+        .nav-btn.active {
+            background: #0a84ff;
+            color: #ffffff;
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: -30px;
+            background: #2c2c2e;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .nav-btn:hover .tooltip {
+            opacity: 1;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .page-header {
+            background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(10, 132, 255, 0.3);
+        }
+
+        .page-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        /* Grid Layout */
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: #1c1c1e;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid #2c2c2e;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            color: #8e8e93;
+            margin-bottom: 20px;
+        }
+
+        /* Form Elements */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-row.single {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-size: 13px;
+            color: #8e8e93;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            background: #2c2c2e;
+            border: 1px solid #38383a;
+            color: #e5e5e7;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #0a84ff;
+            background: #38383a;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        /* Age Range Special */
+        .age-range {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .age-range input {
+            width: 80px;
+        }
+
+        .age-range span {
+            color: #8e8e93;
+        }
+
+        /* Prompt Cards */
+        .prompt-card {
+            background: #2c2c2e;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #38383a;
+        }
+
+        .prompt-card h4 {
+            color: #0a84ff;
+            font-size: 14px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(10, 132, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: #2c2c2e;
+            color: #e5e5e7;
+        }
+
+        .btn-secondary:hover {
+            background: #38383a;
+        }
+
+        /* Action Bar */
+        .action-bar {
+            background: #1c1c1e;
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            bottom: 20px;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid #2c2c2e;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Status Message */
+        .status-message {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .status-message.success {
+            background: #30d158;
+            color: #000000;
+        }
+
+        .status-message.error {
+            background: #ff453a;
+            color: #ffffff;
+        }
+
+        .status-message.info {
+            background: #0a84ff;
+            color: #ffffff;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #2c2c2e;
+            border-top-color: #0a84ff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .action-bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .action-group {
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <button class="nav-btn" onclick="window.location.href='index.html'">
+            🏠
+            <span class="tooltip">Back to Dashboard</span>
+        </button>
+        <button class="nav-btn active">
+            🔧
+            <span class="tooltip">Hinge Config</span>
+        </button>
+        <div style="flex: 1;"></div>
+        <button class="nav-btn" onclick="loadCurrentConfig()">
+            🔄
+            <span class="tooltip">Refresh</span>
+        </button>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Header -->
+        <div class="page-header">
+            <h1>🔧 Hinge Profile Configuration</h1>
+            <p>Configure the profile settings that will be used for all Hinge account creation tasks</p>
+        </div>
+
+        <!-- Status Message -->
+        <div id="statusMessage" class="status-message"></div>
+
+        <!-- Configuration Form -->
+        <form id="configForm">
+            <!-- Left Column -->
+            <div class="config-grid">
+                <!-- Basic Information -->
+                <div class="card">
+                    <h3 class="card-title">👤 Basic Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-input" id="firstName" value="Emma" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Gender</label>
+                            <select class="form-select" id="gender">
+                                <option value="female">Female</option>
+                                <option value="male">Male</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Age Range</label>
+                            <div class="age-range">
+                                <input type="number" class="form-input" id="ageMin" value="22" min="18" max="99">
+                                <span>to</span>
+                                <input type="number" class="form-input" id="ageMax" value="26" min="18" max="99">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Height</label>
+                            <select class="form-select" id="height">
+                                <option value="5'2\"">5'2"</option>
+                                <option value="5'3\"">5'3"</option>
+                                <option value="5'4\"">5'4"</option>
+                                <option value="5'5\"" selected>5'5"</option>
+                                <option value="5'6\"">5'6"</option>
+                                <option value="5'7\"">5'7"</option>
+                                <option value="5'8\"">5'8"</option>
+                                <option value="5'9\"">5'9"</option>
+                                <option value="5'10\"">5'10"</option>
+                                <option value="5'11\"">5'11"</option>
+                                <option value="6'0\"">6'0"</option>
+                                <option value="6'1\"">6'1"</option>
+                                <option value="6'2\"">6'2"</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demographics -->
+                <div class="card">
+                    <h3 class="card-title">🌍 Demographics & Education</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Ethnicity</label>
+                            <select class="form-select" id="ethnicity">
+                                <option value="White/Caucasian">White/Caucasian</option>
+                                <option value="Hispanic/Latino">Hispanic/Latino</option>
+                                <option value="Black/African American">Black/African American</option>
+                                <option value="Asian">Asian</option>
+                                <option value="Middle Eastern">Middle Eastern</option>
+                                <option value="Native American">Native American</option>
+                                <option value="Pacific Islander">Pacific Islander</option>
+                                <option value="Multiracial">Multiracial</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Religion</label>
+                            <select class="form-select" id="religion">
+                                <option value="Agnostic">Agnostic</option>
+                                <option value="Atheist">Atheist</option>
+                                <option value="Buddhist">Buddhist</option>
+                                <option value="Catholic">Catholic</option>
+                                <option value="Christian">Christian</option>
+                                <option value="Hindu">Hindu</option>
+                                <option value="Jewish">Jewish</option>
+                                <option value="Muslim">Muslim</option>
+                                <option value="Spiritual" selected>Spiritual</option>
+                                <option value="Other">Other</option>
+                                <option value="Prefer not to say">Prefer not to say</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row single">
+                        <div class="form-group">
+                            <label class="form-label">Education</label>
+                            <select class="form-select" id="education">
+                                <option value="High school">High school</option>
+                                <option value="Some college">Some college</option>
+                                <option value="Bachelor's degree" selected>Bachelor's degree</option>
+                                <option value="Master's degree">Master's degree</option>
+                                <option value="PhD">PhD</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Relationship Preferences -->
+                <div class="card">
+                    <h3 class="card-title">💝 Relationship Preferences</h3>
+                    <div class="form-row single">
+                        <div class="form-group">
+                            <label class="form-label">Relationship Goal</label>
+                            <select class="form-select" id="relationshipGoal">
+                                <option value="Long-term relationship, open to short">Long-term relationship, open to short</option>
+                                <option value="Short-term relationship, open to long">Short-term relationship, open to long</option>
+                                <option value="Long-term relationship">Long-term relationship</option>
+                                <option value="Short-term relationship">Short-term relationship</option>
+                                <option value="Figuring out my dating goals">Figuring out my dating goals</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row single">
+                        <div class="form-group">
+                            <label class="form-label">Children Preference</label>
+                            <select class="form-select" id="childrenPreference">
+                                <option value="Open to children">Open to children</option>
+                                <option value="Want children">Want children</option>
+                                <option value="Don't want children">Don't want children</option>
+                                <option value="Not sure yet">Not sure yet</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lifestyle -->
+                <div class="card">
+                    <h3 class="card-title">🍷 Lifestyle</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Drinking</label>
+                            <select class="form-select" id="drinking">
+                                <option value="Yes">Yes</option>
+                                <option value="Sometimes" selected>Sometimes</option>
+                                <option value="No">No</option>
+                                <option value="Sober">Sober</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Smoking</label>
+                            <select class="form-select" id="smoking">
+                                <option value="Yes">Yes</option>
+                                <option value="Sometimes">Sometimes</option>
+                                <option value="Socially">Socially</option>
+                                <option value="No" selected>No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Cannabis</label>
+                            <select class="form-select" id="cannabis">
+                                <option value="Yes">Yes</option>
+                                <option value="Sometimes">Sometimes</option>
+                                <option value="No" selected>No</option>
+                                <option value="Never">Never</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Drugs</label>
+                            <select class="form-select" id="drugs" disabled>
+                                <option value="No" selected>No</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="action-bar">
+                <div class="action-group">
+                    <button type="button" class="btn btn-secondary" onclick="loadDefaults()">
+                        🔄 Reset to Defaults
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="loadCurrentConfig()">
+                        📥 Reload Config
+                    </button>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    💾 Save Configuration
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="hinge-config.js"></script>
+</body>
+</html>

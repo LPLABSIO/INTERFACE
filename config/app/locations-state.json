@@ -2,12 +2,345 @@
   "available": [
     {
       "CountryCode": "us",
+      "state": "New York",
+      "city": "New York City",
+      "lat": "40.7419",
+      "lon": "-73.9938",
+      "area_code": "212, 718, 347, 929, 917",
+      "zip_code": "10001"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Texas",
+      "city": "Dallas",
+      "lat": "32.7767",
+      "lon": "-96.797",
+      "area_code": "214, 469, 972, 682",
+      "zip_code": "75201"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Florida",
+      "city": "Jacksonville",
+      "lat": "30.3322",
+      "lon": "-81.6557",
+      "area_code": "904",
+      "zip_code": "32201"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Texas",
+      "city": "Fort Worth",
+      "lat": "32.7555",
+      "lon": "-97.3308",
+      "area_code": "817, 682",
+      "zip_code": "76101"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Ohio",
+      "city": "Columbus",
+      "lat": "39.9612",
+      "lon": "-82.9988",
+      "area_code": "614, 380",
+      "zip_code": "43201"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "San Francisco",
+      "lat": "37.7749",
+      "lon": "-122.4194",
+      "area_code": "415, 628",
+      "zip_code": "94101"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Indiana",
+      "city": "Indianapolis",
+      "lat": "39.7684",
+      "lon": "-86.158",
+      "area_code": "317, 463",
+      "zip_code": "46201"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Washington",
+      "city": "Seattle",
+      "lat": "47.6097",
+      "lon": "-122.3331",
+      "area_code": "206, 425, 253",
+      "zip_code": "98101"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Colorado",
+      "city": "Denver",
+      "lat": "39.7392",
+      "lon": "-104.9903",
+      "area_code": "303, 720",
+      "zip_code": "80201"
+    },
+    {
+      "CountryCode": "us",
       "state": "D.C.",
       "city": "Washington D.C.",
       "lat": "38.9072",
       "lon": "-77.0369",
       "area_code": "202",
       "zip_code": "20001"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Texas",
+      "city": "El Paso",
+      "lat": "31.7619",
+      "lon": "-106.485",
+      "area_code": "915",
+      "zip_code": "79901"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Michigan",
+      "city": "Detroit",
+      "lat": "42.3314",
+      "lon": "-83.0458",
+      "area_code": "313, 734, 248",
+      "zip_code": "48201"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Tennessee",
+      "city": "Memphis",
+      "lat": "35.1495",
+      "lon": "-90.049",
+      "area_code": "901",
+      "zip_code": "37501"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Kentucky",
+      "city": "Louisville",
+      "lat": "38.2527",
+      "lon": "-85.7585",
+      "area_code": "502",
+      "zip_code": "40201"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Maryland",
+      "city": "Baltimore",
+      "lat": "39.2904",
+      "lon": "-76.6122",
+      "area_code": "410, 443, 667",
+      "zip_code": "21201"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Wisconsin",
+      "city": "Milwaukee",
+      "lat": "43.0389",
+      "lon": "-87.9065",
+      "area_code": "414",
+      "zip_code": "53201"
+    },
+    {
+      "CountryCode": "us",
+      "state": "New Mexico",
+      "city": "Albuquerque",
+      "lat": "35.0844",
+      "lon": "-106.6504",
+      "area_code": "505",
+      "zip_code": "87101"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Arizona",
+      "city": "Tucson",
+      "lat": "32.2226",
+      "lon": "-110.9747",
+      "area_code": "520",
+      "zip_code": "85701"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Fresno",
+      "lat": "36.7378",
+      "lon": "-119.7871",
+      "area_code": "559",
+      "zip_code": "93650"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Sacramento",
+      "lat": "38.5816",
+      "lon": "-121.4944",
+      "area_code": "916",
+      "zip_code": "95814"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Arizona",
+      "city": "Mesa",
+      "lat": "33.4152",
+      "lon": "-111.8315",
+      "area_code": "480",
+      "zip_code": "85201"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Georgia",
+      "city": "Atlanta",
+      "lat": "33.749",
+      "lon": "-84.388",
+      "area_code": "404, 470, 678, 770",
+      "zip_code": "30301"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Florida",
+      "city": "Cape Coral",
+      "lat": "26.6406",
+      "lon": "-81.9923",
+      "area_code": "239",
+      "zip_code": "33904"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Santa Clarita",
+      "lat": "34.3917",
+      "lon": "-118.5426",
+      "area_code": "661",
+      "zip_code": "91350"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "San Bernardino",
+      "lat": "34.1083",
+      "lon": "-117.2898",
+      "area_code": "909",
+      "zip_code": "92401"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Washington",
+      "city": "Tacoma",
+      "lat": "47.2529",
+      "lon": "-122.4443",
+      "area_code": "253",
+      "zip_code": "98401"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Florida",
+      "city": "Hialeah",
+      "lat": "25.8576",
+      "lon": "-80.2785",
+      "area_code": "305, 786",
+      "zip_code": "33002"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Louisiana",
+      "city": "Baton Rouge",
+      "lat": "30.4515",
+      "lon": "-91.1871",
+      "area_code": "225",
+      "zip_code": "70801"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Modesto",
+      "lat": "37.6391",
+      "lon": "-120.9969",
+      "area_code": "209",
+      "zip_code": "95350"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Fontana",
+      "lat": "34.0926",
+      "lon": "-117.435",
+      "area_code": "909",
+      "zip_code": "92335"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Texas",
+      "city": "McKinney",
+      "lat": "33.1975",
+      "lon": "-96.6398",
+      "area_code": "214, 972",
+      "zip_code": "75069"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Moreno Valley",
+      "lat": "33.9425",
+      "lon": "-117.2297",
+      "area_code": "951",
+      "zip_code": "92553"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Iowa",
+      "city": "Des Moines",
+      "lat": "41.5868",
+      "lon": "-93.625",
+      "area_code": "515",
+      "zip_code": "50301"
+    },
+    {
+      "CountryCode": "us",
+      "state": "North Carolina",
+      "city": "Fayetteville",
+      "lat": "35.0527",
+      "lon": "-78.8784",
+      "area_code": "910",
+      "zip_code": "28301"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Minnesota",
+      "city": "Saint Paul",
+      "lat": "44.9537",
+      "lon": "-93.09",
+      "area_code": "651",
+      "zip_code": "55101"
+    },
+    {
+      "CountryCode": "us",
+      "state": "New Jersey",
+      "city": "Jersey City",
+      "lat": "40.7282",
+      "lon": "-74.0776",
+      "area_code": "201, 551",
+      "zip_code": "07302"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Texas",
+      "city": "Plano",
+      "lat": "33.0198",
+      "lon": "-96.6989",
+      "area_code": "972, 469",
+      "zip_code": "75023"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Alaska",
+      "city": "Anchorage",
+      "lat": "61.2176",
+      "lon": "-149.8992",
+      "area_code": "907",
+      "zip_code": "99501"
     },
     {
       "CountryCode": "us",
@@ -29,12 +362,237 @@
     },
     {
       "CountryCode": "us",
+      "state": "Wisconsin",
+      "city": "Madison",
+      "lat": "43.0731",
+      "lon": "-89.4012",
+      "area_code": "608",
+      "zip_code": "53703"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Arizona",
+      "city": "Chandler",
+      "lat": "33.3062",
+      "lon": "-111.841",
+      "area_code": "480",
+      "zip_code": "85224"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Arizona",
+      "city": "Gilbert",
+      "lat": "33.4126",
+      "lon": "-111.789",
+      "area_code": "480",
+      "zip_code": "85233"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Nevada",
+      "city": "Reno",
+      "lat": "39.5296",
+      "lon": "-119.8138",
+      "area_code": "775",
+      "zip_code": "89501"
+    },
+    {
+      "CountryCode": "us",
+      "state": "New York",
+      "city": "Buffalo",
+      "lat": "42.8864",
+      "lon": "-78.8784",
+      "area_code": "716",
+      "zip_code": "14201"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Chula Vista",
+      "lat": "32.64",
+      "lon": "-117.0842",
+      "area_code": "619",
+      "zip_code": "91909"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Ohio",
+      "city": "Cleveland",
+      "lat": "41.4993",
+      "lon": "-81.6944",
+      "area_code": "216, 440",
+      "zip_code": "44101"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Hawaii",
+      "city": "Honolulu",
+      "lat": "21.3069",
+      "lon": "-157.8583",
+      "area_code": "808",
+      "zip_code": "96801"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Anaheim",
+      "lat": "33.8366",
+      "lon": "-117.9145",
+      "area_code": "714, 657",
+      "zip_code": "92801"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Nevada",
+      "city": "Henderson",
+      "lat": "36.0395",
+      "lon": "-114.9817",
+      "area_code": "702",
+      "zip_code": "89002"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Stockton",
+      "lat": "37.9577",
+      "lon": "-121.2908",
+      "area_code": "209",
+      "zip_code": "95201"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Colorado",
+      "city": "Lakewood",
+      "lat": "39.7051",
+      "lon": "-105.0814",
+      "area_code": "303",
+      "zip_code": "80226"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Riverside",
+      "lat": "33.9806",
+      "lon": "-117.3755",
+      "area_code": "951",
+      "zip_code": "92501"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Texas",
+      "city": "San Angelo",
+      "lat": "31.4638",
+      "lon": "-100.437",
+      "area_code": "325",
+      "zip_code": "76901"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Connecticut",
+      "city": "Bridgeport",
+      "lat": "41.1792",
+      "lon": "-73.189",
+      "area_code": "203",
+      "zip_code": "06601"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Arizona",
+      "city": "Peoria",
+      "lat": "33.5806",
+      "lon": "-112.237",
+      "area_code": "623",
+      "zip_code": "85345"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Santa Maria",
+      "lat": "34.9592",
+      "lon": "-120.4357",
+      "area_code": "805",
+      "zip_code": "93454"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Escondido",
+      "lat": "33.1192",
+      "lon": "-116.9338",
+      "area_code": "760",
+      "zip_code": "92025"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Missouri",
+      "city": "Springfield",
+      "lat": "37.2087",
+      "lon": "-93.2923",
+      "area_code": "417",
+      "zip_code": "65801"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Lancaster",
+      "lat": "34.6868",
+      "lon": "-118.1542",
+      "area_code": "661",
+      "zip_code": "93534"
+    },
+    {
+      "CountryCode": "us",
       "state": "California",
       "city": "Thousand Oaks",
       "lat": "34.1706",
       "lon": "-118.8376",
       "area_code": "805",
       "zip_code": "91360"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Simi Valley",
+      "lat": "34.2694",
+      "lon": "-118.7815",
+      "area_code": "805",
+      "zip_code": "93062"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Garden Grove",
+      "lat": "33.7739",
+      "lon": "-117.9411",
+      "area_code": "714",
+      "zip_code": "92840"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Inglewood",
+      "lat": "33.9617",
+      "lon": "-118.22",
+      "area_code": "310",
+      "zip_code": "90301"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Downey",
+      "lat": "33.9401",
+      "lon": "-118.1327",
+      "area_code": "562",
+      "zip_code": "90239"
+    },
+    {
+      "CountryCode": "us",
+      "state": "North Dakota",
+      "city": "Bismarck",
+      "lat": "46.8083",
+      "lon": "-100.7837",
+      "area_code": "701",
+      "zip_code": "58501"
     },
     {
       "CountryCode": "us",
@@ -47,12 +605,552 @@
     },
     {
       "CountryCode": "us",
+      "state": "Texas",
+      "city": "Lubbock",
+      "lat": "33.5779",
+      "lon": "-101.8552",
+      "area_code": "806",
+      "zip_code": "79401"
+    },
+    {
+      "CountryCode": "us",
+      "state": "South Dakota",
+      "city": "Rapid City",
+      "lat": "44.0805",
+      "lon": "-103.231",
+      "area_code": "605",
+      "zip_code": "57701"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Alabama",
+      "city": "Tuscaloosa",
+      "lat": "33.2098",
+      "lon": "-87.5692",
+      "area_code": "205",
+      "zip_code": "35401"
+    },
+    {
+      "CountryCode": "us",
+      "state": "New Mexico",
+      "city": "Farmington",
+      "lat": "36.7281",
+      "lon": "-108.2187",
+      "area_code": "505",
+      "zip_code": "87401"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Montana",
+      "city": "Billings",
+      "lat": "45.7833",
+      "lon": "-108.5007",
+      "area_code": "406",
+      "zip_code": "59101"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Wisconsin",
+      "city": "Eau Claire",
+      "lat": "44.8113",
+      "lon": "-91.4985",
+      "area_code": "715",
+      "zip_code": "54701"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Virginia",
+      "city": "Lynchburg",
+      "lat": "37.4138",
+      "lon": "-79.1423",
+      "area_code": "434",
+      "zip_code": "24501"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Michigan",
+      "city": "Kalamazoo",
+      "lat": "42.2917",
+      "lon": "-85.5872",
+      "area_code": "269",
+      "zip_code": "49001"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Redlands",
+      "lat": "34.0556",
+      "lon": "-117.1825",
+      "area_code": "909",
+      "zip_code": "92373"
+    },
+    {
+      "CountryCode": "us",
+      "state": "New Hampshire",
+      "city": "Concord",
+      "lat": "43.2081",
+      "lon": "-71.5375",
+      "area_code": "603",
+      "zip_code": "03301"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Wyoming",
+      "city": "Casper",
+      "lat": "42.85",
+      "lon": "-106.32",
+      "area_code": "307",
+      "zip_code": "82601"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Missouri",
+      "city": "Jefferson City",
+      "lat": "38.5767",
+      "lon": "-92.1735",
+      "area_code": "573",
+      "zip_code": "65101"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Texas",
+      "city": "Longview",
+      "lat": "32.5",
+      "lon": "-94.74",
+      "area_code": "903, 430",
+      "zip_code": "75601"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Colorado",
+      "city": "Grand Junction",
+      "lat": "39.0639",
+      "lon": "-108.55",
+      "area_code": "970",
+      "zip_code": "81501"
+    },
+    {
+      "CountryCode": "us",
+      "state": "South Carolina",
+      "city": "Spartanburg",
+      "lat": "34.9496",
+      "lon": "-81.932",
+      "area_code": "864",
+      "zip_code": "29301"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Carlsbad",
+      "lat": "33.1581",
+      "lon": "-117.3502",
+      "area_code": "760",
+      "zip_code": "92008"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Oregon",
+      "city": "Redmond",
+      "lat": "44.2587",
+      "lon": "-121.3153",
+      "area_code": "541",
+      "zip_code": "97756"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Ohio",
+      "city": "Westerville",
+      "lat": "40.1263",
+      "lon": "-82.933",
+      "area_code": "614",
+      "zip_code": "43081"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Wisconsin",
+      "city": "Brookfield",
+      "lat": "43.08",
+      "lon": "-88.1074",
+      "area_code": "262",
+      "zip_code": "53005"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Illinois",
+      "city": "Danville",
+      "lat": "40.1231",
+      "lon": "-87.6306",
+      "area_code": "217",
+      "zip_code": "61832"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Georgia",
+      "city": "Marietta",
+      "lat": "33.9526",
+      "lon": "-84.5499",
+      "area_code": "770",
+      "zip_code": "30060"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Wisconsin",
+      "city": "Kenosha",
+      "lat": "42.5847",
+      "lon": "-87.8211",
+      "area_code": "262",
+      "zip_code": "53140"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Michigan",
+      "city": "Battle Creek",
+      "lat": "42.3194",
+      "lon": "-85.1794",
+      "area_code": "269",
+      "zip_code": "49014"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Florida",
+      "city": "Gainesville",
+      "lat": "29.6516",
+      "lon": "-82.3248",
+      "area_code": "352",
+      "zip_code": "32601"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Indiana",
+      "city": "Muncie",
+      "lat": "40.1934",
+      "lon": "-85.3863",
+      "area_code": "765",
+      "zip_code": "47302"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Indiana",
+      "city": "Evansville",
+      "lat": "37.9716",
+      "lon": "-87.5711",
+      "area_code": "812",
+      "zip_code": "47708"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Texas",
+      "city": "Waco",
+      "lat": "31.5497",
+      "lon": "-97.1467",
+      "area_code": "254",
+      "zip_code": "76701"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Glendora",
+      "lat": "34.1366",
+      "lon": "-117.8654",
+      "area_code": "626",
+      "zip_code": "91740"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Iowa",
+      "city": "Waterloo",
+      "lat": "42.4925",
+      "lon": "-92.3126",
+      "area_code": "319",
+      "zip_code": "50701"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Idaho",
+      "city": "Meridian",
+      "lat": "43.6121",
+      "lon": "-116.3915",
+      "area_code": "208",
+      "zip_code": "83642"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Indiana",
+      "city": "Anderson",
+      "lat": "40.105",
+      "lon": "-85.6801",
+      "area_code": "765",
+      "zip_code": "46011"
+    },
+    {
+      "CountryCode": "us",
       "state": "Missouri",
       "city": "O'Fallon",
       "lat": "38.8104",
       "lon": "-90.6983",
       "area_code": "636",
       "zip_code": "63366"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Texas",
+      "city": "San Marcos",
+      "lat": "29.884",
+      "lon": "-97.9414",
+      "area_code": "512",
+      "zip_code": "78666"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Massachusetts",
+      "city": "Haverhill",
+      "lat": "42.7762",
+      "lon": "-71.0775",
+      "area_code": "978",
+      "zip_code": "01830"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Ohio",
+      "city": "Elyria",
+      "lat": "41.3685",
+      "lon": "-82.1076",
+      "area_code": "440",
+      "zip_code": "44035"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Texas",
+      "city": "McKinney",
+      "lat": "33.1977",
+      "lon": "-96.6398",
+      "area_code": "214, 469, 972",
+      "zip_code": "75069"
+    },
+    {
+      "CountryCode": "us",
+      "state": "South Carolina",
+      "city": "Sumter",
+      "lat": "33.9207",
+      "lon": "-80.3415",
+      "area_code": "803",
+      "zip_code": "29150"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Illinois",
+      "city": "Wheaton",
+      "lat": "41.8662",
+      "lon": "-88.1061",
+      "area_code": "630",
+      "zip_code": "60187"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Idaho",
+      "city": "Pocatello",
+      "lat": "42.8713",
+      "lon": "-112.4455",
+      "area_code": "208",
+      "zip_code": "83201"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Wisconsin",
+      "city": "La Crosse",
+      "lat": "43.8014",
+      "lon": "-91.2396",
+      "area_code": "608",
+      "zip_code": "54601"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Kansas",
+      "city": "Shawnee",
+      "lat": "39.9396",
+      "lon": "-94.6739",
+      "area_code": "913, 785",
+      "zip_code": "66203"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Madera",
+      "lat": "36.9613",
+      "lon": "-120.0608",
+      "area_code": "559",
+      "zip_code": "93637"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Wisconsin",
+      "city": "Waukesha",
+      "lat": "43.0122",
+      "lon": "-88.231",
+      "area_code": "262",
+      "zip_code": "53186"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Washington",
+      "city": "Puyallup",
+      "lat": "47.1852",
+      "lon": "-122.293",
+      "area_code": "253",
+      "zip_code": "98371"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Illinois",
+      "city": "Decatur",
+      "lat": "39.8403",
+      "lon": "-88.9543",
+      "area_code": "217",
+      "zip_code": "62521"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Texas",
+      "city": "Laredo",
+      "lat": "27.5069",
+      "lon": "-99.5075",
+      "area_code": "956",
+      "zip_code": "78040"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Michigan",
+      "city": "Saginaw",
+      "lat": "43.419",
+      "lon": "-83.95",
+      "area_code": "989",
+      "zip_code": "48601"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Texas",
+      "city": "Killeen",
+      "lat": "31.1171",
+      "lon": "-97.7278",
+      "area_code": "254",
+      "zip_code": "76540"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Kentucky",
+      "city": "Paducah",
+      "lat": "37.0834",
+      "lon": "-88.607",
+      "area_code": "270",
+      "zip_code": "42001"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Missouri",
+      "city": "Springfield",
+      "lat": "37.2087",
+      "lon": "-93.2923",
+      "area_code": "417",
+      "zip_code": "65802"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Oklahoma",
+      "city": "Stillwater",
+      "lat": "36.1156",
+      "lon": "-97.0589",
+      "area_code": "405",
+      "zip_code": "74074"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Mississippi",
+      "city": "Brookhaven",
+      "lat": "31.5536",
+      "lon": "-90.4352",
+      "area_code": "601",
+      "zip_code": "39601"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Texas",
+      "city": "Seguin",
+      "lat": "29.5689",
+      "lon": "-97.9644",
+      "area_code": "830",
+      "zip_code": "78155"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Illinois",
+      "city": "Peoria",
+      "lat": "40.6936",
+      "lon": "-89.5885",
+      "area_code": "309",
+      "zip_code": "61601"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Texas",
+      "city": "Victoria",
+      "lat": "28.8053",
+      "lon": "-97.0025",
+      "area_code": "361",
+      "zip_code": "77901"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Ohio",
+      "city": "Norwalk",
+      "lat": "41.2385",
+      "lon": "-82.6132",
+      "area_code": "419",
+      "zip_code": "44857"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Arkansas",
+      "city": "Bentonville",
+      "lat": "36.3727",
+      "lon": "-94.2087",
+      "area_code": "479",
+      "zip_code": "72712"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Texas",
+      "city": "New Braunfels",
+      "lat": "29.7047",
+      "lon": "-98.1245",
+      "area_code": "830",
+      "zip_code": "78130"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Illinois",
+      "city": "Highland Park",
+      "lat": "42.1954",
+      "lon": "-87.7701",
+      "area_code": "847",
+      "zip_code": "60035"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Georgia",
+      "city": "Macon",
+      "lat": "32.8407",
+      "lon": "-83.6324",
+      "area_code": "478",
+      "zip_code": "31201"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Tennessee",
+      "city": "Jackson",
+      "lat": "35.6145",
+      "lon": "-88.8139",
+      "area_code": "731",
+      "zip_code": "38301"
     },
     {
       "CountryCode": "us",
@@ -74,6 +1172,24 @@
     },
     {
       "CountryCode": "us",
+      "state": "Texas",
+      "city": "Cedar Park",
+      "lat": "30.5072",
+      "lon": "-97.8203",
+      "area_code": "512",
+      "zip_code": "78613"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Indiana",
+      "city": "Westfield",
+      "lat": "40.042",
+      "lon": "-86.1284",
+      "area_code": "317",
+      "zip_code": "46074"
+    },
+    {
+      "CountryCode": "us",
       "state": "Minnesota",
       "city": "St. Cloud",
       "lat": "45.5577",
@@ -83,12 +1199,39 @@
     },
     {
       "CountryCode": "us",
+      "state": "Michigan",
+      "city": "Owosso",
+      "lat": "42.987",
+      "lon": "-84.1896",
+      "area_code": "989",
+      "zip_code": "48867"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Georgia",
+      "city": "Decatur",
+      "lat": "33.7748",
+      "lon": "-84.2963",
+      "area_code": "404",
+      "zip_code": "30030"
+    },
+    {
+      "CountryCode": "us",
       "state": "South Dakota",
       "city": "Watertown",
       "lat": "44.898",
       "lon": "-97.1197",
       "area_code": "605",
       "zip_code": "57201"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Ohio",
+      "city": "Perrysburg",
+      "lat": "41.5577",
+      "lon": "-83.6523",
+      "area_code": "419",
+      "zip_code": "43551"
     },
     {
       "CountryCode": "us",
@@ -110,6 +1253,24 @@
     },
     {
       "CountryCode": "us",
+      "state": "Georgia",
+      "city": "Tifton",
+      "lat": "31.4581",
+      "lon": "-83.5042",
+      "area_code": "229",
+      "zip_code": "31794"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Clovis",
+      "lat": "36.8252",
+      "lon": "-119.7022",
+      "area_code": "559",
+      "zip_code": "93611"
+    },
+    {
+      "CountryCode": "us",
       "state": "Minnesota",
       "city": "Eagan",
       "lat": "44.8092",
@@ -119,12 +1280,111 @@
     },
     {
       "CountryCode": "us",
+      "state": "Colorado",
+      "city": "Greeley",
+      "lat": "40.4233",
+      "lon": "-104.7091",
+      "area_code": "970",
+      "zip_code": "80631"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Merced",
+      "lat": "37.3022",
+      "lon": "-120.482",
+      "area_code": "209",
+      "zip_code": "95340"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Montana",
+      "city": "Bozeman",
+      "lat": "45.6796",
+      "lon": "-111.0377",
+      "area_code": "406",
+      "zip_code": "59715"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Delaware",
+      "city": "Dover",
+      "lat": "39.1582",
+      "lon": "-75.5244",
+      "area_code": "302",
+      "zip_code": "19901"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Colorado",
+      "city": "Fort Collins",
+      "lat": "40.5853",
+      "lon": "-105.0844",
+      "area_code": "970",
+      "zip_code": "80521"
+    },
+    {
+      "CountryCode": "us",
+      "state": "California",
+      "city": "Martinez",
+      "lat": "38.0196",
+      "lon": "-122.134",
+      "area_code": "925",
+      "zip_code": "94553"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Illinois",
+      "city": "Brookfield",
+      "lat": "41.8244",
+      "lon": "-87.8197",
+      "area_code": "708",
+      "zip_code": "60513"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Florida",
+      "city": "West Palm Beach",
+      "lat": "26.7153",
+      "lon": "-80.0534",
+      "area_code": "561",
+      "zip_code": "33401"
+    },
+    {
+      "CountryCode": "us",
       "state": "Oregon",
       "city": "McMinnville",
       "lat": "45.2045",
       "lon": "-123.202",
       "area_code": "503",
       "zip_code": "97128"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Ohio",
+      "city": "Zanesville",
+      "lat": "39.9407",
+      "lon": "-82.0138",
+      "area_code": "740",
+      "zip_code": "43701"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Colorado",
+      "city": "Loveland",
+      "lat": "40.3977",
+      "lon": "-105.074",
+      "area_code": "970",
+      "zip_code": "80537"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Minnesota",
+      "city": "Mankato",
+      "lat": "44.1638",
+      "lon": "-94.0004",
+      "area_code": "507",
+      "zip_code": "56001"
     },
     {
       "CountryCode": "us",
@@ -146,6 +1406,33 @@
     },
     {
       "CountryCode": "us",
+      "state": "Indiana",
+      "city": "Evansville",
+      "lat": "37.9716",
+      "lon": "-87.5711",
+      "area_code": "812",
+      "zip_code": "47708"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Wyoming",
+      "city": "Sheridan",
+      "lat": "44.7962",
+      "lon": "-106.9564",
+      "area_code": "307",
+      "zip_code": "82801"
+    },
+    {
+      "CountryCode": "us",
+      "state": "South Dakota",
+      "city": "Aberdeen",
+      "lat": "45.4687",
+      "lon": "-98.48",
+      "area_code": "605",
+      "zip_code": "57401"
+    },
+    {
+      "CountryCode": "us",
       "state": "Minnesota",
       "city": "Woodbury",
       "lat": "44.9233",
@@ -164,12 +1451,39 @@
     },
     {
       "CountryCode": "us",
+      "state": "Colorado",
+      "city": "Loveland",
+      "lat": "40.3977",
+      "lon": "-105.074",
+      "area_code": "970",
+      "zip_code": "80537"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Colorado",
+      "city": "Wiggins",
+      "lat": "39.7472",
+      "lon": "-104.0162",
+      "area_code": "970",
+      "zip_code": "80654"
+    },
+    {
+      "CountryCode": "us",
       "state": "California",
       "city": "Lompoc",
       "lat": "34.6391",
       "lon": "-120.4579",
       "area_code": "805",
       "zip_code": "93436"
+    },
+    {
+      "CountryCode": "us",
+      "state": "Georgia",
+      "city": "Statesboro",
+      "lat": "32.4487",
+      "lon": "-81.782",
+      "area_code": "912",
+      "zip_code": "30458"
     }
   ],
   "testing": {},
@@ -177,8 +1491,8 @@
   "blacklisted": [],
   "failures": {},
   "stats": {
-    "totalLocations": 19,
-    "availableCount": 19,
+    "totalLocations": 165,
+    "availableCount": 165,
     "usedCount": 0,
     "blacklistedCount": 0,
     "testingCount": 0

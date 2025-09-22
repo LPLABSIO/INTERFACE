@@ -1,5 +1,8 @@
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 const EventEmitter = require('eventemitter3');
+
+// Fonction pour générer un ID unique
+const uuidv4 = () => crypto.randomUUID();
 
 /**
  * Priority levels for tasks

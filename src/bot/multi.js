@@ -1,8 +1,8 @@
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
-const { listConnectedUdids, saveDevices } = require('./src/deviceManager');
-const { log } = require('./src/utils');
+const DeviceManager = require('../../packages/@shared/device-manager/src/DeviceManager');
+const { log } = require('../../SHARED/utils/utils');
 
 function readJSON(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
@@ -39,8 +39,9 @@ function startAppiumForDevice(udid, basePort, baseWdaPort, basepath) {
 
 async function main() {
   const cfg = readJSON(CONFIG_PATH);
-  const udids = listConnectedUdids();
-  saveDevices(udids);
+  // Utiliser DeviceManager pour détecter les appareils
+  const devices = await DeviceManager.detectConnectedDevices();
+  const udids = devices.map(d => d.udid);
   const state = ensureState(cfg.totalAccounts);
 
   if (udids.length === 0) {

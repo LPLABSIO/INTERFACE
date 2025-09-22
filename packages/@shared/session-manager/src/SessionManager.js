@@ -1,7 +1,10 @@
 const EventEmitter = require('events');
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 const SessionStore = require('./SessionStore');
 const SessionMetrics = require('./SessionMetrics');
+
+// Fonction pour générer un ID unique
+const uuidv4 = () => crypto.randomUUID();
 
 /**
  * États possibles d'une session

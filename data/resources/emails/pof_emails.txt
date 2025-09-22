@@ -1,0 +1,6 @@
+# Emails pour POF uniquement
+pof1@gmail.com
+pof2@gmail.com
+pof3@gmail.com
+pof4@gmail.com
+pof5@gmail.com

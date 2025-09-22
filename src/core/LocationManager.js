@@ -8,7 +8,7 @@ const path = require('path');
 class LocationManager {
     constructor() {
         this.stateFile = path.join(__dirname, '../../config/app/locations-state.json');
-        this.locationsCSV = path.join(__dirname, '../../HINGE/locations_usa_tinder.csv');
+        this.locationsCSV = path.join(__dirname, '../../data/resources/locations/locations_usa_tinder_original.csv');
         this.state = {
             available: [],
             testing: {}, // deviceId -> location

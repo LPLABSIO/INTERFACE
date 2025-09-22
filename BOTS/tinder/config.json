@@ -1,0 +1,50 @@
+{
+  "app": "tinder",
+  "bundleId": "com.cardify.tinder",
+  "settings": {
+    "smsProvider": "daisysms",
+    "smsProviderBackup": "api21k",
+    "proxyProvider": "marsproxies",
+    "emailsFile": "tinder_emails.txt",
+    "locationsFile": "locations_usa_tinder.csv",
+    "useQueue": true,
+    "maxRetries": 3
+  },
+  "profile": {
+    "names": ["Ashley", "Taylor", "Morgan", "Jordan", "Casey", "Riley", "Alex"],
+    "ageRange": [21, 27],
+    "bio": [
+      "Adventure seeker 🌍",
+      "Coffee enthusiast ☕",
+      "Dog mom 🐕",
+      "Yoga & meditation 🧘‍♀️",
+      "Foodie & traveler 🍜✈️"
+    ],
+    "interests": [
+      "Travel",
+      "Yoga",
+      "Coffee",
+      "Music",
+      "Photography",
+      "Hiking",
+      "Reading"
+    ]
+  },
+  "flow": {
+    "steps": [
+      "resetIdentifiers",
+      "configurePrivacy",
+      "setupProxy",
+      "setLocation",
+      "createAccount",
+      "uploadPhotos",
+      "setBio",
+      "setPreferences"
+    ],
+    "delays": {
+      "betweenSteps": [1000, 3000],
+      "afterError": 5000,
+      "beforeRetry": 10000
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "profileSettings": {
+    "firstName": "Chloe",
+    "gender": "female",
+    "ageRange": {
+      "min": 21,
+      "max": 23
+    },
+    "height": "",
+    "relationshipGoal": "Short-term relationship, open to long",
+    "ethnicity": "White/Caucasian",
+    "education": "Bachelor's degree",
+    "religion": "Prefer not to say",
+    "hometown": "",
+    "children": "Don't have children",
+    "childrenPreference": "Want children",
+    "drinking": "Sometimes",
+    "smoking": "No",
+    "cannabis": "No",
+    "drugs": "No"
+  },
+  "prompts": [],
+  "photoSettings": {
+    "uploadPhotos": true,
+    "numberOfPhotos": 6,
+    "photoSource": "library"
+  },
+  "behaviorSettings": {
+    "randomizeOrder": false,
+    "useVariations": false,
+    "delayBetweenActions": {
+      "min": 1,
+      "max": 3
+    }
+  },
+  "autoSwipe": {
+    "enabled": false,
+    "swipeCount": 0,
+    "likeRatio": 0.3
+  }
+}

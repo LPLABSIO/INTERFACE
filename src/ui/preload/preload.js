@@ -100,6 +100,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
     loadSettings: () => ipcRenderer.invoke('load-settings'),
 
+    // Hinge Configuration
+    loadHingeConfig: () => ipcRenderer.invoke('load-hinge-config'),
+    saveHingeConfig: (config) => ipcRenderer.invoke('save-hinge-config', config),
+
     // Resource management
     getResourceStats: () => ipcRenderer.invoke('get-resource-stats'),
     resetLocations: () => ipcRenderer.invoke('reset-locations'),

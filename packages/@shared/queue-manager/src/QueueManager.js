@@ -1,6 +1,7 @@
 const EventEmitter = require('eventemitter3');
 const { TaskQueue, TaskPriority, TaskState } = require('./TaskQueue');
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
+const uuidv4 = () => crypto.randomUUID();
 
 /**
  * Queue Manager orchestrates task distribution across multiple devices

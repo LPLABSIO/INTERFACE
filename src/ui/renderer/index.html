@@ -464,6 +464,11 @@
             color: white;
         }
 
+        .status-badge.paused {
+            background: #ff9500;
+            color: white;
+        }
+
         .status-badge.inactive {
             background: #3c3c3e;
             color: #8e8e93;
@@ -620,6 +625,71 @@
         .device-log-tab:hover {
             background: #3a3a3c;
             color: #ffffff;
+        }
+
+        /* Statistics Dashboard - Clean and Integrated */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #2c2c2e;
+        }
+
+        .stats-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-name {
+            font-size: 13px;
+            color: #8e8e93;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0a84ff;
+        }
+
+        /* History Table - Clean Design */
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th {
+            background: transparent;
+            color: #8e8e93;
+            padding: 8px;
+            text-align: left;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-weight: 500;
+            border-bottom: 1px solid #2c2c2e;
+        }
+
+        .history-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #1c1c1e;
+            font-size: 13px;
+            color: #e5e5e7;
+        }
+
+        .history-table tbody tr:hover {
+            background: rgba(10, 132, 255, 0.05);
+        }
+
+        .history-table tbody tr:last-child td {
+            border-bottom: none;
         }
 
         .device-log-tab-content {
@@ -814,6 +884,10 @@
                 📊
                 <span class="tooltip">Monitor</span>
             </button>
+            <button class="nav-btn" onclick="window.location.href='hinge-config.html'">
+                🔧
+                <span class="tooltip">Hinge Config</span>
+            </button>
             <div style="flex: 1;"></div>
             <button class="nav-btn" onclick="refreshAll()">
                 🔄
@@ -898,7 +972,40 @@
 
                 <!-- Production Page -->
                 <div id="production-page" class="page">
+
                     <div class="grid-2">
+                        <!-- Production Statistics -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Production Statistics</h3>
+                                <button class="btn btn-secondary" onclick="exportStatistics()" style="padding: 5px 10px; font-size: 11px;">Export</button>
+                            </div>
+                            <div class="stats-row">
+                                <span class="stat-name">Total Created</span>
+                                <span class="stat-value" id="stat-total-created">0</span>
+                            </div>
+                            <div class="stats-row">
+                                <span class="stat-name">Success Rate</span>
+                                <span class="stat-value" id="stat-success-rate">0%</span>
+                            </div>
+                            <div class="stats-row">
+                                <span class="stat-name">Average Time</span>
+                                <span class="stat-value" id="stat-avg-time">0s</span>
+                            </div>
+                            <div class="stats-row">
+                                <span class="stat-name">Active Devices</span>
+                                <span class="stat-value" id="stat-active-devices">0</span>
+                            </div>
+                            <div class="stats-row">
+                                <span class="stat-name">Proxies Used</span>
+                                <span class="stat-value" id="stat-proxies-used">0</span>
+                            </div>
+                            <div class="stats-row">
+                                <span class="stat-name">SMS Consumed</span>
+                                <span class="stat-value" id="stat-sms-consumed">0</span>
+                            </div>
+                        </div>
+
                         <!-- Production Setup -->
                         <div class="card">
                             <h3 class="card-title">Production Setup</h3>
@@ -933,8 +1040,31 @@
                                 </select>
                             </div>
 
-                            <button class="btn btn-success" onclick="startProduction()" style="width: 100%;">
+                            <div class="form-group">
+                                <label class="form-label">SMS Provider</label>
+                                <select class="form-select" id="sms-provider">
+                                    <option value="api21k">API21K</option>
+                                    <option value="daisysms">DaisySMS</option>
+                                    <option value="smspool">SMSPool</option>
+                                    <option value="none">None (Test Mode)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <input type="checkbox" id="debug-mode" style="margin-right: 5px;">
+                                    Debug Mode
+                                </label>
+                                <small style="color: #999; font-size: 11px; display: block; margin-top: 5px;">
+                                    Affiche les actions détaillées sans les exécuter réellement
+                                </small>
+                            </div>
+
+                            <button class="btn btn-success" onclick="startProduction()" style="width: 100%; margin-bottom: 10px;">
                                 🚀 Start Production
+                            </button>
+                            <button class="btn btn-secondary" onclick="window.location.href='hinge-config.html'" style="width: 100%;">
+                                🔧 Configure Hinge Profile
                             </button>
                         </div>
 
@@ -1026,6 +1156,31 @@
                             <div class="device-log-content empty">
                                 No active devices. Start a production to see logs.
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Production History -->
+                    <div class="card" style="margin-top: 20px;">
+                        <h3 class="card-title">Production History</h3>
+                        <div style="overflow-x: auto; max-height: 300px; overflow-y: auto;">
+                            <table class="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>Session</th>
+                                        <th>Time</th>
+                                        <th>Duration</th>
+                                        <th>Devices</th>
+                                        <th>Accounts</th>
+                                        <th>Success</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-tbody">
+                                    <tr>
+                                        <td colspan="7" style="text-align: center; color: #8e8e93; padding: 20px;">No production history yet</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -1147,6 +1302,19 @@
                 document.getElementById('page-icon').textContent = pageInfo.icon;
                 document.getElementById('page-title').textContent = pageInfo.title;
             }
+
+            // Re-render content when switching to production page
+            if (pageName === 'production') {
+                renderActiveProductions();
+                updateQueueStats();
+                updateResourceStats();
+                // Re-render device logs if any
+                if (appState.deviceLogs.size > 0) {
+                    renderDeviceLogs();
+                }
+            } else if (pageName === 'devices') {
+                renderDevices();
+            }
         }
 
         // Tab Navigation
@@ -1226,7 +1394,7 @@
                     <div class="device-header">
                         <div class="device-info">
                             <div class="device-name">${device.name}</div>
-                            <div class="device-details">${device.model} • iOS ${device.ios}</div>
+                            <div class="device-details">${device.model || 'iPhone'} • iOS ${device.ios || 'Unknown'}</div>
                         </div>
                         <div class="device-status ${device.status}">${device.status}</div>
                     </div>
@@ -1313,15 +1481,22 @@
             const app = document.getElementById('app-select').value;
             const totalAccounts = parseInt(document.getElementById('total-accounts').value);
             const proxyProvider = document.getElementById('proxy-provider').value;
+            const smsProvider = document.getElementById('sms-provider').value;
+            const debugMode = document.getElementById('debug-mode').checked;
 
             addLog('system', `Starting production: ${selectedCount} devices, ${totalAccounts} total accounts`);
+            if (debugMode) {
+                addLog('warning', '🐛 Debug mode enabled - actions will be simulated');
+            }
 
             // Ajouter les comptes à la queue
             try {
                 if (window.electronAPI && window.electronAPI.queueAddBatch) {
                     const result = await window.electronAPI.queueAddBatch(totalAccounts, {
                         app: app,
-                        proxyProvider: proxyProvider
+                        proxyProvider: proxyProvider,
+                        smsProvider: smsProvider,
+                        debugMode: debugMode
                     });
 
                     if (result.success) {
@@ -1335,6 +1510,9 @@
                 addLog('error', `Queue error: ${error.message}`);
                 return;
             }
+
+            // Calculate accounts per device
+            const accountsPerDevice = Math.ceil(totalAccounts / selectedCount);
 
             // Debug: Check available APIs
             console.log('Checking APIs...');
@@ -1423,16 +1601,25 @@
             const container = document.getElementById('active-productions');
             container.innerHTML = '';
 
+            if (appState.activeProductions.size === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #8e8e93; padding: 20px;">No active productions</div>';
+                return;
+            }
+
             appState.activeProductions.forEach((production, udid) => {
                 const device = appState.devices.get(udid);
                 if (!device) return;
 
                 const card = document.createElement('div');
                 card.className = 'status-card';
+                const isPaused = production.status === 'paused';
+                const statusBadge = isPaused ? 'paused' : 'active';
+                const statusText = isPaused ? 'Paused' : 'Running';
+
                 card.innerHTML = `
                     <div class="status-header">
                         <span class="status-title">${device.name}</span>
-                        <span class="status-badge active">Running</span>
+                        <span class="status-badge ${statusBadge}">${statusText}</span>
                     </div>
                     <div style="margin-top: 15px;">
                         <div class="progress-label">Account ${production.progress}/${production.accounts}</div>
@@ -1442,6 +1629,14 @@
                     </div>
                     <div style="margin-top: 10px; font-size: 12px; color: #8e8e93;">
                         App: ${production.app} • Started: ${new Date(production.startTime).toLocaleTimeString()}
+                    </div>
+                    <div style="margin-top: 15px; display: flex; gap: 5px;">
+                        ${isPaused ?
+                            `<button class="btn btn-success" onclick="resumeDevice('${udid}')" style="flex: 1; padding: 5px; font-size: 12px;">▶️ Resume</button>` :
+                            `<button class="btn btn-warning" onclick="pauseDevice('${udid}')" style="flex: 1; padding: 5px; font-size: 12px;">⏸️ Pause</button>`
+                        }
+                        <button class="btn btn-danger" onclick="stopDevice('${udid}')" style="flex: 1; padding: 5px; font-size: 12px;">⏹️ Stop</button>
+                        <button class="btn btn-secondary" onclick="showDeviceDetails('${udid}')" style="flex: 1; padding: 5px; font-size: 12px;">📊 Details</button>
                     </div>
                 `;
                 container.appendChild(card);
@@ -1762,7 +1957,12 @@
         }
 
         async function clearQueue() {
-            if (!confirm('Clear all tasks from the queue?')) return;
+            // Protection contre le vidage accidentel pendant la production
+            if (appState.productionActive) {
+                if (!confirm('⚠️ Production is active! Are you sure you want to clear the queue?')) return;
+            } else {
+                if (!confirm('Clear all tasks from the queue?')) return;
+            }
 
             try {
                 if (window.electronAPI && window.electronAPI.queueClear) {
@@ -1885,7 +2085,87 @@
         }
 
         function pauseAll() {
-            addLog('system', 'All productions paused', 'warning');
+            for (const [udid, production] of appState.activeProductions) {
+                production.status = 'paused';
+            }
+            renderActiveProductions();
+            addLog('system', 'All productions paused');
+        }
+
+        // Individual device control functions
+        function pauseDevice(udid) {
+            const production = appState.activeProductions.get(udid);
+            const device = appState.devices.get(udid);
+            if (production && device) {
+                production.status = 'paused';
+                renderActiveProductions();
+                addLog('warning', `Production paused for ${device.name}`);
+            }
+        }
+
+        function resumeDevice(udid) {
+            const production = appState.activeProductions.get(udid);
+            const device = appState.devices.get(udid);
+            if (production && device) {
+                production.status = 'running';
+                renderActiveProductions();
+                addLog('success', `Production resumed for ${device.name}`);
+            }
+        }
+
+        async function stopDevice(udid) {
+            const device = appState.devices.get(udid);
+            if (!device) return;
+
+            if (!confirm(`Stop production for ${device.name}?`)) return;
+
+            try {
+                addLog('system', `Stopping production for ${device.name}...`);
+
+                // Stop the bot
+                if (window.electronAPI && window.electronAPI.stopBot) {
+                    await window.electronAPI.stopBot({ udid });
+                } else if (window.deviceRun && window.deviceRun.stop) {
+                    await window.deviceRun.stop(udid);
+                }
+
+                // Stop Appium
+                if (window.electronAPI && window.electronAPI.stopAppium) {
+                    await window.electronAPI.stopAppium({ udid });
+                }
+
+                // Stop WDA
+                if (window.electronAPI && window.electronAPI.stopWDA) {
+                    await window.electronAPI.stopWDA({ udid });
+                }
+
+                appState.activeProductions.delete(udid);
+                device.status = 'idle';
+                renderDevices();
+                renderActiveProductions();
+                addLog('success', `Production stopped for ${device.name}`);
+            } catch (error) {
+                addLog('error', `Failed to stop production for ${device.name}: ${error.message}`);
+            }
+        }
+
+        function showDeviceDetails(udid) {
+            const production = appState.activeProductions.get(udid);
+            const device = appState.devices.get(udid);
+            if (production && device) {
+                const elapsedTime = Date.now() - production.startTime;
+                const hours = Math.floor(elapsedTime / 3600000);
+                const minutes = Math.floor((elapsedTime % 3600000) / 60000);
+                const seconds = Math.floor((elapsedTime % 60000) / 1000);
+
+                alert(`Device: ${device.name}
+App: ${production.app}
+Progress: ${production.progress}/${production.accounts} accounts
+Status: ${production.status || 'running'}
+Runtime: ${hours}h ${minutes}m ${seconds}s
+Appium Port: ${production.appiumPort}
+WDA Port: ${production.wdaPort}`);
+            }
         }
 
         function refreshAll() {
@@ -1953,6 +2233,55 @@
                         }
                     });
                 }
+            }
+
+            // Listen for bot output logs from deviceRun
+            if (window.deviceRun && window.deviceRun.onOutput) {
+                window.deviceRun.onOutput((data) => {
+                    // Log only in debug mode
+                    if (window.debugMode) {
+                        console.log('Bot output:', data);
+                    }
+
+                    // Add log to device logs
+                    if (data.udid && data.line) {
+                        const device = appState.devices.get(data.udid);
+                        const deviceName = device?.name || data.udid;
+
+                        // Determine log type based on content
+                        let logType = 'info';
+                        const lowerLine = data.line.toLowerCase();
+                        if (lowerLine.includes('error') || lowerLine.includes('failed')) {
+                            logType = 'error';
+                        } else if (lowerLine.includes('warning') || lowerLine.includes('retry')) {
+                            logType = 'warning';
+                        } else if (lowerLine.includes('success') || lowerLine.includes('created')) {
+                            logType = 'success';
+                        }
+
+                        addDeviceLog(data.udid, deviceName, 'script', logType, data.line);
+
+                        // Update statistics on certain events
+                        if (data.line.includes('Account created successfully')) {
+                            productionStats.totalCreated++;
+                            productionStats.smsConsumed++;
+                            updateStatistics();
+
+                            // Update production progress
+                            const production = appState.activeProductions.get(data.udid);
+                            if (production) {
+                                production.accountsCreated++;
+                                renderActiveProductions();
+                            }
+                        } else if (data.line.includes('SMS verification completed')) {
+                            productionStats.smsConsumed++;
+                            updateStatistics();
+                        } else if (data.line.includes('Proxy assigned')) {
+                            productionStats.proxiesUsed++;
+                            updateStatistics();
+                        }
+                    }
+                });
             }
         });
     </script>

@@ -26,7 +26,8 @@ class QueueManager {
    * Initialise le gestionnaire de queue
    */
   async initialize() {
-    // console.log('[QueueManager] Initializing...');
+    console.log('[QueueManager] Initializing...');
+    console.log('[QueueManager] Config path:', this.configPath);
 
     try {
       // Créer le dossier si nécessaire
@@ -39,9 +40,10 @@ class QueueManager {
       // Nettoyer les tâches abandonnées
       await this.cleanupAbandonedTasks();
 
-      // console.log('[QueueManager] Initialized with', this.state.tasks.length, 'tasks');
+      console.log('[QueueManager] Initialized with', this.state.tasks.length, 'tasks');
+      console.log('[QueueManager] Tasks:', this.state.tasks.map(t => ({ id: t.id, status: t.status })));
     } catch (error) {
-      // console.error('[QueueManager] Initialization error:', error);
+      console.error('[QueueManager] Initialization error:', error);
       throw error;
     }
   }
@@ -51,14 +53,16 @@ class QueueManager {
    */
   async loadState() {
     try {
+      console.log('[QueueManager] Loading state from:', this.configPath);
       const data = await fs.readFile(this.configPath, 'utf8');
       this.state = JSON.parse(data);
-      // console.log('[QueueManager] State loaded from file');
+      console.log('[QueueManager] State loaded from file, tasks:', this.state.tasks.length);
     } catch (error) {
       if (error.code === 'ENOENT') {
-        // console.log('[QueueManager] No existing state, starting fresh');
+        console.log('[QueueManager] No existing state file, starting fresh');
         await this.saveState();
       } else {
+        console.error('[QueueManager] Error loading state:', error);
         throw error;
       }
     }
@@ -113,6 +117,9 @@ class QueueManager {
    * @param {string} deviceId - ID de l'appareil
    */
   async getNextTask(deviceId) {
+    console.log(`[QueueManager] getNextTask called with deviceId: ${deviceId}`);
+    console.log(`[QueueManager] Current tasks count: ${this.state.tasks.length}`);
+
     // Nettoyer d'abord les tâches abandonnées
     await this.cleanupAbandonedTasks();
 
@@ -123,8 +130,11 @@ class QueueManager {
     );
 
     if (!task) {
+      console.log('[QueueManager] No pending tasks found');
       return null; // Plus de tâches disponibles
     }
+
+    console.log(`[QueueManager] Found task #${task.id} with status: ${task.status}`);
 
     // Marquer comme en cours
     task.status = 'in_progress';
@@ -141,7 +151,7 @@ class QueueManager {
     this.updateStats();
     await this.saveState();
 
-    // console.log(`[QueueManager] Task ${task.id} assigned to ${deviceId}`);
+    console.log(`[QueueManager] Task ${task.id} assigned to ${deviceId} (attempt ${task.attempts})`);
     return task;
   }
 

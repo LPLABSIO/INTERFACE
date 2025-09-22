@@ -4,7 +4,7 @@ const StateManager = require('@shared/state-manager');
 const { QueueManager, TaskPriority } = require('@shared/queue-manager');
 const ErrorRecovery = require('@shared/error-recovery/src/ErrorRecovery');
 const HealthMonitor = require('@shared/error-recovery/src/HealthMonitor');
-const deviceDiscovery = require('../utils/device-discovery');
+const deviceDiscovery = require('../../packages/@shared/device-manager/src/DeviceDiscovery');
 const path = require('path');
 
 /**

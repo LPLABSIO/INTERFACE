@@ -1,0 +1,154 @@
+{
+  "prompts": [
+    {
+      "question": "My simple pleasures",
+      "answers": [
+        "Morning coffee while the world is still quiet",
+        "Finding a new book I can't put down",
+        "Sunday farmers market trips",
+        "Cooking a meal from scratch",
+        "Sunset walks with good music"
+      ]
+    },
+    {
+      "question": "Typical Sunday",
+      "answers": [
+        "Brunch, beach, and a good book",
+        "Gym, meal prep, and Netflix",
+        "Hiking trails and trying new cafes",
+        "Sleep in, cook breakfast, explore the city",
+        "Yoga, farmers market, and friends"
+      ]
+    },
+    {
+      "question": "Together, we could",
+      "answers": [
+        "Find the city's best hidden speakeasies",
+        "Start a two-person book club",
+        "Learn to make pasta from scratch",
+        "Explore every museum in town",
+        "Plan spontaneous weekend road trips"
+      ]
+    },
+    {
+      "question": "I'll fall for you if",
+      "answers": [
+        "You can make me laugh even on my worst days",
+        "You're passionate about something",
+        "You love dogs as much as I do",
+        "You're down for random adventures",
+        "You appreciate the little things in life"
+      ]
+    },
+    {
+      "question": "The way to win me over is",
+      "answers": [
+        "Good conversation and great tacos",
+        "Be genuinely kind to everyone",
+        "Share your favorite music with me",
+        "Plan thoughtful surprises",
+        "Make me laugh until my stomach hurts"
+      ]
+    },
+    {
+      "question": "I'm looking for",
+      "answers": [
+        "Someone who doesn't take life too seriously",
+        "A partner in crime for all adventures",
+        "Someone to share lazy Sundays with",
+        "My plus one for concerts and comedy shows",
+        "Someone who values growth and authenticity"
+      ]
+    },
+    {
+      "question": "This year, I really want to",
+      "answers": [
+        "Travel to three new countries",
+        "Learn a new language",
+        "Run my first marathon",
+        "Start my own business",
+        "Master the art of sourdough"
+      ]
+    },
+    {
+      "question": "A random fact I love is",
+      "answers": [
+        "Octopuses have three hearts",
+        "Honey never expires",
+        "Trees can communicate with each other",
+        "The moon is moving away from Earth",
+        "Bananas are berries but strawberries aren't"
+      ]
+    },
+    {
+      "question": "Dating me is like",
+      "answers": [
+        "Finding money in your pocket you forgot about",
+        "A perfectly curated playlist",
+        "Your favorite comfort food",
+        "A weekend with no plans",
+        "The first day of spring"
+      ]
+    },
+    {
+      "question": "We'll get along if",
+      "answers": [
+        "You appreciate sarcasm and dad jokes",
+        "You're always down for trying new food",
+        "You can enjoy comfortable silence",
+        "You love deep conversations at 2am",
+        "You think pineapple belongs on pizza"
+      ]
+    },
+    {
+      "question": "My Love Language is",
+      "answers": [
+        "Quality time and good food",
+        "Acts of service and coffee runs",
+        "Words of affirmation and playlists",
+        "Physical touch and forehead kisses",
+        "All of the above, honestly"
+      ]
+    },
+    {
+      "question": "The dorkiest thing about me is",
+      "answers": [
+        "I have a spreadsheet for everything",
+        "I know way too much about dinosaurs",
+        "I still sleep with a stuffed animal",
+        "I practice conversations in the shower",
+        "I get excited about organizing things"
+      ]
+    },
+    {
+      "question": "The best way to ask me out is",
+      "answers": [
+        "Suggest a specific plan, not just 'hang out'",
+        "Send me a voice note instead of texting",
+        "Challenge me to mini golf",
+        "Ask me to show you my favorite coffee spot",
+        "Be direct and genuine about it"
+      ]
+    },
+    {
+      "question": "Two truths and a lie",
+      "answers": [
+        "I've been skydiving, I speak 3 languages, I hate chocolate",
+        "I've met a celebrity, I can't swim, I've lived in 5 countries",
+        "I'm a twin, I've never broken a bone, I hate coffee",
+        "I can play guitar, I've been on TV, I'm scared of birds",
+        "I've run a marathon, I make great pasta, I love mornings"
+      ]
+    },
+    {
+      "question": "My greatest strength",
+      "answers": [
+        "I can find humor in any situation",
+        "I'm a great listener",
+        "I never give up on people I care about",
+        "I can cook a meal from anything in the fridge",
+        "I stay calm under pressure"
+      ]
+    }
+  ]
+}

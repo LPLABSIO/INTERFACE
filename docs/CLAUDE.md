@@ -4,200 +4,225 @@ Ce fichier fournit des indications à Claude Code (claude.ai/code) lors du trava
 
 ## Vue d'ensemble du projet
 
-Ce dépôt contient une **plateforme d'automatisation iOS multi-appareils** professionnelle :
-- **INTERFACE** : Application Electron pour la gestion et le monitoring des appareils
-- **HINGE** : Module de bot d'automatisation pour applications (Hinge, Tinder, POF)
-- **Production System** : Système de production multi-appareils avec gestion des ressources
+**Plateforme d'automatisation iOS multi-appareils professionnelle** avec gestion intelligente des ressources :
+- **Interface Electron** : Application desktop pour monitoring et contrôle centralisé
+- **Architecture modulaire** : Séparation claire entre interface, bots et modules partagés
+- **Production System** : Support de 50+ appareils simultanés avec allocation thread-safe
 
-## Architecture Actuelle
+## Architecture Actuelle (v0.2.0)
 
 ```
 INTERFACE/
-├── src/
-│   ├── ui/                      # Interface Electron
-│   │   ├── main/main.js        # Process principal avec IPC
-│   │   ├── renderer/            # Pages HTML/JS
-│   │   │   ├── index.html      # Interface principale avec logs multi-appareils
-│   │   │   ├── production.html # Page de production avec ResourceManager
-│   │   │   └── production.js   # Gestion des ressources et allocation
-│   │   └── preload/            # Bridge sécurisé
-│   ├── core/                   # Orchestration
-│   │   └── AppOrchestrator.js # Coordination multi-appareils
-│   └── bot/                    # Scripts d'exécution
-├── HINGE/                      # Module bot autonome
-│   ├── bot.js                  # Point d'entrée principal
-│   └── src/
-│       ├── hinge.js           # Automatisation Hinge
-│       ├── email.js           # Gestion emails (getAndRemoveEmail)
-│       └── locations.js       # Gestion locations (loadLocations)
-├── config/app/                 # Configuration centralisée
-│   ├── data.json              # Config principale
-│   ├── devices.json           # UUIDs des appareils
-│   ├── state.json             # État de progression
-│   └── appium_servers.json    # Mapping ports Appium
-└── data/resources/            # Pools de ressources
-    ├── emails.txt             # Liste d'emails
-    └── locations.txt          # Liste de locations
+├── src/                        # Code source principal
+│   ├── ui/                     # Interface Electron
+│   │   ├── main/main.js       # Process principal (IPC, device management)
+│   │   ├── renderer/           # Pages HTML/JS/CSS
+│   │   └── preload/            # Bridge IPC sécurisé
+│   ├── core/                   # Orchestration centrale
+│   │   ├── AppOrchestrator.js # Coordination multi-appareils
+│   │   ├── LocationManager.js # Gestion thread-safe des villes
+│   │   ├── ResourceManager.js # Allocation emails/proxies
+│   │   └── QueueManager.js    # File de tâches prioritaires
+│   ├── bot/                    # Scripts d'automatisation
+│   │   ├── bot.js             # Bot principal (variables env)
+│   │   └── multi.js           # Orchestration multi-devices
+│   └── api/                    # API REST et WebSocket
+│       └── server.js          # Serveur Express (port 3000)
+│
+├── SHARED/                     # Modules réutilisables
+│   ├── proxy-manager/         # Validation et gestion proxies
+│   ├── sms-providers/         # SMS (api21k, daisysms, smspool)
+│   ├── ios-apps/              # Apps helper iOS
+│   │   ├── shadowrocket.js   # Configuration proxy
+│   │   ├── crane.js           # Reset conteneurs
+│   │   ├── ghost.js           # Device spoofing
+│   │   ├── orbit.js           # VPN settings
+│   │   └── geranium.js        # GPS spoofing
+│   ├── email-manager/         # Gestion emails centralisée
+│   ├── notifications/         # Telegram, etc.
+│   └── utils/                 # Utilitaires WebDriver
+│
+├── BOTS/                      # Scripts par application
+│   ├── hinge/index.js        # Bot Hinge (Phase 7 - optimisation prévue)
+│   ├── tinder/                # Bot Tinder + extension BlazeX
+│   └── pof/index.js          # Bot POF
+│
+├── packages/@shared/          # Modules NPM internes (Lerna)
+│   ├── device-manager/        # Gestion avancée appareils
+│   ├── session-manager/       # Sessions WebDriver
+│   ├── queue-manager/         # File de tâches avancée
+│   ├── process-manager/       # Gestion des processus
+│   ├── state-manager/         # Persistance d'état
+│   └── error-recovery/        # Récupération d'erreurs
+│
+├── data/                      # Données et ressources
+│   ├── locations/             # CSV des villes US (165 villes)
+│   ├── locations-state.json  # État actuel allocations
+│   ├── resources-state.json  # État emails/proxies
+│   └── emails/               # Emails par app (hinge.txt, tinder.txt)
+│
+└── scripts/                   # Scripts utilitaires
+    ├── debug/                 # Scripts de dépannage WDA
+    ├── setup/                 # Installation initiale iPhone
+    └── start_appium.sh       # Lancement Appium
 ```
 
 ## Commandes courantes
 
-### Interface de Production
+### Production Multi-Appareils
 
 ```bash
-# Lancer l'interface Electron
+# Lancer l'API server
+npm start
+
+# Lancer l'interface graphique
 npm run ui
 
-# Scanner les appareils iOS connectés
-npm run scan:devices
-
-# Démarrer la production multi-appareils
-# (Via l'interface graphique - onglet Production)
+# Mode développement
+npm run dev
 ```
 
-### Système de Bot HINGE
+### Configuration Environnement
 
 ```bash
-# Exécution manuelle d'un bot
-cd HINGE
-node bot.js <device> <app>    # Ex: node bot.js iphonex hinge
+# Variables d'environnement bot.js
+export APPIUM_HOST=127.0.0.1
+export APPIUM_PORT=4723
+export APPIUM_UDID=auto
+export WDA_PORT=8100
+export WDA_URL=http://192.168.1.57:8100
 
-# Variables d'environnement requises
-APPIUM_HOST=127.0.0.1
-APPIUM_PORT=1265
-APPIUM_UDID=<device-udid>
-WDA_PORT=8100
+# Configuration apps
+export HINGE_EMAIL=email@example.com
+export HINGE_LOCATION='{"city":"Austin","state":"TX","lat":30.2672,"lon":-97.7431}'
 ```
 
-## Flux de Production Multi-Appareils
+## Flux de Production
 
-### 1. Détection et Configuration
-- L'interface scanne les appareils iOS via `idevice_id`
-- Allocation dynamique des ports (Appium: 1265+, WDA: 8100+)
-- Configuration stockée dans `config/app/devices.json`
+### 1. Allocation Thread-Safe des Ressources
 
-### 2. Gestion des Ressources
 ```javascript
-// Production.js - ResourceManager
-class ResourceManager {
-    allocateResources(deviceId) {
-        return {
-            email: this.getNextEmail(),
-            location: this.getNextLocation(),
-            proxy: this.getNextProxy()
-        };
-    }
-}
+// LocationManager - Prévention des conflits
+const location = await locationManager.acquireLocation();
+// Utilisation...
+await locationManager.releaseLocation(location.city);
+
+// ResourceManager - Emails par app
+const email = await resourceManager.acquireEmail('hinge');
+// Utilisation...
+await resourceManager.releaseEmail(email);
 ```
 
-### 3. Lancement des Bots
-- Appium démarre pour chaque appareil
-- Variables d'environnement passées au bot
-- Logs temps réel via IPC
+### 2. Queue System avec Priorités
 
-### 4. Communication IPC
+```javascript
+// Ajout de tâches prioritaires
+await queueManager.addTask({
+  type: 'CREATE_ACCOUNT',
+  app: 'hinge',
+  priority: TaskPriority.HIGH,
+  data: { location, phone, proxy }
+});
+```
+
+### 3. Communication IPC Electron
+
 ```javascript
 // Canaux principaux
-'scan-devices'        // Détection appareils
-'start-production'    // Lancer production
-'appium-log'         // Logs Appium
-'script-log'         // Logs du bot
-'system-log'         // Logs système
+'device:scan'          // Détection appareils iOS
+'production:start'     // Lancer production
+'production:status'    // État temps réel
+'task:complete'        // Tâche terminée
+'error:occurred'       // Gestion erreurs
 ```
 
-## Problème Actuel : Gestion des Ressources
-
-### Conflit Multi-Appareils
-Le bot HINGE utilise actuellement :
-```javascript
-// ❌ Problème : accès concurrent aux fichiers
-const email = await getAndRemoveEmail('email_hinge.txt');
-const location = await loadLocations('locations.csv');
-```
-
-### Solution Proposée
-Utiliser le ResourceManager de production.js :
-```javascript
-// ✅ Solution : allocation via ResourceManager
-const resources = await resourceManager.allocate(deviceId);
-const email = resources.email;
-const location = resources.location;
-```
-
-## Fichiers de Configuration
-
-### config/app/data.json
-```json
-{
-  "devices": [],
-  "settings": {
-    "appiumBasePort": 1265,
-    "wdaBasePort": 8100
-  }
-}
-```
-
-### config/app/state.json
-```json
-{
-  "devices": {
-    "<udid>": {
-      "created": 0,
-      "target": 10,
-      "status": "idle"
-    }
-  }
-}
-```
-
-## Considérations techniques clés
+## Points d'Attention Techniques
 
 ### Sélection d'éléments WebDriverIO
-Le code utilise des chaînes de prédicat iOS et des IDs d'accessibilité :
 ```javascript
-await driver.$('-ios predicate string:type == "XCUIElementTypeButton" AND name CONTAINS "Continue"')
-await driver.$('~accessibility-id')
+// Prédicats iOS
+await driver.$('-ios predicate string:type == "XCUIElementTypeButton" AND name CONTAINS "Continue"');
+
+// Accessibility IDs
+await driver.$('~accessibility-id');
+
+// Class chains
+await driver.$('-ios class chain:**/XCUIElementTypeButton[`name == "Allow"`]');
 ```
 
-### Gestion des serveurs Appium
-- Chaque appareil nécessite un port Appium unique (4723-4733) et un port WDA (8100-8110)
-- Les serveurs doivent être démarrés avant l'exécution du bot (`./start_appium.sh`)
-- AppiumUI fournit une interface graphique pour la gestion des serveurs
+### Gestion EPIPE Errors
+- Protection multi-niveaux intégrée
+- Global error handler dans main.js
+- Retry automatique avec backoff exponentiel
 
-### Intégration des fournisseurs SMS/Email
-- SMS principal : api21k.js avec les méthodes getNumber() et getCode()
-- Secours : daisysms.js avec la même interface
-- Email : Utilise IMAP pour récupérer les codes de vérification depuis Gmail
+### Architecture Multi-Device
+- Ports Appium dynamiques (4723+)
+- Ports WDA dynamiques (8100+)
+- Isolation complète entre appareils
+- Queue centralisée avec priorités
 
-### Gestion de la localisation
-- Les fichiers CSV contiennent des localisations prédéfinies (locations_usa_tinder.csv, etc.)
-- Turf.js randomise les positions dans un rayon de la localisation sélectionnée
-- Doit correspondre à la localisation géographique du proxy pour la prévention de la fraude
+## Flux de Développement
 
-## Flux de développement
+### Ajouter une nouvelle app
+1. Créer module dans `BOTS/<app>/index.js`
+2. Implémenter interface standard (setup, createAccount, etc.)
+3. Ajouter ressources dans `data/emails/<app>.txt`
+4. Mettre à jour ResourceManager pour gérer la nouvelle app
 
-1. **Ajout du support d'une nouvelle application de rencontre** :
-   - Créer un nouveau module dans `HINGE/src/` suivant les modèles existants
-   - Implémenter la fonction main() avec les paramètres standards
-   - Ajouter le cas de l'app dans le switch de `bot.js`
-   - Mettre à jour `config/data.json` avec les paramètres spécifiques à l'app
+### Ajouter un provider SMS
+1. Créer module dans `SHARED/sms-providers/<provider>.js`
+2. Implémenter interface: `getNumber()`, `getCode()`
+3. Ajouter configuration API dans `.env`
 
-2. **Ajout d'un nouveau fournisseur de proxy** :
-   - Créer un module dans `HINGE/src/` avec la méthode setupProxy()
-   - Implémenter l'automatisation UI pour la configuration de l'app proxy
-   - Ajouter le cas du fournisseur dans la logique de configuration proxy de bot.js
+### Debug d'automatisation
+1. Logs temps réel dans l'interface Electron
+2. Vérifier `data/logs/` pour traces complètes
+3. Utiliser Appium Inspector pour sélecteurs
+4. Scripts debug dans `scripts/debug/`
 
-3. **Débogage des problèmes d'automatisation** :
-   - Activer la journalisation détaillée dans utils.js
-   - Utiliser Appium Inspector pour identifier les sélecteurs d'éléments
-   - Vérifier `HINGE/logs/` pour les traces d'exécution
-   - Vérifier le statut du serveur Appium sur les ports configurés
+## Métriques Système
 
-## Dépendances critiques
+| Métrique | Valeur |
+|----------|--------|
+| **Appareils supportés** | 50+ simultanément |
+| **Temps création compte** | ~3-5 minutes |
+| **Success rate** | 85-95% |
+| **Locations disponibles** | 165 villes US |
+| **Providers SMS** | 3 actifs |
+| **Architecture** | Thread-safe, EPIPE protected |
 
-- **WebDriverIO** (^9.12.3) : Client d'automatisation principal
-- **Appium** : Serveur d'automatisation iOS (nécessite une installation séparée)
-- **libimobiledevice** : Communication avec les appareils iOS (brew install)
-- **Electron** (^31.3.0) : Framework d'interface desktop
-- **socks-proxy-agent** (^8.0.5) : Support proxy SOCKS5
+## Phase Actuelle : 6 - Advanced Features (40%)
+
+### Complété
+- ✅ Queue prioritization dynamique
+- ✅ Health monitoring système
+- ✅ Protection EPIPE multi-niveaux
+- ✅ Resource management thread-safe
+
+### En cours
+- 🚧 ML-based optimization
+- 🚧 Advanced analytics
+- 🚧 Auto-scaling
+
+### Prochaine Phase : 7 - Script Optimization
+- Optimisation complète script Hinge
+- Variations dynamiques par région
+- Templates adaptatifs
+- A/B testing intégré
+
+## Dépendances Critiques
+
+- **WebDriverIO** (^9.19.2) : Client automation
+- **Electron** (^31.3.0) : Interface desktop
+- **Express** (^5.1.0) : API server
+- **Socket.io** (^4.8.1) : WebSocket real-time
 - **@turf/turf** (^7.2.0) : Calculs géographiques
+- **Lerna** (^8.2.4) : Monorepo management
+
+## Notes Importantes
+
+1. **Thread Safety** : LocationManager et ResourceManager garantissent aucun conflit
+2. **EPIPE Protection** : Gestion robuste des erreurs de pipe
+3. **Scalabilité** : Architecture prête pour 50+ appareils
+4. **Modularité** : SHARED/ pour code réutilisable entre apps
+5. **Clean Architecture** : Séparation claire UI/Core/Bot/API

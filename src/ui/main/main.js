@@ -20,7 +20,7 @@ const fs = require('fs');
 const { spawn, spawnSync } = require('child_process');
 const axios = require('axios');
 const net = require('net');
-const deviceDiscovery = require('../../utils/device-discovery');
+const deviceDiscovery = require('../../../packages/@shared/device-manager/src/DeviceDiscovery');
 const AppOrchestrator = require('../../core/AppOrchestrator');
 const setupOrchestratorHandlers = require('./orchestrator-handlers');
 const LocationManager = require('../../core/LocationManager');
@@ -232,8 +232,11 @@ function listIosDevices() {
 
     console.log('Running idevice_id -l...');
     const res = spawnSync(ideviceIdPath, ['-l'], { encoding: 'utf8' });
+    console.log('idevice_id result:', { status: res.status, stdout: res.stdout, stderr: res.stderr });
+
     if (res && res.status === 0 && res.stdout) {
       const udids = res.stdout.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+      console.log('Found UDIDs:', udids);
       if (udids.length > 0) {
         const devices = [];
         for (const udid of udids) {
@@ -278,7 +281,7 @@ function listIosDevices() {
         }
         const name = node && node._name;
         if (name && /iPhone/i.test(String(name))) {
-          list.push({ type: 'ios', name: String(name), udid: null });
+          list.push({ type: 'ios', name: String(name), udid: null, model: 'iPhone', ios: 'iOS' });
         }
         if (node._items) walk(node._items);
       }
@@ -286,7 +289,7 @@ function listIosDevices() {
       if (list.length > 0) return list;
     } catch (_) {
       const found = /iPhone/i.test(out);
-      if (found) return [{ type: 'ios', name: 'iPhone', udid: null }];
+      if (found) return [{ type: 'ios', name: 'iPhone', udid: null, model: 'iPhone', ios: 'iOS' }];
     }
   } catch (_) {}
   return [];
@@ -769,7 +772,7 @@ function startDeviceBot(_e, payload = {}) {
   const hingeRoot = path.join(projectRoot, 'src', 'bot');
   const nodeBin = process.env.npm_node_execpath || 'node';
   const scriptPath = path.join(hingeRoot, 'bot.js');
-  const args = [scriptPath, 'iphonex', 'hinge'];
+  const args = [scriptPath, 'iphonex', 'hinge', '1', 'marsproxies'];
   // Lire appium_servers.json pour trouver host/port/basepath du device
   let env = { ...process.env };
   try {
@@ -790,9 +793,26 @@ function startDeviceBot(_e, payload = {}) {
   env.USE_QUEUE = 'true';
   env.QUEUE_DEVICE_ID = udid;
 
+  // Variables d'environnement nécessaires pour le bot Hinge
+  env.WDA_URL = `http://localhost:${env.WDA_PORT || 8100}`;
+  env.DEVICE_UDID = udid;
+
+  // Debug: Log the command being executed
+  console.log('[DEBUG] Starting bot with:');
+  console.log('  Script path:', scriptPath);
+  console.log('  Args:', args);
+  console.log('  CWD:', hingeRoot);
+  console.log('  ENV WDA_URL:', env.WDA_URL);
+  console.log('  ENV APPIUM_PORT:', env.APPIUM_PORT);
+  console.log('  ENV USE_QUEUE:', env.USE_QUEUE);
+  console.log('  ENV QUEUE_DEVICE_ID:', env.QUEUE_DEVICE_ID);
+
+  mainWindow?.webContents.send('deviceRun:output', { udid, line: `[ui] Starting: ${nodeBin} ${args.join(' ')}` });
+  mainWindow?.webContents.send('deviceRun:output', { udid, line: `[ui] Working directory: ${hingeRoot}` });
+
   const child = spawn(nodeBin, args, { cwd: hingeRoot, env });
   perDeviceChildren.set(udid, child);
-  mainWindow?.webContents.send('deviceRun:output', { udid, line: `[ui] Start bot.js for ${deviceLabel || deviceName || udid}` });
+  mainWindow?.webContents.send('deviceRun:output', { udid, line: `[ui] Start Hinge bot for ${deviceLabel || deviceName || udid}` });
   // Capturer les logs du script avec meilleure gestion du buffering
   child.stdout.setEncoding('utf8');
   child.stderr.setEncoding('utf8');
@@ -800,27 +820,33 @@ function startDeviceBot(_e, payload = {}) {
   child.stdout.on('data', (data) => {
     const lines = data.split('\n').filter(line => line.trim());
     lines.forEach(message => {
-      mainWindow?.webContents.send('script-log', {
-        message,
-        level: 'info',
-        udid: udid,
-        deviceName: deviceName || deviceLabel || udid
+      // Send only via deviceRun:output to avoid duplicates
+      mainWindow?.webContents.send('deviceRun:output', {
+        udid,
+        line: message
       });
     });
   });
 
   child.stderr.on('data', (data) => {
+    console.log('[DEBUG] Bot stderr:', data);
     const lines = data.split('\n').filter(line => line.trim());
     lines.forEach(message => {
-      mainWindow?.webContents.send('script-log', {
-        message,
-        level: 'error',
-        udid: udid,
-        deviceName: deviceName || deviceLabel || udid
+      // Send only via deviceRun:output to avoid duplicates
+      mainWindow?.webContents.send('deviceRun:output', {
+        udid,
+        line: `[ERROR] ${message}`
       });
     });
   });
+  child.on('error', (error) => {
+    console.log('[DEBUG] Bot process error:', error);
+    mainWindow?.webContents.send('deviceRun:output', { udid, line: `[ERROR] Failed to start bot: ${error.message}` });
+  });
+
   child.on('close', (code) => {
+    console.log('[DEBUG] Bot process exited with code:', code);
+    mainWindow?.webContents.send('deviceRun:output', { udid, line: `[ui] Bot exited with code ${code}` });
     perDeviceChildren.delete(udid);
     mainWindow?.webContents.send('deviceRun:exit', { udid, code });
   });
@@ -999,8 +1025,8 @@ ipcMain.handle('start-bot', async (_e, config) => {
     const nodeBin = process.env.npm_node_execpath || 'node';
     const scriptPath = path.join(hingeRoot, 'bot.js');
 
-    // Arguments pour le bot
-    const args = [scriptPath, 'iphonex', app || 'hinge', String(accountsNumber || 1), proxyProvider || 'marsproxies'];
+    // Le nouveau bot.js n'utilise plus d'arguments, seulement les variables d'environnement
+    const args = [scriptPath];
 
     // Variables d'environnement
     const env = {
@@ -1426,6 +1452,63 @@ ipcMain.handle('load-settings', async () => {
   } catch (error) {
     console.error('Erreur chargement paramètres:', error);
     return null;
+  }
+});
+
+// Hinge Configuration handlers
+ipcMain.handle('load-hinge-config', async () => {
+  try {
+    const configPath = path.join(__dirname, '../../../config/app/hinge-profile-config.json');
+
+    if (fs.existsSync(configPath)) {
+      const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      return config;
+    }
+
+    // Return default config if file doesn't exist
+    return {
+      profileSettings: {
+        firstName: 'Emma',
+        gender: 'female',
+        ageRange: { min: 22, max: 26 }
+      },
+      prompts: []
+    };
+  } catch (error) {
+    console.error('Error loading Hinge config:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('save-hinge-config', async (_event, config) => {
+  try {
+    const configPath = path.join(__dirname, '../../../config/app/hinge-profile-config.json');
+
+    // Ensure directory exists
+    const configDir = path.dirname(configPath);
+    if (!fs.existsSync(configDir)) {
+      fs.mkdirSync(configDir, { recursive: true });
+    }
+
+    // Save configuration
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+
+    // Send success log
+    mainWindow?.webContents.send('system-log', {
+      message: 'Hinge profile configuration saved successfully',
+      level: 'success'
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error saving Hinge config:', error);
+
+    mainWindow?.webContents.send('system-log', {
+      message: `Failed to save Hinge config: ${error.message}`,
+      level: 'error'
+    });
+
+    return { success: false, error: error.message };
   }
 });
 

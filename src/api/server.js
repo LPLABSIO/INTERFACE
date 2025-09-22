@@ -292,6 +292,7 @@ class APIServer {
         timestamp: new Date().toISOString()
       });
     }, 5000); // Every 5 seconds
+    } // Fermeture du if
   }
 
   /**
