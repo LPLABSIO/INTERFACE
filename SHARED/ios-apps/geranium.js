@@ -10,6 +10,14 @@ async function setupGeraniumApp(client, location) {
   try {
     log('Starting Geranium app session...');
 
+    // Vérifier que la session est valide avant de continuer
+    try {
+      await client.execute('mobile: getDeviceTime');
+    } catch (sessionError) {
+      log('Session lost before Geranium, aborting...');
+      return false;
+    }
+
     // Assurer un état propre puis lancer l'app
     await checkAndTerminateApp(client, bundleId);
     await client.execute('mobile: activateApp', { bundleId });
@@ -26,13 +34,11 @@ async function setupGeraniumApp(client, location) {
     await findAndTypeCharByChar(client, latitude);
 
     // Attendre un peu après la latitude
-    await randomWait(0.5, 1);
+    await randomWait(0.3, 0.5);
 
-    // Cliquer sur le deuxième champ (longitude)
-    await findAndClickWithPolling(client, '//XCUIElementTypeTextField[2]');
-
-    // Attendre que le champ soit actif
-    await randomWait(0.5, 1);
+    // Cliquer sur le champ Longitude par son placeholder
+    await findAndClickWithPolling(client, '-ios predicate string:value == "Longitude"');
+    await randomWait(0.2, 0.3);
 
     // Champ longitude
     const longitude = String(location?.lon ?? '0');
