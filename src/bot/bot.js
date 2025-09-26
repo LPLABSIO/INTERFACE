@@ -7,7 +7,7 @@ const { generateProxyInfo } = require("../../SHARED/proxy-manager/proxy");
 const { performCraneForApp } = require("../../SHARED/ios-apps/crane");
 const { setupGhostForApp } = require("../../SHARED/ios-apps/ghost");
 const { getSMSProvider } = require("../../SHARED/sms-providers/sms-provider");
-const { runHingeApp } = require("../../BOTS/hinge/index");
+// Will be imported dynamically based on app type
 const { setupGeraniumApp } = require("../../SHARED/ios-apps/geranium");
 const QueueAdapter = require("../../SHARED/queue/queue-adapter");
 const path = require("path");
@@ -28,23 +28,33 @@ if (process.argv.length > 2) {
 /**
  * Configure et exécute Hinge avec tous les helper apps nécessaires
  */
-async function setupAndRunHinge(client, proxyInfo, location, phone, smsProvider) {
-  // 1. Configurer Crane pour l'isolation des conteneurs
-  await performCraneForApp(client, 'Hinge', location.city);
+async function setupAndRunHinge(client, proxyInfo, location, phone, smsProvider, appType = 'hinge') {
+  // Pour Hinge Fast, toute la configuration est gérée dans le script lui-même
+  if (appType === 'hinge-fast') {
+    // Hinge Fast: configuration intégrée dans le script
+    log("🚀 Using Hinge Fast mode - all configuration handled in script");
+    const { runHingeApp } = require("../../BOTS/hinge-fast/index");
+    await runHingeApp(client, location, phone, proxyInfo, smsProvider);
+  } else {
+    // Hinge normal: configuration complète
+    // 1. Configurer Crane pour l'isolation des conteneurs
+    await performCraneForApp(client, 'Hinge', location.city);
 
-  // 2. Configurer Ghost pour le spoofing d'appareil
-  await setupGhostForApp(client, 'Hinge', location.city);
+    // 2. Configurer Ghost pour le spoofing d'appareil
+    await setupGhostForApp(client, 'Hinge', location.city);
 
-  // 3. Configurer le proxy via Shadowrocket
-  await configureShadowrocket(client, proxyInfo, location.city);
+    // 3. Configurer le proxy via Shadowrocket
+    await configureShadowrocket(client, proxyInfo, location.city);
 
-  // 4. Configurer la géolocalisation via Geranium
-  const lat = location?.latitude || location?.lat;
-  const lon = location?.longitude || location?.lon;
-  await setupGeraniumApp(client, { lat, lon, city: location.city });
+    // 4. Configurer la géolocalisation via Geranium
+    const lat = location?.latitude || location?.lat;
+    const lon = location?.longitude || location?.lon;
+    await setupGeraniumApp(client, { lat, lon, city: location.city });
 
-  // 5. Exécuter Hinge
-  await runHingeApp(client, location, phone, proxyInfo, smsProvider);
+    // 5. Exécuter Hinge normal
+    const { runHingeApp } = require("../../BOTS/hinge/index");
+    await runHingeApp(client, location, phone, proxyInfo, smsProvider);
+  }
 }
 
 /**
@@ -53,7 +63,7 @@ async function setupAndRunHinge(client, proxyInfo, location, phone, smsProvider)
 async function processQueueTask(client, task) {
   const { config } = task;
 
-  // Charger une location
+  // Charger les locations
   const location_file = path.join(__dirname, '../../data/resources/locations/locations_usa_tinder_original.csv');
   let locations = await loadLocations(location_file);
 
@@ -61,14 +71,31 @@ async function processQueueTask(client, task) {
     throw new Error('No locations available');
   }
 
-  const location = locations[0];
-  log(`📍 Processing location: ${location.city}, ${location.state}`);
+  // Boucle pour essayer différentes villes jusqu'à trouver un proxy valide
+  let proxyInfo = null;
+  let location = null;
 
-  // Générer le proxy
-  const proxyInfo = await generateProxyInfo(location, config.proxyProvider || 'marsproxies');
-  if (!proxyInfo) {
-    throw new Error(`Failed to get proxy for ${location.city}`);
+  while (locations.length > 0 && !proxyInfo) {
+    location = locations[0];
+    log(`📍 Processing location: ${location.city}, ${location.state}`);
+
+    // Essayer de générer un proxy pour cette ville
+    proxyInfo = await generateProxyInfo(location, config.proxyProvider || 'marsproxies');
+
+    if (!proxyInfo) {
+      log(`⚠️ No valid proxy found for ${location.city}, moving to next city...`);
+      // Sauvegarder cette ville comme traitée
+      await saveLocations(location.city, location_file);
+      // Recharger les locations pour avoir la liste mise à jour (sans la ville qu'on vient de sauvegarder)
+      locations = await loadLocations(location_file);
+    }
   }
+
+  if (!proxyInfo || !location) {
+    throw new Error('No valid proxy found in any available city');
+  }
+
+  log(`✅ Valid proxy found for ${location.city}!`);
 
   // Obtenir un numéro de téléphone
   const provider = config.smsProvider || 'api21k';
@@ -91,8 +118,9 @@ async function processQueueTask(client, task) {
     throw new Error('Failed to get phone number');
   }
 
-  // Exécuter Hinge
-  await setupAndRunHinge(client, proxyInfo, location, phone, provider);
+  // Exécuter Hinge (normal ou fast selon config)
+  const appType = config.app || 'hinge';
+  await setupAndRunHinge(client, proxyInfo, location, phone, provider, appType);
 
   // Sauvegarder la location utilisée
   await saveLocations(location.city, location_file);

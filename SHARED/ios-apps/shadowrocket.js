@@ -47,7 +47,7 @@ async function configureShadowrocket(client, proxyInfo, city) {
         try {
             const secureField = await client.$('-ios predicate string:type == "XCUIElementTypeSecureTextField"');
             await secureField.click();
-            await randomWait(1, 1);
+            await randomWait(0.2, 0.3);
             // Taper via le clavier système (évite setValue sur SecureTextField)
             await findAndTypeCharByChar(client, proxyInfo.password, true);
             log('Password set (typed)');
@@ -56,7 +56,7 @@ async function configureShadowrocket(client, proxyInfo, city) {
             await client.execute('mobile: activateApp', { bundleId: 'com.liguangming.Shadowrocket' });
             const secureFieldRetry = await client.$('-ios predicate string:type == "XCUIElementTypeSecureTextField"');
             await secureFieldRetry.click();
-            await randomWait(1, 1);
+            await randomWait(0.2, 0.3);
             await findAndTypeCharByChar(client, proxyInfo.password, true);
             log('Password set (retry typed)');
         }
@@ -77,17 +77,69 @@ async function configureShadowrocket(client, proxyInfo, city) {
         await findAndClickWithPolling(client, '-ios predicate string:type == "XCUIElementTypeButton" AND name == "Save"');
         log('Save button clicked');
 
-        await randomWait(5, 5);
+        await randomWait(2, 2.5);
 
         await findAndClickWithPolling(client, '-ios predicate string:name == "' + remarks + '"');
         log('New proxy selected');
 
-        // Vérifier et cliquer sur la checkbox si nécessaire
+        // Gérer le switch de connexion
         const switchSelector = '-ios predicate string:type == "XCUIElementTypeSwitch"';
-        await findAndClickWithPollingIfNotEnabled(client, switchSelector);
+
+        // Petite attente pour laisser l'UI se charger
+        await randomWait(0.5, 1);
+
+        // Vérifier l'état du switch via le XCUIElementTypeCell
+        try {
+            const cellElement = await client.$('-ios predicate string:value == "1" AND type == "XCUIElementTypeCell"');
+            const isConnected = await cellElement.isExisting();
+
+            if (isConnected) {
+                // Le switch est à 1 (activé) - il faut le désactiver puis réactiver
+                log('Status: Already connected (value=1) - Refreshing connection...');
+
+                // Clic pour désactiver
+                log('Disabling current connection...');
+                await findAndClickWithPolling(client, switchSelector);
+                await randomWait(2, 2.5); // Plus de temps pour la déconnexion
+
+                // Clic pour réactiver
+                log('Re-enabling connection...');
+                await findAndClickWithPolling(client, switchSelector);
+                await randomWait(1, 1.5);
+                log('Connection refreshed successfully');
+            } else {
+                // Le switch est à 0 (désactivé) - juste l'activer
+                log('Status: Not connected (value=0) - Activating connection...');
+                await findAndClickWithPolling(client, switchSelector);
+                log('Connection enabled from disconnected state');
+            }
+        } catch (e) {
+            // En cas d'erreur, essayer l'ancienne méthode avec Not Connected
+            log('Fallback method: checking for "Not Connected" text...');
+            try {
+                const notConnected = await client.$('-ios predicate string:name == "Not Connected" AND label == "Not Connected"');
+                if (await notConnected.isDisplayed()) {
+                    log('Status: Not Connected - Activating connection...');
+                    await findAndClickWithPolling(client, switchSelector);
+                    log('Connection enabled');
+                } else {
+                    // Faire un toggle par défaut
+                    log('Default behavior: toggle off/on...');
+                    await findAndClickWithPolling(client, switchSelector);
+                    await randomWait(2, 2.5);
+                    await findAndClickWithPolling(client, switchSelector);
+                    log('Connection toggled');
+                }
+            } catch (fallbackError) {
+                // En dernier recours, juste cliquer une fois
+                log('Last resort: clicking switch once...');
+                await findAndClickWithPolling(client, switchSelector);
+            }
+        }
+
         log('Server configuration completed successfully');
 
-        await randomWait(5, 5);
+        await randomWait(1.5, 2);
 
         // Go to home
         await client.execute('mobile: pressButton', { name: 'home' });

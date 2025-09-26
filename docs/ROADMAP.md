@@ -744,6 +744,142 @@ main
 
 ---
 
+## 🎯 PHASE 8 : Améliorations Bot Alternatif (Analyse du 23/09/2025)
+> **Objectif** : Intégrer les meilleures pratiques du bot alternatif analysé
+
+### 🔴 Sprint 8.1 : Séquence de Démarrage Pré-Hinge (HAUTE PRIORITÉ)
+**Ce que fait le bot alternatif AVANT d'ouvrir Hinge :**
+
+#### **8.1.1 Configuration Infrastructure**
+- [ ] **VPN/Proxy Setup**
+  - [ ] Lancer Shadowrocket automatiquement
+  - [ ] Vérifier que l'IP est masquée
+  - [ ] Validation de la connexion proxy
+
+- [ ] **Anti-Détection Stack**
+  - [ ] AD Manager pour bloquer tracking
+  - [ ] Ghost app pour masquer l'automatisation
+  - [ ] Cache les chemins Crane si détectés
+  - [ ] Bloquer l'accès au presse-papiers
+
+- [ ] **Nettoyage Données**
+  - [ ] "Wipe Hinge data" avant chaque session
+  - [ ] Suppression complète des traces précédentes
+  - [ ] Reset des permissions
+
+- [ ] **Configuration GPS**
+  - [ ] Spoofing de localisation avancé
+  - [ ] Simulation de mouvement
+  - [ ] Validation des coordonnées
+
+### 🟠 Sprint 8.2 : Saisie Humaine et Anti-Détection
+
+#### **8.2.1 Saisie Numérique par Clavier iOS** 🎯
+- [ ] **Implémentation clavier numérique**
+  ```javascript
+  // Au lieu de : await findAndTypeCharByChar(client, phone.number)
+  for (const digit of phone.number) {
+    await client.$(`~${digit}`).click(); // accessibility id
+    await randomWait(0.1, 0.3);
+  }
+  ```
+- [ ] **Variation des timings entre chiffres**
+- [ ] **Simulation d'erreurs et corrections**
+
+#### **8.2.2 Saisie Fragmentée des Textes** 📝
+- [ ] **Division naturelle des noms**
+  - [ ] Prénom : "Ch" → pause → "loe"
+  - [ ] Nom : "Mar" → pause → "tin"
+- [ ] **Pauses aléatoires entre fragments**
+- [ ] **Simulation de réflexion humaine**
+
+#### **8.2.3 Clear() Systématique** 🧹
+- [ ] **Utiliser element.clear() natif**
+  ```javascript
+  const field = await client.$('selector');
+  await field.clear();
+  await field.setValue(newValue);
+  ```
+- [ ] **Fallback sur triple-tap si clear() échoue**
+
+### 🟡 Sprint 8.3 : Robustesse et Sélecteurs Avancés
+
+#### **8.3.1 Gestion Rate Limits SMS** ⏱️
+- [ ] **Détection "Too many verification requests"**
+- [ ] **Attente progressive avec backoff**
+- [ ] **Retry automatique intelligent**
+- [ ] **Rotation des providers SMS si blocage**
+
+#### **8.3.2 iOS Class Chains** 🔍
+- [ ] **Migration vers class chains**
+  ```javascript
+  "**/XCUIElementTypeTextField[`value == \"Phone number\"`]"
+  "**/XCUIElementTypeButton[`name == \"Next\"`][2]"
+  ```
+- [ ] **Support des indices pour éléments multiples**
+- [ ] **Combinaison avec predicates pour robustesse**
+
+#### **8.3.3 Validation d'État** ✅
+- [ ] **Triple validation avant interaction**
+  ```javascript
+  await client.waitUntil(async () => {
+    return await element.isDisplayed() &&
+           await element.isEnabled() &&
+           await element.getAttribute('hittable') === 'true';
+  });
+  ```
+
+### 🟢 Sprint 8.4 : Monitoring et Analytics
+
+#### **8.4.1 Métriques Anti-Détection**
+- [ ] **Score de "naturalité" par session**
+- [ ] **Tracking des patterns détectés**
+- [ ] **Analyse des échecs par étape**
+- [ ] **A/B testing des stratégies**
+
+#### **8.4.2 Performance Metrics**
+- [ ] **Temps par action (clavier vs typing)**
+- [ ] **Comparaison avant/après optimisations**
+- [ ] **Taux de détection par méthode**
+
+### 📊 Comparaison Méthodes
+
+| Fonctionnalité | Notre Bot | Bot Alternatif | Priorité |
+|----------------|-----------|----------------|----------|
+| Saisie numéro | TypeCharByChar | Clavier iOS digit par digit | 🔴 HAUTE |
+| Saisie texte | Direct | Fragmentée ("Ch" + "loe") | 🟠 MOYENNE |
+| Clear champs | Backspace/Select All | element.clear() | 🔴 HAUTE |
+| Anti-détection | Ghost + Shadowrocket | Stack complet (AD Manager, etc.) | 🟡 MOYENNE |
+| Sélecteurs | Predicate strings | Class chains + indices | 🟠 MOYENNE |
+| SMS rate limits | Attente fixe | Détection dynamique | 🔴 HAUTE |
+| Validation éléments | Click direct | isDisplayed + isEnabled + hittable | 🟢 BASSE |
+
+### 🎯 Plan d'Implémentation Phase 8
+
+#### Quick Wins (1-2 jours)
+1. [ ] element.clear() systématique
+2. [ ] Saisie par clavier numérique iOS
+3. [ ] Validation triple état
+
+#### Améliorations Moyennes (3-5 jours)
+1. [ ] Saisie fragmentée avec pauses
+2. [ ] Détection rate limits SMS
+3. [ ] Migration class chains
+
+#### Long Terme (1 semaine+)
+1. [ ] Stack anti-détection complet
+2. [ ] Wipe data automatique
+3. [ ] A/B testing des méthodes
+
+### 📈 Résultats Attendus
+
+- **Taux de création** : +40% (de 60% à 85%+)
+- **Détection Hinge** : -60%
+- **Temps moyen** : Acceptable (+20% mais plus naturel)
+- **Stabilité** : 95%+ de sessions complètes
+
+---
+
 ### 🟠 Priorité 2 : Analytics Dashboard (Phase 6 - Sprint 6.1)
 - [ ] **Graphiques temps réel** : Success rate, performance
 - [ ] **Export CSV/JSON** : Données de production

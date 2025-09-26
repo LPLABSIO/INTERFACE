@@ -1021,6 +1021,7 @@
                                 <label class="form-label">Application</label>
                                 <select class="form-select" id="app-select">
                                     <option value="hinge">Hinge</option>
+                                    <option value="hinge-fast">Hinge Fast</option>
                                     <option value="tinder">Tinder</option>
                                     <option value="bumble">Bumble</option>
                                 </select>
@@ -1048,6 +1049,20 @@
                                     <option value="smspool">SMSPool</option>
                                     <option value="none">None (Test Mode)</option>
                                 </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Email Method</label>
+                                <select class="form-select" id="email-method">
+                                    <option value="gmail">Gmail (Liste emails existants)</option>
+                                    <option value="quix">Quix API (Emails temporaires)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" id="quix-api-key-group" style="display: none;">
+                                <label class="form-label">Quix API Key</label>
+                                <input type="text" class="form-input" id="quix-api-key" placeholder="Enter Quix API key">
+                                <small style="color: #999; font-size: 11px;">Required for Quix email method</small>
                             </div>
 
                             <div class="form-group">
@@ -1482,6 +1497,8 @@
             const totalAccounts = parseInt(document.getElementById('total-accounts').value);
             const proxyProvider = document.getElementById('proxy-provider').value;
             const smsProvider = document.getElementById('sms-provider').value;
+            const emailMethod = document.getElementById('email-method').value;
+            const quixApiKey = document.getElementById('quix-api-key').value;
             const debugMode = document.getElementById('debug-mode').checked;
 
             addLog('system', `Starting production: ${selectedCount} devices, ${totalAccounts} total accounts`);
@@ -1496,6 +1513,8 @@
                         app: app,
                         proxyProvider: proxyProvider,
                         smsProvider: smsProvider,
+                        emailMethod: emailMethod,
+                        quixApiKey: emailMethod === 'quix' ? quixApiKey : '',
                         debugMode: debugMode
                     });
 
@@ -2183,6 +2202,18 @@ WDA Port: ${production.wdaPort}`);
             updateSelectedCount();
             updateResourceStats();
             updateQueueStats();
+
+            // Handle email method change
+            const emailMethodSelect = document.getElementById('email-method');
+            const quixApiKeyGroup = document.getElementById('quix-api-key-group');
+
+            emailMethodSelect.addEventListener('change', function() {
+                if (this.value === 'quix') {
+                    quixApiKeyGroup.style.display = 'block';
+                } else {
+                    quixApiKeyGroup.style.display = 'none';
+                }
+            });
 
             // Update stats every 5 seconds
             setInterval(() => {

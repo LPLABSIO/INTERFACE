@@ -3,6 +3,7 @@ const { getSMSProvider } = require('../../SHARED/sms-providers/sms-provider');
 const EmailManager = require('../../SHARED/email-manager/EmailManager');
 const { getAndRemoveEmail } = require('../../SHARED/email-manager/email');
 const { waitForHingeCodeFromGmail } = require('../../SHARED/email-manager/email-inbox');
+const QuixEmailService = require('../../SHARED/email-manager/quix-email');
 const config = require('./config.json');
 const fs = require('fs');
 const path = require('path');
@@ -154,7 +155,7 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
               velocity: 250
             });
 
-            await randomWait(1, 1.5); // Plus de temps entre les swipes
+            await randomWait(0.3, 0.5); // Délai réduit entre les swipes
 
             // Vérifier que la session est toujours active
             if (i < 4) {  // Pas besoin de vérifier après le dernier swipe
@@ -173,7 +174,7 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
                     toY: 200,
                     duration: 0.5
                   });
-                  await randomWait(1, 1.5);
+                  await randomWait(0.3, 0.5);
                 } catch (dragError) {
                   log(`Alternative drag method also failed: ${dragError.message}`);
                   break;
@@ -210,34 +211,27 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
         // Clic 1: X:128 Y:375 - Premier clic sur le champ (MODIFIÉ)
         log('Click 1/4 at X:128 Y:375...');
         await client.execute('mobile: tap', { x: 128, y: 375 });
-        await randomWait(0.8, 1.2);
+        await randomWait(0.2, 0.3);
 
         // Clic 2: X:345 Y:275 - Deuxième clic
         log('Click 2/4 at X:345 Y:275...');
         await client.execute('mobile: tap', { x: 345, y: 275 });
-        await randomWait(0.8, 1.2);
+        await randomWait(0.2, 0.3);
 
         // Clic 3: X:342 Y:275 - Troisième clic (MODIFIÉ)
         log('Click 3/4 at X:342 Y:275...');
         await client.execute('mobile: tap', { x: 342, y: 275 });
-        await randomWait(0.8, 1.2);
+        await randomWait(0.2, 0.3);
 
         // Clic 4: X:315 Y:230 - Position finale pour écrire (MODIFIÉ)
         log('Click 4/4 at X:315 Y:230 - Final position for typing...');
         await client.execute('mobile: tap', { x: 315, y: 230 });
-        await randomWait(1, 1.5);
+        await randomWait(0.3, 0.5);
 
-        // Effacer le contenu existant avec plus de backspaces
-        log('Clearing existing content...');
-        for (let i = 0; i < 50; i++) {
-          await client.keys('\uE003'); // Backspace
-        }
-        await randomWait(0.5, 0.8);
-
-        // Écrire Proxy String
+        // Écrire Proxy String directement
         log(`Writing proxy string: ${proxyString}`);
         await findAndTypeCharByChar(client, proxyString, true);
-        await randomWait(1.5, 2);
+        await randomWait(0.5, 0.8);
         log('Proxy String configured successfully');
       } catch (proxyError) {
         log(`Proxy String configuration error: ${proxyError.message}`);
@@ -251,34 +245,27 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
       // Clic 1: X:150 Y:230 - Premier clic sur le champ MP Credentials
       log('MP Click 1/4 at X:150 Y:230...');
       await client.execute('mobile: tap', { x: 150, y: 230 });
-      await randomWait(0.8, 1.2);
+      await randomWait(0.2, 0.3);
 
       // Clic 2: X:345 Y:233 - Deuxième clic
       log('MP Click 2/4 at X:345 Y:233...');
       await client.execute('mobile: tap', { x: 345, y: 233 });
-      await randomWait(0.8, 1.2);
+      await randomWait(0.2, 0.3);
 
       // Clic 3: X:335 Y:232 - Troisième clic
       log('MP Click 3/4 at X:341 Y:232...');
       await client.execute('mobile: tap', { x: 341, y: 232 });
-      await randomWait(0.8, 1.2);
+      await randomWait(0.2, 0.3);
 
       // Clic 4: X:315 Y:190 - Position finale pour écrire
       log('MP Click 4/4 at X:315 Y:190 - Final position for typing...');
       await client.execute('mobile: tap', { x: 315, y: 190 });
-      await randomWait(1, 1.5);
+      await randomWait(0.3, 0.5);
 
-      // Effacer le contenu existant
-      log('Clearing existing MP Credentials content...');
-      for (let i = 0; i < 40; i++) {
-        await client.keys('\uE003'); // Backspace
-      }
-      await randomWait(0.5, 0.8);
-
-      // Écrire MP Credentials
+      // Écrire MP Credentials directement
       log(`Writing MP Credentials: ${mpCredential}`);
       await findAndTypeCharByChar(client, mpCredential, true);
-      await randomWait(1.5, 2);
+      await randomWait(0.5, 0.8);
       log('MP Credentials configured successfully');
     } catch (mpError) {
       log(`MP Credentials configuration error: ${mpError.message}`);
@@ -287,14 +274,19 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
 
       await randomWait(1, 2);
 
-      // Fermer les Réglages
-      await client.execute('mobile: terminateApp', { bundleId: 'com.apple.Preferences' });
-      log('Settings configured and closed');
+      // Cliquer sur Settings pour revenir à la page principale
+      log('Clicking on Settings to go back...');
+      await findAndClickWithPolling(client, '-ios predicate string:name == "Settings"');
+      await randomWait(2, 2.5);
+
+      // Fermer les Réglages en douceur (pas kill)
+      await client.execute('mobile: pressButton', { name: 'home' });
+      log('Settings configured and closed gracefully');
       settingsConfigured = true;
     } catch (settingsError) {
       log(`Settings configuration error: ${settingsError.message}`);
       // Essayer de fermer Settings en cas d'erreur
-      try { await client.execute('mobile: terminateApp', { bundleId: 'com.apple.Preferences' }); } catch {}
+      try { await client.execute('mobile: pressButton', { name: 'home' }); } catch {}
     }
 
     if (!settingsConfigured) {
@@ -349,8 +341,8 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
       await findAndTypeCharByChar(client, containerName);
       await randomWait(0.5, 1);
 
-      // Valider la création du conteneur avec le bouton Launch
-      await findAndClickWithPolling(client, '-ios predicate string:name == "Launch"');
+      // Valider la création du conteneur avec le bouton Create
+      await findAndClickWithPolling(client, '-ios predicate string:name == "Create"');
       await randomWait(2, 3);
 
       log('Container created successfully');
@@ -444,14 +436,32 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     // No thanks, puis email (depuis env ou fichier)
     await findAndClickWithPolling(client, '-ios predicate string:name == "No thanks" AND label == "No thanks" AND value == "No thanks"');
 
-    // Utiliser l'email depuis l'environnement si disponible, sinon fallback sur l'ancien système
-    let email = process.env.HINGE_EMAIL;
-    if (!email) {
-      log('No email in env, using file system');
-      const emailFilePath = path.join(__dirname, '../../data/resources/emails/hinge_emails.txt');
-      email = await getAndRemoveEmail(emailFilePath);
+    // Obtenir l'email selon la méthode configurée
+    let email;
+    let quixService = null;
+
+    const emailMethod = config.settings?.emailMethod || 'gmail';
+    log(`Using email method: ${emailMethod}`);
+
+    if (emailMethod === 'quix') {
+      // Utiliser l'API Quix pour générer un email temporaire
+      const quixApiKey = config.settings?.quixApiKey || process.env.QUIX_API_KEY;
+      if (!quixApiKey) {
+        throw new Error('Quix API key not configured. Add quixApiKey to config or set QUIX_API_KEY env variable');
+      }
+      quixService = new QuixEmailService(quixApiKey);
+      email = await quixService.generateEmail();
+      log(`Generated temporary email via Quix: ${email.substring(0, 5)}***@${email.split('@')[1]}`);
     } else {
-      log('Using email from environment variable');
+      // Méthode Gmail traditionnelle
+      email = process.env.HINGE_EMAIL;
+      if (!email) {
+        log('No email in env, using file system');
+        const emailFilePath = path.join(__dirname, '../../data/resources/emails/hinge_emails.txt');
+        email = await getAndRemoveEmail(emailFilePath);
+      } else {
+        log('Using email from environment variable');
+      }
     }
 
     if (email) {
@@ -465,26 +475,43 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     }
     await findAndClickWithPolling(client, '-ios predicate string:name == "Next"');
 
-    // Code email via Gmail - attendre le vrai code
+    // Code email - récupérer selon la méthode configurée
     if (email) {
       try {
-        log('Waiting for email verification code from Gmail...');
-        const gmailUser = process.env.GMAIL_IMAP_USER || 'lucas@lpplabs.io';
-        const gmailPass = (process.env.GMAIL_IMAP_PASS || 'mxtiogiawujyffyy'); // sans espaces
-        const gmailCode = await waitForHingeCodeFromGmail({
-          host: process.env.GMAIL_IMAP_HOST || 'imap.gmail.com',
-          port: Number(process.env.GMAIL_IMAP_PORT || 993),
-          secure: true,
-          auth: { user: gmailUser, pass: gmailPass },
-          timeoutMs: 120000,
-        });
+        let verificationCode;
+
+        if (emailMethod === 'quix' && quixService) {
+          // Utiliser Quix pour récupérer le code
+          log('Waiting for email verification code from Quix...');
+          verificationCode = await quixService.getHingeCode(120000);
+          log(`Received verification code from Quix: ${verificationCode}`);
+        } else {
+          // Méthode Gmail traditionnelle
+          log('Waiting for email verification code from Gmail...');
+          const gmailUser = process.env.GMAIL_IMAP_USER || 'lucas@lpplabs.io';
+          const gmailPass = (process.env.GMAIL_IMAP_PASS || 'mxtiogiawujyffyy'); // sans espaces
+          verificationCode = await waitForHingeCodeFromGmail({
+            host: process.env.GMAIL_IMAP_HOST || 'imap.gmail.com',
+            port: Number(process.env.GMAIL_IMAP_PORT || 993),
+            secure: true,
+            auth: { user: gmailUser, pass: gmailPass },
+            timeoutMs: 120000,
+          });
+          log(`Received verification code from Gmail: ${verificationCode}`);
+        }
+
         await randomWait(0.5, 1); // Attendre avant de taper le code
-        await findAndTypeCharByChar(client, gmailCode);
-        log('Entered email verification code from Gmail');
+        await findAndTypeCharByChar(client, verificationCode);
+        log('Entered email verification code');
       } catch (e) {
-        log(`Email code not available from Gmail (${e.message}), using placeholder 0000`);
+        log(`Email code not available (${e.message}), using placeholder 0000`);
         await randomWait(0.5, 1);
         await findAndTypeCharByChar(client, '0000');
+      } finally {
+        // Nettoyer le service Quix si utilisé
+        if (quixService) {
+          await quixService.cleanup().catch(err => log(`Quix cleanup error: ${err.message}`));
+        }
       }
     } else {
       // Pas d'email, donc pas de code à attendre

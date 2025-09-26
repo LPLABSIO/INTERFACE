@@ -1,15 +1,4 @@
 CountryCode,state,city,lat,lon,area_code,zip_code
-us,Florida,Jacksonville,30.3322,-81.6557,904,32201
-us,Texas,Fort Worth,32.7555,-97.3308,"817, 682",76101
-us,Ohio,Columbus,39.9612,-82.9988,"614, 380",43201
-us,California,San Francisco,37.7749,-122.4194,"415, 628",94101
-us,Indiana,Indianapolis,39.7684,-86.158,"317, 463",46201
-us,Washington,Seattle,47.6097,-122.3331,"206, 425, 253",98101
-us,Colorado,Denver,39.7392,-104.9903,"303, 720",80201
-us,D.C.,Washington D.C.,38.9072,-77.0369,202,20001
-us,Texas,El Paso,31.7619,-106.485,915,79901
-us,Michigan,Detroit,42.3314,-83.0458,"313, 734, 248",48201
-us,Tennessee,Memphis,35.1495,-90.049,901,37501
 us,Kentucky,Louisville,38.2527,-85.7585,502,40201
 us,Maryland,Baltimore,39.2904,-76.6122,"410, 443, 667",21201
 us,Wisconsin,Milwaukee,43.0389,-87.9065,414,53201

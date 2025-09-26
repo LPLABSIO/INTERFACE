@@ -982,7 +982,7 @@ ipcMain.handle('start-bot', async (_e, config) => {
     let allocatedEmail = null;
     let allocatedLocation = null;
 
-    if (app === 'hinge') {
+    if (app === 'hinge' || app === 'hinge-fast') {
       try {
         // Allouer un email
         if (resourceManager) {
@@ -1089,7 +1089,7 @@ ipcMain.handle('start-bot', async (_e, config) => {
       perDeviceChildren.delete(udid);
 
       // Gérer les ressources selon le résultat
-      if (app === 'hinge') {
+      if (app === 'hinge' || app === 'hinge-fast') {
         try {
           if (code === 0) {
             // Succès : marquer les ressources comme utilisées

@@ -301,12 +301,18 @@ async function generateProxyInfo(location, provider = "marsproxies") {
     for (let attempt = 1; attempt <= MAX_PROXY_ATTEMPTS; attempt++) {
         log(`[generateProxyInfo] 🔄 Tentative ${attempt}/${MAX_PROXY_ATTEMPTS} pour ${location.city}`);
         
+        // Formater le nom de la ville pour le proxy (enlever espaces et caractères spéciaux)
+        const cityFormatted = location.city.toLowerCase()
+            .replace(/\./g, '') // Enlever les points
+            .replace(/\s+/g, '') // Enlever les espaces
+            .replace(/[^a-z0-9]/g, ''); // Garder seulement lettres et chiffres
+
         // Générer un nouveau proxy avec un session ID unique pour chaque tentative
         const proxyConfig = {
             domain: "91.239.130.17",
-            port: "44445", 
+            port: "44445",
             username: "mr91891Jq0I",
-            password: `MgtGbjSfmP_country-${location.CountryCode}_city-${location.city.toLowerCase().replace(/\s+/g, '')}_session-sid${Date.now()}_attempt-${attempt}_lifetime-168h_ultraset-1`
+            password: `MgtGbjSfmP_country-${location.CountryCode}_city-${cityFormatted}_session-sid${Date.now()}_attempt-${attempt}_lifetime-168h_ultraset-1`
         };
         
         log(`[generateProxyInfo] Proxy généré (tentative ${attempt}): ${JSON.stringify(proxyConfig)}`);

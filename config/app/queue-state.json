@@ -3,24 +3,22 @@
     {
       "id": 1,
       "type": "create_account",
-      "status": "in_progress",
+      "status": "pending",
       "config": {
-        "app": "hinge",
+        "app": "hinge-fast",
         "proxyProvider": "marsproxies",
         "smsProvider": "daisysms",
         "debugMode": false
       },
-      "createdAt": "2025-09-22T02:35:15.364Z",
+      "createdAt": "2025-09-23T10:29:41.774Z",
       "attempts": 1,
-      "maxAttempts": 3,
-      "deviceId": "af5afd94d5a9256554e735003c2f72fd16ec22f8",
-      "startedAt": "2025-09-22T02:35:20.625Z"
+      "maxAttempts": 3
     }
   ],
   "stats": {
     "total": 1,
-    "pending": 0,
-    "inProgress": 1,
+    "pending": 1,
+    "inProgress": 0,
     "completed": 0,
     "failed": 0
   },

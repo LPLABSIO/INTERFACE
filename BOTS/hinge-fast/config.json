@@ -5,7 +5,9 @@
     "smsProvider": "api21k",
     "smsProviderBackup": "daisysms",
     "proxyProvider": "marsproxies",
+    "emailMethod": "gmail",
     "emailsFile": "hinge_emails.txt",
+    "quixApiKey": "",
     "locationsFile": "locations_usa_tinder.csv",
     "useQueue": true,
     "maxRetries": 3

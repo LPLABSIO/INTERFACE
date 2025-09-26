@@ -209,6 +209,7 @@ class QueueManager {
     }
 
     task.status = task.attempts >= task.maxAttempts ? 'failed' : 'pending';
+
     task.lastError = error;
     task.failedAt = new Date().toISOString();
 
