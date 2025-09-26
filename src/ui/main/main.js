@@ -772,7 +772,8 @@ function startDeviceBot(_e, payload = {}) {
   const hingeRoot = path.join(projectRoot, 'src', 'bot');
   const nodeBin = process.env.npm_node_execpath || 'node';
   const scriptPath = path.join(hingeRoot, 'bot.js');
-  const args = [scriptPath, 'iphonex', 'hinge', '1', 'marsproxies'];
+  // Utiliser hinge-fast au lieu de hinge pour avoir le progress tracking
+  const args = [scriptPath, 'iphonex', 'hinge-fast', '1', 'marsproxies'];
   // Lire appium_servers.json pour trouver host/port/basepath du device
   let env = { ...process.env };
   try {
@@ -796,6 +797,16 @@ function startDeviceBot(_e, payload = {}) {
   // Variables d'environnement nécessaires pour le bot Hinge
   env.WDA_URL = `http://localhost:${env.WDA_PORT || 8100}`;
   env.DEVICE_UDID = udid;
+  env.DEVICE_ID = udid; // Pour le progress tracker
+  env.TASK_ID = Date.now().toString(); // Pour le progress tracker
+
+  // Ajouter les paramètres de configuration depuis le payload
+  if (payload.emailMethod) env.EMAIL_METHOD = payload.emailMethod;
+  if (payload.quixApiKey) env.QUIX_API_KEY = payload.quixApiKey;
+  if (payload.smsProvider) env.SMS_PROVIDER = payload.smsProvider;
+
+  // Définir le mode du bot (hinge-fast pour le progress tracking)
+  env.BOT_MODE = 'hinge-fast';
 
   // Debug: Log the command being executed
   console.log('[DEBUG] Starting bot with:');
@@ -806,6 +817,10 @@ function startDeviceBot(_e, payload = {}) {
   console.log('  ENV APPIUM_PORT:', env.APPIUM_PORT);
   console.log('  ENV USE_QUEUE:', env.USE_QUEUE);
   console.log('  ENV QUEUE_DEVICE_ID:', env.QUEUE_DEVICE_ID);
+  console.log('  ENV EMAIL_METHOD:', env.EMAIL_METHOD);
+  console.log('  ENV QUIX_API_KEY:', env.QUIX_API_KEY ? 'Set' : 'Not set');
+  console.log('  ENV SMS_PROVIDER:', env.SMS_PROVIDER);
+  console.log('  ENV BOT_MODE:', env.BOT_MODE);
 
   mainWindow?.webContents.send('deviceRun:output', { udid, line: `[ui] Starting: ${nodeBin} ${args.join(' ')}` });
   mainWindow?.webContents.send('deviceRun:output', { udid, line: `[ui] Working directory: ${hingeRoot}` });
@@ -820,6 +835,18 @@ function startDeviceBot(_e, payload = {}) {
   child.stdout.on('data', (data) => {
     const lines = data.split('\n').filter(line => line.trim());
     lines.forEach(message => {
+      // Check if this is a progress update message
+      if (message.startsWith('[PROGRESS-UPDATE]')) {
+        try {
+          const progressData = JSON.parse(message.substring('[PROGRESS-UPDATE]'.length));
+          progressData.udid = udid;
+          mainWindow?.webContents.send('progress-update', progressData);
+          console.log('[Main] Progress update sent:', progressData.currentStep, progressData.percentage + '%');
+        } catch (err) {
+          console.error('[Main] Failed to parse progress update:', err);
+        }
+      }
+
       // Send only via deviceRun:output to avoid duplicates
       mainWindow?.webContents.send('deviceRun:output', {
         udid,
@@ -943,7 +970,7 @@ ipcMain.handle('scan-devices', async () => {
 
 // Démarrer le bot pour un appareil spécifique
 ipcMain.handle('start-bot', async (_e, config) => {
-  const { udid, deviceName, app, appiumPort, wdaPort, accountsNumber, proxyProvider } = config;
+  const { udid, deviceName, app, appiumPort, wdaPort, accountsNumber, proxyProvider, emailMethod, quixApiKey, smsProvider } = config;
 
   try {
     // Log système
@@ -1040,6 +1067,9 @@ ipcMain.handle('start-bot', async (_e, config) => {
       // WDA_URL: wdaUrl,  // Commenté pour laisser Appium gérer WDA
       BOT_ACCOUNTS: String(accountsNumber || 1),
       PROXY_PROVIDER: proxyProvider || 'marsproxies',
+      SMS_PROVIDER: smsProvider || 'api21k',
+      EMAIL_METHOD: emailMethod || 'gmail',
+      QUIX_API_KEY: quixApiKey || '',
       NODE_NO_WARNINGS: '1',
       FORCE_COLOR: '0',  // Désactiver les couleurs pour éviter les caractères spéciaux
       // Passer les ressources allouées

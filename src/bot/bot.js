@@ -280,7 +280,7 @@ async function main() {
       }
 
       // Obtenir un numéro de téléphone
-      const provider = "api21k";
+      const provider = process.env.SMS_PROVIDER || "api21k";
       const smsService = getSMSProvider(provider);
       log(`Getting phone number from ${provider}...`);
 
@@ -314,8 +314,10 @@ async function main() {
         }
       }
 
-      // Exécuter Hinge
-      await setupAndRunHinge(client, proxyInfo, location, phone);
+      // Exécuter Hinge (utiliser BOT_MODE si défini)
+      const botMode = process.env.BOT_MODE || 'hinge';
+      log(`🤖 Using bot mode: ${botMode}`);
+      await setupAndRunHinge(client, proxyInfo, location, phone, provider, botMode);
 
       // Sauvegarder la progression (sauf si location vient de l'env)
       if (!process.env.HINGE_LOCATION) {

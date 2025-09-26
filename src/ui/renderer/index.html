@@ -131,6 +131,15 @@
             to { opacity: 1; }
         }
 
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
         /* Cards */
         .card {
             background: #1c1c1e;
@@ -975,189 +984,290 @@
 
                     <div class="grid-2">
                         <!-- Production Statistics -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Production Statistics</h3>
-                                <button class="btn btn-secondary" onclick="exportStatistics()" style="padding: 5px 10px; font-size: 11px;">Export</button>
+                        <div class="card" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid rgba(10, 132, 255, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);">
+                            <div class="card-header" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 15px; margin-bottom: 20px;">
+                                <h3 class="card-title" style="background: linear-gradient(90deg, #0a84ff, #00d4ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 18px; font-weight: 600;">
+                                    📊 Statistiques de Production
+                                </h3>
+                                <button class="btn btn-secondary" onclick="exportStatistics()" style="padding: 8px 16px; font-size: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); transition: all 0.3s;">
+                                    📤 Exporter
+                                </button>
                             </div>
-                            <div class="stats-row">
-                                <span class="stat-name">Total Created</span>
-                                <span class="stat-value" id="stat-total-created">0</span>
+
+                            <!-- Stats Grid -->
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                                <!-- Total Created -->
+                                <div style="background: rgba(10, 132, 255, 0.1); border-radius: 12px; padding: 15px; border: 1px solid rgba(10, 132, 255, 0.2);">
+                                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                                        <div>
+                                            <div style="color: #8e8e93; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">
+                                                Comptes Créés
+                                            </div>
+                                            <div style="color: #0a84ff; font-size: 24px; font-weight: 700;" id="stat-total-created">0</div>
+                                        </div>
+                                        <div style="font-size: 24px;">🎯</div>
+                                    </div>
+                                </div>
+
+                                <!-- Success Rate -->
+                                <div style="background: rgba(48, 209, 88, 0.1); border-radius: 12px; padding: 15px; border: 1px solid rgba(48, 209, 88, 0.2);">
+                                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                                        <div>
+                                            <div style="color: #8e8e93; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">
+                                                Taux de Réussite
+                                            </div>
+                                            <div style="color: #30d158; font-size: 24px; font-weight: 700;" id="stat-success-rate">0%</div>
+                                        </div>
+                                        <div style="font-size: 24px;">✅</div>
+                                    </div>
+                                </div>
+
+                                <!-- Average Time -->
+                                <div style="background: rgba(255, 159, 10, 0.1); border-radius: 12px; padding: 15px; border: 1px solid rgba(255, 159, 10, 0.2);">
+                                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                                        <div>
+                                            <div style="color: #8e8e93; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">
+                                                Temps Moyen
+                                            </div>
+                                            <div style="color: #ff9f0a; font-size: 24px; font-weight: 700;" id="stat-avg-time">0s</div>
+                                        </div>
+                                        <div style="font-size: 24px;">⏱️</div>
+                                    </div>
+                                </div>
+
+                                <!-- Active Devices -->
+                                <div style="background: rgba(175, 82, 222, 0.1); border-radius: 12px; padding: 15px; border: 1px solid rgba(175, 82, 222, 0.2);">
+                                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                                        <div>
+                                            <div style="color: #8e8e93; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">
+                                                Appareils Actifs
+                                            </div>
+                                            <div style="color: #af52de; font-size: 24px; font-weight: 700;" id="stat-active-devices">0</div>
+                                        </div>
+                                        <div style="font-size: 24px;">📱</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="stats-row">
-                                <span class="stat-name">Success Rate</span>
-                                <span class="stat-value" id="stat-success-rate">0%</span>
-                            </div>
-                            <div class="stats-row">
-                                <span class="stat-name">Average Time</span>
-                                <span class="stat-value" id="stat-avg-time">0s</span>
-                            </div>
-                            <div class="stats-row">
-                                <span class="stat-name">Active Devices</span>
-                                <span class="stat-value" id="stat-active-devices">0</span>
-                            </div>
-                            <div class="stats-row">
-                                <span class="stat-name">Proxies Used</span>
-                                <span class="stat-value" id="stat-proxies-used">0</span>
-                            </div>
-                            <div class="stats-row">
-                                <span class="stat-name">SMS Consumed</span>
-                                <span class="stat-value" id="stat-sms-consumed">0</span>
+
+                            <!-- Secondary Stats -->
+                            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background: rgba(255, 255, 255, 0.03); border-radius: 8px;">
+                                        <span style="color: #8e8e93; font-size: 12px;">🌐 Proxies Utilisés</span>
+                                        <span style="color: #e5e5e7; font-size: 14px; font-weight: 600;" id="stat-proxies-used">0</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background: rgba(255, 255, 255, 0.03); border-radius: 8px;">
+                                        <span style="color: #8e8e93; font-size: 12px;">💬 SMS Consommés</span>
+                                        <span style="color: #e5e5e7; font-size: 14px; font-weight: 600;" id="stat-sms-consumed">0</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Production Setup -->
-                        <div class="card">
-                            <h3 class="card-title">Production Setup</h3>
+                        <div class="card" style="background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%); border: 1px solid rgba(88, 101, 242, 0.2); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);">
+                            <h3 class="card-title" style="background: linear-gradient(90deg, #5865f2, #eb459e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 18px; font-weight: 700; margin-bottom: 25px;">
+                                ⚙️ Configuration de Production
+                            </h3>
 
-                            <div class="form-group">
-                                <label class="form-label">Selected Devices (<span id="selected-count">0</span>)</label>
-                                <div id="selected-devices" class="selected-devices">
-                                    <!-- Selected devices will appear here -->
+                            <!-- Selected Devices Section -->
+                            <div style="background: rgba(88, 101, 242, 0.1); border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid rgba(88, 101, 242, 0.2);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <label style="color: #e5e5e7; font-size: 14px; font-weight: 600;">
+                                        📱 Appareils sélectionnés
+                                    </label>
+                                    <span style="background: linear-gradient(135deg, #5865f2, #eb459e); color: white; padding: 4px 12px; border-radius: 20px; font-size: 14px; font-weight: 700;" id="selected-count">0</span>
+                                </div>
+                                <div id="selected-devices" class="selected-devices" style="min-height: 40px; padding: 8px; background: rgba(0, 0, 0, 0.2); border-radius: 8px;">
+                                    <div style="color: #8e8e93; text-align: center; font-size: 12px;">Aucun appareil sélectionné</div>
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label class="form-label">Application</label>
-                                <select class="form-select" id="app-select">
-                                    <option value="hinge">Hinge</option>
-                                    <option value="hinge-fast">Hinge Fast</option>
-                                    <option value="tinder">Tinder</option>
-                                    <option value="bumble">Bumble</option>
-                                </select>
+                            <!-- Configuration Grid -->
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
+                                <!-- Application -->
+                                <div>
+                                    <label style="color: #8e8e93; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block;">
+                                        🎯 Application
+                                    </label>
+                                    <select id="app-select" style="width: 100%; padding: 10px 12px; background: linear-gradient(135deg, rgba(88, 101, 242, 0.1), rgba(0, 0, 0, 0.2)); border: 1px solid rgba(88, 101, 242, 0.3); border-radius: 8px; color: #e5e5e7; font-size: 14px; cursor: pointer; transition: all 0.3s;">
+                                        <option value="hinge">Hinge</option>
+                                        <option value="hinge-fast" selected>⚡ Hinge Fast</option>
+                                        <option value="tinder">Tinder</option>
+                                        <option value="bumble">Bumble</option>
+                                    </select>
+                                </div>
+
+                                <!-- Total Accounts -->
+                                <div>
+                                    <label style="color: #8e8e93; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block;">
+                                        🎯 Nombre de comptes
+                                    </label>
+                                    <input type="number" id="total-accounts" value="10" min="1" max="1000" style="width: 100%; padding: 10px 12px; background: linear-gradient(135deg, rgba(88, 101, 242, 0.1), rgba(0, 0, 0, 0.2)); border: 1px solid rgba(88, 101, 242, 0.3); border-radius: 8px; color: #e5e5e7; font-size: 14px;">
+                                </div>
                             </div>
 
-                            <div class="form-group">
-                                <label class="form-label">Total Accounts to Create</label>
-                                <input type="number" class="form-input" id="total-accounts" value="10" min="1" max="1000">
-                                <small style="color: #999; font-size: 11px;">Will be automatically distributed across selected devices</small>
+                            <!-- Providers Section -->
+                            <div style="background: rgba(0, 0, 0, 0.3); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+                                <h4 style="color: #e5e5e7; font-size: 13px; font-weight: 600; margin-bottom: 15px;">🔌 Fournisseurs de services</h4>
+
+                                <div style="display: grid; gap: 12px;">
+                                    <!-- Proxy Provider -->
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span style="color: #ff9f0a; font-size: 16px;">🌐</span>
+                                        <select id="proxy-provider" style="flex: 1; padding: 8px 12px; background: rgba(255, 159, 10, 0.1); border: 1px solid rgba(255, 159, 10, 0.3); border-radius: 8px; color: #e5e5e7; font-size: 13px;">
+                                            <option value="marsproxies">Mars Proxies</option>
+                                            <option value="none">Aucun proxy</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- SMS Provider -->
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span style="color: #30d158; font-size: 16px;">💬</span>
+                                        <select id="sms-provider" style="flex: 1; padding: 8px 12px; background: rgba(48, 209, 88, 0.1); border: 1px solid rgba(48, 209, 88, 0.3); border-radius: 8px; color: #e5e5e7; font-size: 13px;">
+                                            <option value="api21k">API21K</option>
+                                            <option value="daisysms">DaisySMS</option>
+                                            <option value="smspool">SMSPool</option>
+                                            <option value="none">Mode test</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Email Method -->
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span style="color: #0a84ff; font-size: 16px;">📧</span>
+                                        <select id="email-method" style="flex: 1; padding: 8px 12px; background: rgba(10, 132, 255, 0.1); border: 1px solid rgba(10, 132, 255, 0.3); border-radius: 8px; color: #e5e5e7; font-size: 13px;">
+                                            <option value="gmail">Gmail (existants)</option>
+                                            <option value="quix">Quix API (temporaires)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Quix API Key -->
+                                <div id="quix-api-key-group" style="display: none; margin-top: 12px; padding: 12px; background: rgba(10, 132, 255, 0.05); border-radius: 8px; border: 1px solid rgba(10, 132, 255, 0.2);">
+                                    <label style="color: #0a84ff; font-size: 12px; font-weight: 600; margin-bottom: 6px; display: block;">
+                                        🔑 Clé API Quix
+                                    </label>
+                                    <input type="text" id="quix-api-key" placeholder="Entrer votre clé API Quix" style="width: 100%; padding: 8px 12px; background: rgba(10, 132, 255, 0.1); border: 1px solid rgba(10, 132, 255, 0.3); border-radius: 6px; color: #e5e5e7; font-size: 13px;">
+                                    <small style="color: #8e8e93; font-size: 11px; margin-top: 4px; display: block;">Requis pour générer des emails temporaires</small>
+                                </div>
                             </div>
 
-                            <div class="form-group">
-                                <label class="form-label">Proxy Provider</label>
-                                <select class="form-select" id="proxy-provider">
-                                    <option value="marsproxies">Mars Proxies</option>
-                                    <option value="none">None</option>
-                                </select>
-                            </div>
+                            <!-- Debug Options -->
+                            <div style="background: rgba(255, 69, 58, 0.05); border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid rgba(255, 69, 58, 0.2);">
+                                <h4 style="color: #e5e5e7; font-size: 13px; font-weight: 600; margin-bottom: 15px;">🐛 Options de débogage</h4>
 
-                            <div class="form-group">
-                                <label class="form-label">SMS Provider</label>
-                                <select class="form-select" id="sms-provider">
-                                    <option value="api21k">API21K</option>
-                                    <option value="daisysms">DaisySMS</option>
-                                    <option value="smspool">SMSPool</option>
-                                    <option value="none">None (Test Mode)</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Email Method</label>
-                                <select class="form-select" id="email-method">
-                                    <option value="gmail">Gmail (Liste emails existants)</option>
-                                    <option value="quix">Quix API (Emails temporaires)</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group" id="quix-api-key-group" style="display: none;">
-                                <label class="form-label">Quix API Key</label>
-                                <input type="text" class="form-input" id="quix-api-key" placeholder="Enter Quix API key">
-                                <small style="color: #999; font-size: 11px;">Required for Quix email method</small>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">
-                                    <input type="checkbox" id="debug-mode" style="margin-right: 5px;">
-                                    Debug Mode
+                                <label style="display: flex; align-items: start; gap: 10px; margin-bottom: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="debug-mode" style="margin-top: 2px;">
+                                    <div>
+                                        <div style="color: #e5e5e7; font-size: 13px; font-weight: 500;">Mode Debug</div>
+                                        <div style="color: #8e8e93; font-size: 11px; margin-top: 2px;">Affiche les actions sans les exécuter</div>
+                                    </div>
                                 </label>
-                                <small style="color: #999; font-size: 11px; display: block; margin-top: 5px;">
-                                    Affiche les actions détaillées sans les exécuter réellement
-                                </small>
-                            </div>
 
-                            <div class="form-group">
-                                <label class="form-label">
-                                    <input type="checkbox" id="debug-assisted" style="margin-right: 5px;">
-                                    Debug Assisté (Hinge Fast uniquement)
+                                <label style="display: flex; align-items: start; gap: 10px; cursor: pointer;">
+                                    <input type="checkbox" id="debug-assisted" style="margin-top: 2px;">
+                                    <div>
+                                        <div style="color: #e5e5e7; font-size: 13px; font-weight: 500;">Debug Assisté ⚡</div>
+                                        <div style="color: #8e8e93; font-size: 11px; margin-top: 2px;">Continue même si des éléments manquent (Hinge Fast)</div>
+                                    </div>
                                 </label>
-                                <small style="color: #999; font-size: 11px; display: block; margin-top: 5px;">
-                                    🔧 Le bot continue même si des éléments ne sont pas trouvés. Permet l'intervention manuelle.
-                                </small>
                             </div>
 
-                            <button class="btn btn-success" onclick="startProduction()" style="width: 100%; margin-bottom: 10px;">
-                                🚀 Start Production
-                            </button>
-                            <button class="btn btn-secondary" onclick="window.location.href='hinge-config.html'" style="width: 100%;">
-                                🔧 Configure Hinge Profile
-                            </button>
+                            <!-- Action Buttons -->
+                            <div style="display: grid; gap: 10px;">
+                                <button onclick="startProduction()" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #30d158, #32d74b); border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(48, 209, 88, 0.4); transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                    <span style="font-size: 18px;">🚀</span>
+                                    Lancer la Production
+                                </button>
+
+                                <button onclick="window.location.href='hinge-config.html'" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #5865f2, #eb459e); border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3); transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                    <span style="font-size: 16px;">⚙️</span>
+                                    Configurer le Profil Hinge
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Queue Status -->
-                        <div class="card">
-                            <h3 class="card-title">📋 Queue Status</h3>
-                            <div class="resource-bar">
-                                <span class="resource-name">Total Tasks</span>
-                                <div class="resource-usage">
-                                    <span class="resource-count" id="queue-total">0</span>
+                        <div class="card" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border: 1px solid rgba(0, 212, 255, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);">
+                            <h3 class="card-title" style="background: linear-gradient(90deg, #00d4ff, #0a84ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 16px; font-weight: 600; margin-bottom: 20px;">
+                                📋 File d'attente
+                            </h3>
+
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 15px;">
+                                <!-- Total Tasks -->
+                                <div style="background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                    <div style="color: #8e8e93; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Total</div>
+                                    <div style="color: #e5e5e7; font-size: 20px; font-weight: 700;" id="queue-total">0</div>
+                                </div>
+
+                                <!-- Pending -->
+                                <div style="background: rgba(255, 159, 10, 0.1); border-radius: 10px; padding: 12px; border: 1px solid rgba(255, 159, 10, 0.2);">
+                                    <div style="color: #8e8e93; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">⏳ En attente</div>
+                                    <div style="color: #ff9f0a; font-size: 20px; font-weight: 700;" id="queue-pending">0</div>
+                                </div>
+
+                                <!-- In Progress -->
+                                <div style="background: rgba(10, 132, 255, 0.1); border-radius: 10px; padding: 12px; border: 1px solid rgba(10, 132, 255, 0.2);">
+                                    <div style="color: #8e8e93; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">🔄 En cours</div>
+                                    <div style="color: #0a84ff; font-size: 20px; font-weight: 700;" id="queue-progress">0</div>
+                                </div>
+
+                                <!-- Completed -->
+                                <div style="background: rgba(48, 209, 88, 0.1); border-radius: 10px; padding: 12px; border: 1px solid rgba(48, 209, 88, 0.2);">
+                                    <div style="color: #8e8e93; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">✅ Terminés</div>
+                                    <div style="color: #30d158; font-size: 20px; font-weight: 700;" id="queue-completed">0</div>
                                 </div>
                             </div>
-                            <div class="resource-bar">
-                                <span class="resource-name">⏳ Pending</span>
-                                <div class="resource-usage">
-                                    <span class="resource-count" id="queue-pending">0</span>
-                                </div>
-                            </div>
-                            <div class="resource-bar">
-                                <span class="resource-name">🔄 In Progress</span>
-                                <div class="resource-usage">
-                                    <span class="resource-count" id="queue-progress">0</span>
-                                </div>
-                            </div>
-                            <div class="resource-bar">
-                                <span class="resource-name">✅ Completed</span>
-                                <div class="resource-usage">
-                                    <span class="resource-count" id="queue-completed">0</span>
-                                </div>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <button class="btn btn-secondary" onclick="clearQueue()" style="width: 100%;">🗑️ Clear Queue</button>
-                            </div>
+
+                            <button class="btn" onclick="clearQueue()" style="width: 100%; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); border: none; padding: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3); transition: all 0.3s;">
+                                🗑️ Vider la file
+                            </button>
                         </div>
 
                         <!-- Resource Status -->
-                        <div class="card" style="margin-top: 20px;">
-                            <h3 class="card-title">Resources</h3>
+                        <div class="card" style="margin-top: 20px; background: linear-gradient(135deg, #232526 0%, #414345 100%); border: 1px solid rgba(175, 82, 222, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);">
+                            <h3 class="card-title" style="background: linear-gradient(90deg, #af52de, #ff375f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 16px; font-weight: 600; margin-bottom: 20px;">
+                                ⚡ Ressources
+                            </h3>
 
-                            <div class="resource-bar">
-                                <span class="resource-name">📧 Emails</span>
-                                <div class="resource-usage">
-                                    <span class="resource-count" id="email-count">0/0</span>
-                                    <div class="resource-bar-track">
-                                        <div class="resource-bar-fill" id="email-bar" style="width: 0%;"></div>
-                                    </div>
+                            <!-- Emails Resource -->
+                            <div style="margin-bottom: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <span style="color: #e5e5e7; font-size: 14px; font-weight: 500;">📧 Emails</span>
+                                    <span style="color: #0a84ff; font-size: 16px; font-weight: 700;" id="email-count">0/0</span>
+                                </div>
+                                <div style="height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; overflow: hidden;">
+                                    <div id="email-bar" style="height: 100%; background: linear-gradient(90deg, #0a84ff, #00d4ff); width: 0%; transition: width 0.5s; border-radius: 10px; box-shadow: 0 0 10px rgba(10, 132, 255, 0.5);"></div>
                                 </div>
                             </div>
 
-                            <div class="resource-bar">
-                                <span class="resource-name">📍 Locations</span>
-                                <div class="resource-usage">
-                                    <div style="display: flex; align-items: center; gap: 8px;">
-                                        <span class="resource-count" id="location-count">0/0</span>
-                                        <button id="reset-locations-btn" onclick="resetLocations()" style="padding: 2px 6px; font-size: 14px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;" title="Recycler toutes les villes">♻️</button>
+                            <!-- Locations Resource -->
+                            <div style="margin-bottom: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span style="color: #e5e5e7; font-size: 14px; font-weight: 500;">📍 Localisations</span>
+                                        <button id="reset-locations-btn" onclick="resetLocations()" style="padding: 4px 8px; font-size: 12px; background: linear-gradient(135deg, #30d158, #32d74b); color: white; border: none; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 8px rgba(48, 209, 88, 0.3); transition: all 0.3s;" title="Recycler toutes les villes">
+                                            ♻️ Recycler
+                                        </button>
                                     </div>
-                                    <div class="resource-bar-track">
-                                        <div class="resource-bar-fill" id="location-bar" style="width: 0%;"></div>
-                                    </div>
-                                    <div style="margin-top: 4px; font-size: 11px; color: #999;">
-                                        <span id="locations-details">En test: 0 | Utilisées: 0 | Blacklist: 0</span>
-                                    </div>
+                                    <span style="color: #af52de; font-size: 16px; font-weight: 700;" id="location-count">0/0</span>
+                                </div>
+                                <div style="height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; overflow: hidden;">
+                                    <div id="location-bar" style="height: 100%; background: linear-gradient(90deg, #af52de, #ff375f); width: 0%; transition: width 0.5s; border-radius: 10px; box-shadow: 0 0 10px rgba(175, 82, 222, 0.5);"></div>
+                                </div>
+                                <div style="margin-top: 8px; padding: 8px; background: rgba(255, 255, 255, 0.03); border-radius: 6px; font-size: 11px; color: #8e8e93;">
+                                    <span id="locations-details">🔍 En test: 0 | ✅ Utilisées: 0 | 🚫 Blacklist: 0</span>
                                 </div>
                             </div>
 
-                            <div style="margin-top: 20px;">
-                                <button class="btn btn-danger" onclick="stopAll()" style="width: 48%;">⏹️ Stop All</button>
-                                <button class="btn btn-secondary" onclick="pauseAll()" style="width: 48%; float: right;">⏸️ Pause All</button>
+                            <!-- Control Buttons -->
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px;">
+                                <button class="btn" onclick="stopAll()" style="background: linear-gradient(135deg, #ff453a, #ff6b6b); border: none; padding: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 15px rgba(255, 69, 58, 0.3); transition: all 0.3s;">
+                                    ⏹️ Tout arrêter
+                                </button>
+                                <button class="btn" onclick="pauseAll()" style="background: linear-gradient(135deg, #ffa500, #ff9f0a); border: none; padding: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 15px rgba(255, 159, 10, 0.3); transition: all 0.3s;">
+                                    ⏸️ Tout suspendre
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1171,15 +1281,49 @@
                     </div>
 
                     <!-- Device Logs -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Device Logs</h3>
-                            <button class="btn btn-secondary" onclick="clearAllDeviceLogs()">Clear All</button>
+                    <div class="card" style="background: linear-gradient(135deg, #1a1a1f 0%, #0d0d0f 100%); border: 1px solid rgba(100, 255, 218, 0.15); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);">
+                        <div class="card-header" style="border-bottom: 1px solid rgba(100, 255, 218, 0.1); padding-bottom: 15px; margin-bottom: 20px;">
+                            <h3 class="card-title" style="background: linear-gradient(90deg, #64ffda, #48d1cc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 16px; font-weight: 600;">
+                                📋 Journal des Appareils
+                            </h3>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn" onclick="filterLogs('all')" style="padding: 6px 12px; font-size: 12px; background: rgba(100, 255, 218, 0.1); border: 1px solid rgba(100, 255, 218, 0.3); color: #64ffda;">
+                                    Tous
+                                </button>
+                                <button class="btn" onclick="filterLogs('error')" style="padding: 6px 12px; font-size: 12px; background: rgba(255, 69, 58, 0.1); border: 1px solid rgba(255, 69, 58, 0.3); color: #ff453a;">
+                                    Erreurs
+                                </button>
+                                <button class="btn" onclick="clearAllDeviceLogs()" style="padding: 6px 12px; font-size: 12px; background: linear-gradient(135deg, #ff453a, #ff6b6b); border: none; color: white;">
+                                    🗑️ Effacer
+                                </button>
+                            </div>
                         </div>
-                        <div id="device-logs-container" class="device-logs-container">
+                        <div id="device-logs-container" class="device-logs-container" style="max-height: 400px; overflow-y: auto; padding: 10px; background: rgba(0, 0, 0, 0.3); border-radius: 8px;">
                             <!-- Device-specific logs will appear here -->
-                            <div class="device-log-content empty">
-                                No active devices. Start a production to see logs.
+                            <div class="device-log-content empty" style="text-align: center; padding: 40px; color: #8e8e93;">
+                                <div style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;">📱</div>
+                                <div style="font-size: 14px; font-weight: 500;">Aucun appareil actif</div>
+                                <div style="font-size: 12px; margin-top: 5px; opacity: 0.7;">Lancez une production pour voir les logs</div>
+                            </div>
+                        </div>
+
+                        <!-- Log Stats Bar -->
+                        <div style="margin-top: 15px; padding: 10px; background: rgba(100, 255, 218, 0.05); border-radius: 8px; display: flex; justify-content: space-around; border: 1px solid rgba(100, 255, 218, 0.1);">
+                            <div style="text-align: center;">
+                                <div style="color: #64ffda; font-size: 18px; font-weight: 700;" id="total-logs-count">0</div>
+                                <div style="color: #8e8e93; font-size: 10px; text-transform: uppercase;">Total Logs</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="color: #30d158; font-size: 18px; font-weight: 700;" id="success-logs-count">0</div>
+                                <div style="color: #8e8e93; font-size: 10px; text-transform: uppercase;">Succès</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="color: #ff9f0a; font-size: 18px; font-weight: 700;" id="warning-logs-count">0</div>
+                                <div style="color: #8e8e93; font-size: 10px; text-transform: uppercase;">Alertes</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="color: #ff453a; font-size: 18px; font-weight: 700;" id="error-logs-count">0</div>
+                                <div style="color: #8e8e93; font-size: 10px; text-transform: uppercase;">Erreurs</div>
                             </div>
                         </div>
                     </div>
@@ -1302,6 +1446,125 @@
             }
         };
 
+        // Load saved statistics from localStorage
+        function loadSavedStats() {
+            const saved = localStorage.getItem('productionStats');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    return {
+                        totalCreated: parsed.totalCreated || 0,
+                        successRate: parsed.successRate || 0,
+                        averageTime: parsed.averageTime || 0,
+                        activeDevices: 0, // Always reset active devices on startup
+                        proxiesUsed: parsed.proxiesUsed || 0,
+                        smsConsumed: parsed.smsConsumed || 0,
+                        startTimes: new Map(),
+                        completionTimes: parsed.completionTimes || [],
+                        dailyStats: new Map(parsed.dailyStats || [])
+                    };
+                } catch (e) {
+                    console.error('Failed to load saved stats:', e);
+                }
+            }
+            return null;
+        }
+
+        // Save statistics to localStorage
+        function saveStats() {
+            try {
+                const toSave = {
+                    totalCreated: productionStats.totalCreated,
+                    successRate: productionStats.successRate,
+                    averageTime: productionStats.averageTime,
+                    proxiesUsed: productionStats.proxiesUsed,
+                    smsConsumed: productionStats.smsConsumed,
+                    completionTimes: productionStats.completionTimes,
+                    dailyStats: Array.from(productionStats.dailyStats.entries())
+                };
+                localStorage.setItem('productionStats', JSON.stringify(toSave));
+            } catch (e) {
+                console.error('Failed to save stats:', e);
+            }
+        }
+
+        // Load saved history from localStorage
+        function loadSavedHistory() {
+            const saved = localStorage.getItem('productionHistory');
+            if (saved) {
+                try {
+                    return JSON.parse(saved) || [];
+                } catch (e) {
+                    console.error('Failed to load saved history:', e);
+                }
+            }
+            return [];
+        }
+
+        // Save history to localStorage
+        function saveHistory() {
+            try {
+                // Keep only last 100 items to avoid storage issues
+                const toSave = productionHistory.slice(-100);
+                localStorage.setItem('productionHistory', JSON.stringify(toSave));
+            } catch (e) {
+                console.error('Failed to save history:', e);
+            }
+        }
+
+        // Clear all saved statistics
+        function clearAllStats() {
+            if (confirm('Voulez-vous vraiment effacer toutes les statistiques sauvegardées ?')) {
+                // Clear localStorage
+                localStorage.removeItem('productionStats');
+                localStorage.removeItem('productionHistory');
+
+                // Reset current stats
+                productionStats = {
+                    totalCreated: 0,
+                    successRate: 0,
+                    averageTime: 0,
+                    activeDevices: 0,
+                    proxiesUsed: 0,
+                    smsConsumed: 0,
+                    startTimes: new Map(),
+                    completionTimes: [],
+                    dailyStats: new Map()
+                };
+
+                productionHistory = [];
+
+                // Update displays
+                updateStatistics();
+                updateMonitorPage();
+                updateProductionHistoryDisplay();
+
+                alert('Statistiques effacées avec succès');
+            }
+        }
+
+        // Production statistics - load saved data or use defaults
+        let productionStats = loadSavedStats() || {
+            totalCreated: 0,
+            successRate: 0,
+            averageTime: 0,
+            activeDevices: 0,
+            proxiesUsed: 0,
+            smsConsumed: 0,
+            startTimes: new Map(),
+            completionTimes: [],
+            dailyStats: new Map()
+        };
+
+        // Application startup time for uptime calculation
+        const appStartTime = Date.now();
+
+        // Production history - load saved data
+        let productionHistory = loadSavedHistory();
+
+        // Monitor page refresh interval
+        let monitorRefreshInterval = null;
+
         // Page Navigation
         function switchPage(pageName) {
             // Update nav buttons
@@ -1328,17 +1591,35 @@
                 document.getElementById('page-title').textContent = pageInfo.title;
             }
 
-            // Re-render content when switching to production page
+            // Re-render content when switching pages
             if (pageName === 'production') {
                 renderActiveProductions();
                 updateQueueStats();
                 updateResourceStats();
+                updateProductionHistoryDisplay();
+                updateStatistics();
                 // Re-render device logs if any
                 if (appState.deviceLogs.size > 0) {
                     renderDeviceLogs();
                 }
             } else if (pageName === 'devices') {
                 renderDevices();
+            } else if (pageName === 'monitor') {
+                // Ensure active productions continue to show in monitor
+                updateStatistics();
+                updateMonitorPage();
+
+                // Start auto-refresh for monitor page
+                if (monitorRefreshInterval) clearInterval(monitorRefreshInterval);
+                monitorRefreshInterval = setInterval(() => {
+                    updateMonitorPage();
+                }, 5000); // Refresh every 5 seconds
+            } else {
+                // Clear monitor refresh interval when leaving monitor page
+                if (monitorRefreshInterval) {
+                    clearInterval(monitorRefreshInterval);
+                    monitorRefreshInterval = null;
+                }
             }
         }
 
@@ -1589,7 +1870,10 @@
                             model: device.model,
                             app: app,
                             accounts: accountsPerDevice,
-                            proxyProvider: proxyProvider
+                            proxyProvider: proxyProvider,
+                            smsProvider: smsProvider,
+                            emailMethod: emailMethod,
+                            quixApiKey: emailMethod === 'quix' ? quixApiKey : ''
                         });
                         console.log('Bot start result:', result);
                         addLog('success', `Bot started successfully for ${device.name}`);
@@ -1601,6 +1885,9 @@
                             app: app,
                             accounts: accountsPerDevice,
                             proxyProvider: proxyProvider,
+                            smsProvider: smsProvider,
+                            emailMethod: emailMethod,
+                            quixApiKey: emailMethod === 'quix' ? quixApiKey : '',
                             appiumPort: appiumPort,
                             wdaPort: wdaPort
                         });
@@ -1614,6 +1901,7 @@
                     appState.activeProductions.set(udid, {
                         app,
                         accounts: accountsPerDevice,
+                        accountsCreated: 0,  // Initialiser le compteur
                         progress: 0,
                         startTime: Date.now(),
                         appiumPort,
@@ -1626,6 +1914,9 @@
                     device.status = 'error';
                 }
             }
+
+            // Démarrer le timer de mise à jour du temps écoulé
+            startElapsedTimeUpdater();
 
             renderDevices();
             renderActiveProductions();
@@ -1652,28 +1943,158 @@
                 const statusText = isPaused ? 'Paused' : 'Running';
 
                 card.innerHTML = `
-                    <div class="status-header">
-                        <span class="status-title">${device.name}</span>
-                        <span class="status-badge ${statusBadge}">${statusText}</span>
+                    <div class="status-header" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <span class="status-title" style="font-size: 18px; font-weight: 600; color: #fff;">
+                            <span style="margin-right: 8px;">📱</span>${device.name}
+                        </span>
+                        <span class="status-badge ${statusBadge}" style="
+                            background: ${isPaused ? 'linear-gradient(135deg, #FFA500, #FF8C00)' : 'linear-gradient(135deg, #4CAF50, #45a049)'};
+                            padding: 6px 14px;
+                            border-radius: 20px;
+                            font-size: 11px;
+                            font-weight: 600;
+                            color: white;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                            ${isPaused ? '⏸️ En pause' : '🟢 En cours'}
+                        </span>
                     </div>
-                    <div style="margin-top: 15px;">
-                        <div class="progress-label" id="progress-label-${udid}">
-                            ${production.currentStep || 'Account ' + production.progress + '/' + production.accounts} ${production.progressPercent !== undefined ? '(' + production.progressPercent + '%)' : ''}
+
+                    <!-- Section de progression améliorée -->
+                    <div style="margin-top: 20px; background: rgba(0,0,0,0.3); padding: 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div class="progress-label" id="progress-label-${udid}" style="
+                                font-size: 14px;
+                                font-weight: 500;
+                                color: #fff;
+                                display: flex;
+                                align-items: center;">
+                                <span style="margin-right: 10px; font-size: 18px;">🚀</span>
+                                <span>${production.currentStep || 'Initialisation...'}</span>
+                            </div>
+                            <div style="
+                                font-size: 16px;
+                                font-weight: bold;
+                                background: linear-gradient(135deg, #4CAF50, #8BC34A);
+                                -webkit-background-clip: text;
+                                -webkit-text-fill-color: transparent;
+                                padding: 5px 12px;
+                                background-color: rgba(76, 175, 80, 0.1);
+                                border-radius: 20px;
+                                border: 2px solid rgba(76, 175, 80, 0.3);">
+                                ${production.progressPercent || 0}%
+                            </div>
                         </div>
-                        <div class="progress-track">
-                            <div class="progress-fill" id="progress-fill-${udid}" style="width: ${production.progressPercent || (production.progress / production.accounts) * 100}%;"></div>
+
+                        <!-- Barre de progression principale -->
+                        <div style="
+                            position: relative;
+                            height: 28px;
+                            background: linear-gradient(90deg, #0a0a0a, #1a1a1a);
+                            border-radius: 14px;
+                            overflow: hidden;
+                            box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.1);">
+                            <div class="progress-fill" id="progress-fill-${udid}" style="
+                                width: ${production.progressPercent || 0}%;
+                                height: 100%;
+                                background: linear-gradient(90deg, #4CAF50, #8BC34A, #CDDC39);
+                                border-radius: 14px;
+                                transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+                                position: relative;
+                                box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);">
+
+                                <!-- Effet de brillance animé -->
+                                <div style="
+                                    position: absolute;
+                                    top: 0;
+                                    left: -150px;
+                                    width: 150px;
+                                    height: 100%;
+                                    background: linear-gradient(90deg,
+                                        transparent,
+                                        rgba(255,255,255,0.4),
+                                        transparent);
+                                    animation: shimmer 2s infinite;"></div>
+                            </div>
+
+                            <!-- Texte centré sur la barre -->
+                            <div style="
+                                position: absolute;
+                                top: 50%;
+                                left: 50%;
+                                transform: translate(-50%, -50%);
+                                font-size: 12px;
+                                font-weight: 600;
+                                color: #fff;
+                                text-shadow: 0 1px 3px rgba(0,0,0,0.5);">
+                                Compte ${production.progress || 0} sur ${production.accounts || 1}
+                            </div>
+                        </div>
+
+                        <!-- Informations supplémentaires -->
+                        <div style="
+                            margin-top: 12px;
+                            display: flex;
+                            justify-content: space-between;
+                            font-size: 11px;
+                            color: #999;">
+                            <span>⚡ ${production.app}</span>
+                            <span>⏱️ ${new Date(production.startTime).toLocaleTimeString()}</span>
+                            <span>⏳ ${Math.floor((Date.now() - production.startTime) / 60000)} min</span>
                         </div>
                     </div>
-                    <div style="margin-top: 10px; font-size: 12px; color: #8e8e93;">
-                        App: ${production.app} • Started: ${new Date(production.startTime).toLocaleTimeString()}
-                    </div>
-                    <div style="margin-top: 15px; display: flex; gap: 5px;">
+
+                    <!-- Boutons avec nouveau design -->
+                    <div style="margin-top: 18px; display: flex; gap: 8px;">
                         ${isPaused ?
-                            `<button class="btn btn-success" onclick="resumeDevice('${udid}')" style="flex: 1; padding: 5px; font-size: 12px;">▶️ Resume</button>` :
-                            `<button class="btn btn-warning" onclick="pauseDevice('${udid}')" style="flex: 1; padding: 5px; font-size: 12px;">⏸️ Pause</button>`
+                            `<button class="btn" onclick="resumeDevice('${udid}')" style="
+                                flex: 1;
+                                padding: 10px;
+                                font-size: 13px;
+                                background: linear-gradient(135deg, #4CAF50, #45a049);
+                                border: none;
+                                border-radius: 10px;
+                                color: white;
+                                font-weight: 600;
+                                cursor: pointer;
+                                transition: all 0.3s;
+                                box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3);">▶️ Reprendre</button>` :
+                            `<button class="btn" onclick="pauseDevice('${udid}')" style="
+                                flex: 1;
+                                padding: 10px;
+                                font-size: 13px;
+                                background: linear-gradient(135deg, #FFA500, #FF8C00);
+                                border: none;
+                                border-radius: 10px;
+                                color: white;
+                                font-weight: 600;
+                                cursor: pointer;
+                                transition: all 0.3s;
+                                box-shadow: 0 3px 10px rgba(255, 165, 0, 0.3);">⏸️ Pause</button>`
                         }
-                        <button class="btn btn-danger" onclick="stopDevice('${udid}')" style="flex: 1; padding: 5px; font-size: 12px;">⏹️ Stop</button>
-                        <button class="btn btn-secondary" onclick="showDeviceDetails('${udid}')" style="flex: 1; padding: 5px; font-size: 12px;">📊 Details</button>
+                        <button class="btn" onclick="stopDevice('${udid}')" style="
+                            flex: 1;
+                            padding: 10px;
+                            font-size: 13px;
+                            background: linear-gradient(135deg, #f44336, #d32f2f);
+                            border: none;
+                            border-radius: 10px;
+                            color: white;
+                            font-weight: 600;
+                            cursor: pointer;
+                            transition: all 0.3s;
+                            box-shadow: 0 3px 10px rgba(244, 67, 54, 0.3);">⏹️ Stop</button>
+                        <button class="btn" onclick="showDeviceDetails('${udid}')" style="
+                            flex: 1;
+                            padding: 10px;
+                            font-size: 13px;
+                            background: linear-gradient(135deg, #2196F3, #1976D2);
+                            border: none;
+                            border-radius: 10px;
+                            color: white;
+                            font-weight: 600;
+                            cursor: pointer;
+                            transition: all 0.3s;
+                            box-shadow: 0 3px 10px rgba(33, 150, 243, 0.3);">📊 Détails</button>
                     </div>
                 `;
                 container.appendChild(card);
@@ -1714,6 +2135,9 @@
 
             // Use optimized update function instead of full re-render
             updateDeviceLogDisplay(udid, logType);
+
+            // Update log statistics in real-time
+            updateLogStats();
         }
 
         // Specific log functions for different types
@@ -2138,17 +2562,25 @@
                 production.progressPercent = progressData.percentage;
                 production.stepId = progressData.stepId;
 
-                // Update display directly for better performance
-                const labelElement = document.getElementById(`progress-label-${udid}`);
+                // Mise à jour du nouveau design de la barre de progression
                 const fillElement = document.getElementById(`progress-fill-${udid}`);
-
-                if (labelElement) {
-                    labelElement.textContent = `${progressData.currentStep} (${progressData.percentage}%)`;
-                }
+                const percentElement = document.getElementById(`progress-percent-${udid}`);
+                const stepNameElement = document.getElementById(`progress-step-${udid}`);
 
                 if (fillElement) {
                     fillElement.style.width = `${progressData.percentage}%`;
                 }
+
+                if (percentElement) {
+                    percentElement.textContent = `${progressData.percentage}%`;
+                }
+
+                if (stepNameElement) {
+                    stepNameElement.textContent = progressData.currentStep;
+                }
+
+                // Mettre à jour le temps écoulé
+                updateElapsedTime(udid);
 
                 // Log progress to device logs
                 const device = appState.devices.get(udid);
@@ -2156,6 +2588,345 @@
                     addScriptLogForDevice(udid, device.name, 'info', `📊 ${progressData.currentStep} - ${progressData.percentage}%`);
                 }
             }
+        }
+
+        // Fonction pour mettre à jour le temps écoulé
+        function updateElapsedTime(udid) {
+            const production = appState.activeProductions.get(udid);
+            if (production && production.startTime) {
+                const elapsed = Date.now() - production.startTime;
+                const minutes = Math.floor(elapsed / 60000);
+                const seconds = Math.floor((elapsed % 60000) / 1000);
+                const timeElement = document.getElementById(`elapsed-time-${udid}`);
+                if (timeElement) {
+                    timeElement.textContent = `${minutes}m ${seconds}s`;
+                }
+            }
+        }
+
+        // Timer global pour mettre à jour les temps écoulés
+        let elapsedTimeInterval = null;
+        function startElapsedTimeUpdater() {
+            if (elapsedTimeInterval) return;
+            elapsedTimeInterval = setInterval(() => {
+                for (const [udid] of appState.activeProductions) {
+                    updateElapsedTime(udid);
+                }
+            }, 1000);
+        }
+
+        function stopElapsedTimeUpdater() {
+            if (elapsedTimeInterval) {
+                clearInterval(elapsedTimeInterval);
+                elapsedTimeInterval = null;
+            }
+        }
+
+        // Fonction pour mettre à jour les statistiques de production
+        function updateStatistics() {
+            // Mettre à jour le nombre d'appareils actifs
+            productionStats.activeDevices = appState.activeProductions.size;
+
+            // Calculer le taux de réussite
+            if (productionStats.totalCreated > 0) {
+                productionStats.successRate = 100; // Pour l'instant, on considère tous comme succès
+            }
+
+            // Calculer le temps moyen
+            if (productionStats.completionTimes.length > 0) {
+                const avgMs = productionStats.completionTimes.reduce((a, b) => a + b, 0) / productionStats.completionTimes.length;
+                productionStats.averageTime = Math.round(avgMs / 1000) + 's';
+            }
+
+            // Mettre à jour l'interface
+            document.getElementById('stat-total-created').textContent = productionStats.totalCreated;
+            document.getElementById('stat-success-rate').textContent = productionStats.successRate + '%';
+            document.getElementById('stat-avg-time').textContent = productionStats.averageTime || '0s';
+            document.getElementById('stat-active-devices').textContent = productionStats.activeDevices;
+            document.getElementById('stat-proxies-used').textContent = productionStats.proxiesUsed;
+            document.getElementById('stat-sms-consumed').textContent = productionStats.smsConsumed;
+
+            // Save statistics to localStorage
+            saveStats();
+        }
+
+        // Fonction pour mettre à jour la page Monitor
+        function updateMonitorPage() {
+            // Calculer l'uptime
+            const uptimeMs = Date.now() - appStartTime;
+            const hours = Math.floor(uptimeMs / (1000 * 60 * 60));
+            const minutes = Math.floor((uptimeMs % (1000 * 60 * 60)) / (1000 * 60));
+            const uptimeText = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+
+            // Calculer la moyenne quotidienne
+            const today = new Date().toDateString();
+            const todayCount = productionStats.dailyStats.get(today) || 0;
+
+            // Calculer la moyenne sur les 7 derniers jours
+            let totalLastWeek = 0;
+            let daysWithActivity = 0;
+            const now = new Date();
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+                const dateStr = date.toDateString();
+                const dayCount = productionStats.dailyStats.get(dateStr) || 0;
+                if (dayCount > 0) {
+                    totalLastWeek += dayCount;
+                    daysWithActivity++;
+                }
+            }
+            const dailyAverage = daysWithActivity > 0 ? Math.round(totalLastWeek / daysWithActivity) : 0;
+
+            // Mettre à jour les éléments de la page Monitor
+            const totalAccountsEl = document.getElementById('total-accounts');
+            const dailyAverageEl = document.getElementById('daily-average');
+            const overallSuccessEl = document.getElementById('overall-success');
+            const uptimeEl = document.getElementById('uptime');
+
+            if (totalAccountsEl) totalAccountsEl.textContent = productionStats.totalCreated;
+            if (dailyAverageEl) dailyAverageEl.textContent = dailyAverage;
+            if (overallSuccessEl) overallSuccessEl.textContent = productionStats.successRate + '%';
+            if (uptimeEl) uptimeEl.textContent = uptimeText;
+
+            // Mettre à jour l'activité récente
+            updateRecentActivity();
+
+            // Mettre à jour les performances des appareils
+            updateDevicePerformance();
+
+            // Mettre à jour l'historique
+            updateHistoryTab();
+        }
+
+        // Fonction pour mettre à jour l'activité récente
+        function updateRecentActivity() {
+            const recentActivityEl = document.getElementById('recent-activity');
+            if (!recentActivityEl) return;
+
+            if (productionHistory.length === 0) {
+                recentActivityEl.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #8e8e93;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📊</div>
+                        <div>Aucune activité récente</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Afficher les 5 dernières activités
+            const recentItems = productionHistory.slice(-5).reverse();
+            recentActivityEl.innerHTML = recentItems.map(item => `
+                <div style="padding: 12px; border-bottom: 1px solid #3a3a3c;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600; color: #ffffff;">${item.deviceName}</div>
+                            <div style="font-size: 12px; color: #8e8e93;">
+                                ${item.app} - ${new Date(item.endTime).toLocaleString('fr-FR')}
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 14px; color: ${item.status === 'completed' ? '#30d158' : '#ff453a'};">
+                                ${item.accountsCreated || 0} compte${item.accountsCreated > 1 ? 's' : ''}
+                            </div>
+                            <div style="font-size: 11px; color: #8e8e93;">
+                                ${Math.round(item.duration / 60000)} min
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Fonction pour mettre à jour les performances des appareils
+        function updateDevicePerformance() {
+            const devicePerfEl = document.getElementById('device-performance');
+            if (!devicePerfEl) return;
+
+            if (appState.devices.size === 0) {
+                devicePerfEl.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #8e8e93;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📱</div>
+                        <div>Aucun appareil connecté</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const deviceCards = [];
+            appState.devices.forEach((device, udid) => {
+                // Calculer les stats pour cet appareil
+                const deviceHistory = productionHistory.filter(h => h.udid === udid);
+                const totalAccounts = deviceHistory.reduce((sum, h) => sum + (h.accountsCreated || 0), 0);
+                const isActive = appState.activeProductions.has(udid);
+
+                deviceCards.push(`
+                    <div class="stat-card" style="background: linear-gradient(135deg, #1c1c1e, #2c2c2e);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div style="font-weight: 600;">${device.name}</div>
+                            <div style="width: 10px; height: 10px; border-radius: 50%; background: ${isActive ? '#30d158' : '#8e8e93'};"></div>
+                        </div>
+                        <div style="font-size: 24px; font-weight: bold; margin: 10px 0;">${totalAccounts}</div>
+                        <div style="font-size: 12px; color: #8e8e93;">Comptes créés</div>
+                        <div style="font-size: 11px; color: #8e8e93; margin-top: 5px;">
+                            ${isActive ? '🟢 En production' : '⚪ Inactif'}
+                        </div>
+                    </div>
+                `);
+            });
+
+            devicePerfEl.innerHTML = deviceCards.join('');
+        }
+
+        // Fonction pour mettre à jour l'onglet historique
+        function updateHistoryTab() {
+            const historyEl = document.getElementById('history-content');
+            if (!historyEl) return;
+
+            if (productionHistory.length === 0) {
+                historyEl.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #8e8e93;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📜</div>
+                        <div>Aucun historique disponible</div>
+                    </div>
+                `;
+                return;
+            }
+
+            historyEl.innerHTML = productionHistory.slice().reverse().map(item => `
+                <div style="padding: 15px; border-bottom: 1px solid #3a3a3c;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <div>
+                            <div style="font-weight: 600; color: #ffffff; margin-bottom: 5px;">
+                                ${item.deviceName}
+                            </div>
+                            <div style="font-size: 12px; color: #8e8e93;">
+                                ${item.app} • ${new Date(item.startTime).toLocaleString('fr-FR')}
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 16px; font-weight: bold; color: ${item.status === 'completed' ? '#30d158' : '#ff453a'};">
+                                ${item.accountsCreated || 0} compte${item.accountsCreated > 1 ? 's' : ''}
+                            </div>
+                            <div style="font-size: 11px; color: #8e8e93;">
+                                ⏱️ ${Math.round(item.duration / 60000)} minutes
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Fonction pour ajouter une entrée à l'historique
+        function addToProductionHistory(udid, status = 'completed') {
+            const production = appState.activeProductions.get(udid);
+            const device = appState.devices.get(udid);
+
+            if (production && device) {
+                const endTime = Date.now();
+                const duration = endTime - production.startTime;
+                const minutes = Math.floor(duration / 60000);
+                const seconds = Math.floor((duration % 60000) / 1000);
+
+                const historyEntry = {
+                    sessionId: `#${productionHistory.length + 1}`,
+                    time: new Date(production.startTime).toLocaleTimeString('fr-FR'),
+                    duration: `${minutes}m ${seconds}s`,
+                    deviceName: device.name,
+                    accountsCreated: production.accountsCreated || 0,
+                    accountsTarget: production.accounts || 0,
+                    successRate: production.accountsCreated ? Math.round((production.accountsCreated / production.accounts) * 100) : 0,
+                    status: status
+                };
+
+                // Ajouter à l'historique (garder max 50 entrées)
+                productionHistory.unshift(historyEntry);
+                if (productionHistory.length > 50) {
+                    productionHistory.pop();
+                }
+
+                // Save history to localStorage
+                saveHistory();
+
+                // Mettre à jour l'affichage
+                updateProductionHistoryDisplay();
+            }
+        }
+
+        // Fonction pour afficher l'historique
+        function updateProductionHistoryDisplay() {
+            const tbody = document.getElementById('history-tbody');
+            if (!tbody) return;
+
+            if (productionHistory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #8e8e93; padding: 20px;">Aucun historique de production</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = productionHistory.map(entry => {
+                const statusBadge = entry.status === 'completed'
+                    ? '<span style="background: #30d158; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px;">✅ Terminé</span>'
+                    : entry.status === 'stopped'
+                    ? '<span style="background: #ff453a; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px;">⏹️ Arrêté</span>'
+                    : '<span style="background: #ff9f0a; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px;">⚠️ Erreur</span>';
+
+                return `
+                    <tr>
+                        <td style="font-weight: 600;">${entry.sessionId}</td>
+                        <td>${entry.time}</td>
+                        <td>${entry.duration}</td>
+                        <td>${entry.deviceName}</td>
+                        <td>${entry.accountsCreated}/${entry.accountsTarget}</td>
+                        <td><span style="color: ${entry.successRate >= 80 ? '#30d158' : entry.successRate >= 50 ? '#ff9f0a' : '#ff453a'};">${entry.successRate}%</span></td>
+                        <td>${statusBadge}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Fonction pour filtrer les logs
+        let currentLogFilter = 'all';
+        function filterLogs(type) {
+            currentLogFilter = type;
+            const allLogs = document.querySelectorAll('.log-entry');
+
+            allLogs.forEach(log => {
+                if (type === 'all') {
+                    log.style.display = 'block';
+                } else if (type === 'error' && log.classList.contains('error')) {
+                    log.style.display = 'block';
+                } else if (type === 'error' && !log.classList.contains('error')) {
+                    log.style.display = 'none';
+                }
+            });
+
+            // Mettre à jour les boutons
+            document.querySelectorAll('[onclick^="filterLogs"]').forEach(btn => {
+                if (btn.getAttribute('onclick').includes(type)) {
+                    btn.style.opacity = '1';
+                    btn.style.transform = 'scale(1.05)';
+                } else {
+                    btn.style.opacity = '0.6';
+                    btn.style.transform = 'scale(1)';
+                }
+            });
+        }
+
+        // Fonction pour mettre à jour les compteurs de logs
+        function updateLogStats() {
+            const totalLogs = document.querySelectorAll('.log-entry').length;
+            const errorLogs = document.querySelectorAll('.log-entry.error').length;
+            const warningLogs = document.querySelectorAll('.log-entry.warning').length;
+            const successLogs = document.querySelectorAll('.log-entry.success').length;
+
+            const totalElement = document.getElementById('total-logs-count');
+            const errorElement = document.getElementById('error-logs-count');
+            const warningElement = document.getElementById('warning-logs-count');
+            const successElement = document.getElementById('success-logs-count');
+
+            if (totalElement) totalElement.textContent = totalLogs;
+            if (errorElement) errorElement.textContent = errorLogs;
+            if (warningElement) warningElement.textContent = warningLogs;
+            if (successElement) successElement.textContent = successLogs;
         }
 
         // Individual device control functions
@@ -2205,8 +2976,17 @@
                     await window.electronAPI.stopWDA({ udid });
                 }
 
+                // Ajouter à l'historique avant de supprimer la production
+                addToProductionHistory(udid, 'stopped');
+
                 appState.activeProductions.delete(udid);
                 device.status = 'idle';
+
+                // Arrêter le timer si plus aucune production active
+                if (appState.activeProductions.size === 0) {
+                    stopElapsedTimeUpdater();
+                }
+
                 renderDevices();
                 renderActiveProductions();
                 addLog('success', `Production stopped for ${device.name}`);
@@ -2249,18 +3029,38 @@ WDA Port: ${production.wdaPort}`);
             updateSelectedCount();
             updateResourceStats();
             updateQueueStats();
+            updateLogStats();
+            updateProductionHistoryDisplay();
+            updateStatistics();
 
             // Handle email method change
             const emailMethodSelect = document.getElementById('email-method');
             const quixApiKeyGroup = document.getElementById('quix-api-key-group');
+            const quixApiKeyInput = document.getElementById('quix-api-key');
+
+            // Default Quix API key
+            const DEFAULT_QUIX_API_KEY = 'liagirtwcy1mnv0xszjg4ad3tbgqpurn';
 
             emailMethodSelect.addEventListener('change', function() {
                 if (this.value === 'quix') {
                     quixApiKeyGroup.style.display = 'block';
+                    // Auto-fill the API key if it's empty
+                    if (!quixApiKeyInput.value) {
+                        quixApiKeyInput.value = DEFAULT_QUIX_API_KEY;
+                    }
                 } else {
                     quixApiKeyGroup.style.display = 'none';
                 }
             });
+
+            // Trigger initial check
+            if (emailMethodSelect.value === 'quix') {
+                quixApiKeyGroup.style.display = 'block';
+                if (!quixApiKeyInput.value) {
+                    quixApiKeyInput.value = DEFAULT_QUIX_API_KEY;
+                }
+            }
+
 
             // Update stats every 5 seconds
             setInterval(() => {
@@ -2351,6 +3151,12 @@ WDA Port: ${production.wdaPort}`);
                         if (data.line.includes('Account created successfully')) {
                             productionStats.totalCreated++;
                             productionStats.smsConsumed++;
+
+                            // Update daily statistics
+                            const today = new Date().toDateString();
+                            const currentCount = productionStats.dailyStats.get(today) || 0;
+                            productionStats.dailyStats.set(today, currentCount + 1);
+
                             updateStatistics();
 
                             // Update production progress

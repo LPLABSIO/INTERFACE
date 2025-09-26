@@ -506,24 +506,35 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     let email;
     let quixService = null;
 
-    const emailMethod = config.settings?.emailMethod || 'gmail';
+    // Priorité aux variables d'environnement, puis config, puis défaut
+    const emailMethod = process.env.EMAIL_METHOD || config.settings?.emailMethod || 'gmail';
     log(`Using email method: ${emailMethod}`);
 
     if (emailMethod === 'quix') {
       // Utiliser l'API Quix pour générer un email temporaire
-      const quixApiKey = config.settings?.quixApiKey || process.env.QUIX_API_KEY;
+      const quixApiKey = process.env.QUIX_API_KEY || config.settings?.quixApiKey;
       if (!quixApiKey) {
-        throw new Error('Quix API key not configured. Add quixApiKey to config or set QUIX_API_KEY env variable');
+        log('Warning: Quix API key not configured, falling back to Gmail method');
+      } else {
+        try {
+          quixService = new QuixEmailService(quixApiKey);
+          email = await quixService.generateEmail();
+          log(`Generated temporary email via Quix: ${email.substring(0, 5)}***@${email.split('@')[1]}`);
+        } catch (error) {
+          log(`Failed to generate Quix email: ${error.message}, falling back to Gmail method`);
+          quixService = null;
+        }
       }
-      quixService = new QuixEmailService(quixApiKey);
-      email = await quixService.generateEmail();
-      log(`Generated temporary email via Quix: ${email.substring(0, 5)}***@${email.split('@')[1]}`);
-    } else {
+    }
+
+    // Si Quix a échoué ou n'est pas configuré, utiliser Gmail
+    if (!email) {
       // Méthode Gmail traditionnelle
       email = process.env.HINGE_EMAIL;
       if (!email) {
         log('No email in env, using file system');
-        const emailFilePath = path.join(__dirname, '../../data/resources/emails/hinge_emails.txt');
+        // Corriger le chemin relatif depuis BOTS/hinge-fast vers data/resources/emails
+        const emailFilePath = path.join(__dirname, '../../../INTERFACE/data/resources/emails/hinge_emails.txt');
         email = await getAndRemoveEmail(emailFilePath);
       } else {
         log('Using email from environment variable');
@@ -548,8 +559,8 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
       try {
         let verificationCode;
 
-        if (emailMethod === 'quix' && quixService) {
-          // Utiliser Quix pour récupérer le code
+        if (quixService && email && email.includes('@gmail.com')) {
+          // Utiliser Quix si le service est disponible et qu'on a généré un email
           log('Waiting for email verification code from Quix...');
           verificationCode = await quixService.getHingeCode(120000);
           log(`Received verification code from Quix: ${verificationCode}`);
