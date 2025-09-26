@@ -4,6 +4,14 @@ const EmailManager = require('../../SHARED/email-manager/EmailManager');
 const { getAndRemoveEmail } = require('../../SHARED/email-manager/email');
 const { waitForHingeCodeFromGmail } = require('../../SHARED/email-manager/email-inbox');
 const QuixEmailService = require('../../SHARED/email-manager/quix-email');
+const {
+  setDebugMode,
+  findAndClickWithDebugFallback,
+  findAndSetValueWithDebugFallback,
+  findAndTypeWithDebugFallback,
+  logDebugStep,
+  debugPause
+} = require('../../SHARED/utils/debug-helpers');
 const config = require('./config.json');
 const fs = require('fs');
 const path = require('path');
@@ -69,8 +77,44 @@ function loadPrompts() {
  * @param {Object} phone - { number, id }
  * @param {Object} proxyInfo - { domain, port, username, password }
  */
-async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'api21k') {
+async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'api21k', debugMode = false) {
   try {
+    // Configurer le mode debug assisté
+    const isDebugAssisted = debugMode === 'assisted' || process.env.DEBUG_ASSISTED === 'true';
+    setDebugMode(debugMode, isDebugAssisted);
+
+    if (isDebugAssisted) {
+      log('\n' + '🔧'.repeat(20));
+      log('MODE DEBUG ASSISTÉ ACTIVÉ');
+      log('Le bot continuera même si des éléments ne sont pas trouvés');
+      log('Vous pouvez intervenir manuellement si nécessaire');
+      log('🔧'.repeat(20) + '\n');
+    }
+
+    // Fonctions wrapper pour choisir entre mode normal et debug assisté
+    const clickElement = async (selector, waitTime = 5000) => {
+      if (isDebugAssisted) {
+        return await findAndClickWithDebugFallback(client, selector, { waitTime });
+      } else {
+        return await findAndClickWithPolling(client, selector, waitTime);
+      }
+    };
+
+    const setValue = async (selector, value, waitTime = 5000) => {
+      if (isDebugAssisted) {
+        return await findAndSetValueWithDebugFallback(client, selector, value, { waitTime });
+      } else {
+        return await findAndSetValue(client, selector, value, waitTime);
+      }
+    };
+
+    const typeText = async (text, isSecure = false) => {
+      if (isDebugAssisted) {
+        return await findAndTypeWithDebugFallback(client, text, isSecure);
+      } else {
+        return await findAndTypeCharByChar(client, text, isSecure);
+      }
+    };
     // Vérifier la session au début avec un retry
     let sessionValid = await validateSession(client, 'initial check');
     if (!sessionValid) {
@@ -379,9 +423,10 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
         log('Session might be unstable, continuing...');
       }
 
-      await findAndClickWithPolling(
-        client,
-        '-ios predicate string:name == "Create account" AND label == "Create account" AND value == "Create account"'
+      // Use wrapper function that handles debug mode
+      await clickElement(
+        '-ios predicate string:name == "Create account" AND label == "Create account" AND value == "Create account"',
+        8000
       );
       log('Clicked on Create account');
     } catch (e) {
@@ -392,9 +437,9 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
       log('Create account button not found immediately, retrying after short wait...');
       await randomWait(2, 3);
       try {
-        await findAndClickWithPolling(
-          client,
-          '-ios predicate string:name == "Create account" AND label == "Create account" AND value == "Create account"'
+        await clickElement(
+          '-ios predicate string:name == "Create account" AND label == "Create account" AND value == "Create account"',
+          8000
         );
         log('Clicked on Create account (retry)');
       } catch (retryError) {
@@ -404,23 +449,23 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     }
     
     // Entrer le numéro de téléphone
-    await findAndClickWithPolling(
-      client,
-      '-ios predicate string:name == "phone number" AND label == "phone number" AND type == "XCUIElementTypeTextField"'
+    await clickElement(
+      '-ios predicate string:name == "phone number" AND label == "phone number" AND type == "XCUIElementTypeTextField"',
+      5000
     );
-    await findAndTypeCharByChar(client, phone?.number || '');
+    await typeText(phone?.number || '');
     log('Phone number entered');
     await randomWait(1, 2);
-    await findAndClickWithPolling(client, '-ios predicate string:name == "Next"');
+    await clickElement('-ios predicate string:name == "Next"', 5000);
     log('Clicked Next after phone');
 
     // Récupérer et entrer le code SMS
     const smsService = getSMSProvider(smsProvider);
     const code = await smsService.getCode(phone.id);
-    await findAndTypeCharByChar(client, code);
+    await typeText(code);
     log('SMS code entered');
     await randomWait(1, 2);
-    await findAndClickWithPolling(client, '-ios predicate string:name == "Next"');
+    await clickElement('-ios predicate string:name == "Next"', 5000);
     log('Clicked Next after SMS code');
 
     // Basic info

@@ -1075,6 +1075,16 @@
                                 </small>
                             </div>
 
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <input type="checkbox" id="debug-assisted" style="margin-right: 5px;">
+                                    Debug Assisté (Hinge Fast uniquement)
+                                </label>
+                                <small style="color: #999; font-size: 11px; display: block; margin-top: 5px;">
+                                    🔧 Le bot continue même si des éléments ne sont pas trouvés. Permet l'intervention manuelle.
+                                </small>
+                            </div>
+
                             <button class="btn btn-success" onclick="startProduction()" style="width: 100%; margin-bottom: 10px;">
                                 🚀 Start Production
                             </button>
@@ -1500,10 +1510,14 @@
             const emailMethod = document.getElementById('email-method').value;
             const quixApiKey = document.getElementById('quix-api-key').value;
             const debugMode = document.getElementById('debug-mode').checked;
+            const debugAssisted = document.getElementById('debug-assisted').checked;
 
             addLog('system', `Starting production: ${selectedCount} devices, ${totalAccounts} total accounts`);
             if (debugMode) {
                 addLog('warning', '🐛 Debug mode enabled - actions will be simulated');
+            }
+            if (debugAssisted) {
+                addLog('info', '🔧 Debug Assisté activé - Le bot continuera même si des éléments ne sont pas trouvés');
             }
 
             // Ajouter les comptes à la queue
@@ -1515,7 +1529,7 @@
                         smsProvider: smsProvider,
                         emailMethod: emailMethod,
                         quixApiKey: emailMethod === 'quix' ? quixApiKey : '',
-                        debugMode: debugMode
+                        debugMode: debugAssisted ? 'assisted' : debugMode
                     });
 
                     if (result.success) {
