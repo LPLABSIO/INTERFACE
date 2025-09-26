@@ -95,6 +95,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onScriptLog: (callback) => ipcRenderer.on('script-log', (event, data) => callback(data)),
     onAppiumLog: (callback) => ipcRenderer.on('appium-log', (event, data) => callback(data)),
     onSystemLog: (callback) => ipcRenderer.on('system-log', (event, data) => callback(data)),
+    onProgressUpdate: (callback) => ipcRenderer.on('progress-update', (event, data) => callback(data)),
 
     // Settings
     saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),

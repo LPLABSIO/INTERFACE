@@ -3,22 +3,26 @@
     {
       "id": 1,
       "type": "create_account",
-      "status": "pending",
+      "status": "in_progress",
       "config": {
         "app": "hinge-fast",
         "proxyProvider": "marsproxies",
         "smsProvider": "daisysms",
+        "emailMethod": "quix",
+        "quixApiKey": "liagirtwcy1mnv0xszjg4ad3tbgqpurn",
         "debugMode": false
       },
-      "createdAt": "2025-09-23T10:29:41.774Z",
+      "createdAt": "2025-09-26T07:52:37.119Z",
       "attempts": 1,
-      "maxAttempts": 3
+      "maxAttempts": 3,
+      "deviceId": "af5afd94d5a9256554e735003c2f72fd16ec22f8",
+      "startedAt": "2025-09-26T07:52:42.382Z"
     }
   ],
   "stats": {
     "total": 1,
-    "pending": 1,
-    "inProgress": 0,
+    "pending": 0,
+    "inProgress": 1,
     "completed": 0,
     "failed": 0
   },

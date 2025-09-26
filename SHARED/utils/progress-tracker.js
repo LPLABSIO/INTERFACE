@@ -178,12 +178,20 @@ class ProgressTracker {
       this.onProgressUpdate(progressData);
     }
 
-    // Also emit via IPC if available
+    // Also emit via IPC if available (for fork) or via console.log (for spawn)
     if (typeof process !== 'undefined' && process.send) {
-      process.send({
-        type: 'progress-update',
-        data: progressData
-      });
+      try {
+        process.send({
+          type: 'progress-update',
+          data: progressData
+        });
+      } catch (e) {
+        // If process.send fails, fallback to console.log
+        console.log(`[PROGRESS-UPDATE]${JSON.stringify(progressData)}`);
+      }
+    } else {
+      // Use console.log for spawn processes
+      console.log(`[PROGRESS-UPDATE]${JSON.stringify(progressData)}`);
     }
   }
 

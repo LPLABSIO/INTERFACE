@@ -1657,9 +1657,11 @@
                         <span class="status-badge ${statusBadge}">${statusText}</span>
                     </div>
                     <div style="margin-top: 15px;">
-                        <div class="progress-label">Account ${production.progress}/${production.accounts}</div>
+                        <div class="progress-label" id="progress-label-${udid}">
+                            ${production.currentStep || 'Account ' + production.progress + '/' + production.accounts} ${production.progressPercent !== undefined ? '(' + production.progressPercent + '%)' : ''}
+                        </div>
                         <div class="progress-track">
-                            <div class="progress-fill" style="width: ${(production.progress / production.accounts) * 100}%;"></div>
+                            <div class="progress-fill" id="progress-fill-${udid}" style="width: ${production.progressPercent || (production.progress / production.accounts) * 100}%;"></div>
                         </div>
                     </div>
                     <div style="margin-top: 10px; font-size: 12px; color: #8e8e93;">
@@ -2127,6 +2129,35 @@
             addLog('system', 'All productions paused');
         }
 
+        // Update progress for a specific device
+        function updateProgressForDevice(udid, progressData) {
+            // Update production data
+            const production = appState.activeProductions.get(udid);
+            if (production) {
+                production.currentStep = progressData.currentStep;
+                production.progressPercent = progressData.percentage;
+                production.stepId = progressData.stepId;
+
+                // Update display directly for better performance
+                const labelElement = document.getElementById(`progress-label-${udid}`);
+                const fillElement = document.getElementById(`progress-fill-${udid}`);
+
+                if (labelElement) {
+                    labelElement.textContent = `${progressData.currentStep} (${progressData.percentage}%)`;
+                }
+
+                if (fillElement) {
+                    fillElement.style.width = `${progressData.percentage}%`;
+                }
+
+                // Log progress to device logs
+                const device = appState.devices.get(udid);
+                if (device) {
+                    addScriptLogForDevice(udid, device.name, 'info', `📊 ${progressData.currentStep} - ${progressData.percentage}%`);
+                }
+            }
+        }
+
         // Individual device control functions
         function pauseDevice(udid) {
             const production = appState.activeProductions.get(udid);
@@ -2278,6 +2309,14 @@ WDA Port: ${production.wdaPort}`);
                             // General appium log - might need to associate with active devices
                             console.log(`[APPIUM] ${logData.message || logData}`);
                         }
+                    });
+                }
+
+                // Listen for progress updates
+                if (window.electronAPI.onProgressUpdate) {
+                    window.electronAPI.onProgressUpdate((progressData) => {
+                        console.log('Progress update received:', progressData);
+                        updateProgressForDevice(progressData.deviceId || progressData.udid, progressData);
                     });
                 }
             }

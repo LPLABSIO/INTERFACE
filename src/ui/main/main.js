@@ -1064,12 +1064,24 @@ ipcMain.handle('start-bot', async (_e, config) => {
     child.stdout.on('data', (data) => {
       const lines = data.split('\n').filter(line => line.trim());
       lines.forEach(message => {
-        mainWindow?.webContents.send('script-log', {
-          message,
-          level: 'info',
-          udid: udid,
-          deviceName: device
-        });
+        // Check for progress updates
+        if (message.startsWith('[PROGRESS-UPDATE]')) {
+          try {
+            const progressData = JSON.parse(message.substring('[PROGRESS-UPDATE]'.length));
+            progressData.udid = udid; // Add device ID
+            mainWindow?.webContents.send('progress-update', progressData);
+          } catch (e) {
+            console.error('Error parsing progress update:', e);
+          }
+        } else {
+          // Normal log
+          mainWindow?.webContents.send('script-log', {
+            message,
+            level: 'info',
+            udid: udid,
+            deviceName: device
+          });
+        }
       });
     });
 
