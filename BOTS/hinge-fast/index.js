@@ -12,6 +12,7 @@ const {
   logDebugStep,
   debugPause
 } = require('../../SHARED/utils/debug-helpers');
+const { createProgressTracker } = require('../../SHARED/utils/progress-tracker');
 const config = require('./config.json');
 const fs = require('fs');
 const path = require('path');
@@ -78,6 +79,15 @@ function loadPrompts() {
  * @param {Object} proxyInfo - { domain, port, username, password }
  */
 async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'api21k', debugMode = false) {
+  // Initialize progress tracker
+  const progressTracker = createProgressTracker();
+  progressTracker.initializeSteps('hinge-fast');
+
+  // Set up progress reporting
+  const deviceId = process.env.DEVICE_ID || 'unknown';
+  const taskId = process.env.TASK_ID || Date.now().toString();
+  progressTracker.setProgressCallback(null, deviceId, taskId);
+
   try {
     // Configurer le mode debug assisté
     const isDebugAssisted = debugMode === 'assisted' || process.env.DEBUG_ASSISTED === 'true';
@@ -406,6 +416,7 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
         log('Session might be unstable, attempting launch anyway...');
       }
 
+      progressTracker.moveToStep('app_start');
       const bundleId = 'co.hinge.mobile.ios';
       await checkAndTerminateApp(client, bundleId);
       await client.execute('mobile: launchApp', { bundleId });
@@ -417,6 +428,7 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     }
 
     // Bouton Create account
+    progressTracker.moveToStep('create_account');
     try {
       // Vérifier la session
       if (!await validateSession(client, 'Create account')) {
@@ -449,6 +461,7 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     }
     
     // Entrer le numéro de téléphone
+    progressTracker.moveToStep('phone_input');
     await clickElement(
       '-ios predicate string:name == "phone number" AND label == "phone number" AND type == "XCUIElementTypeTextField"',
       5000
@@ -456,29 +469,37 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     await typeText(phone?.number || '');
     log('Phone number entered');
     await randomWait(1, 2);
+    progressTracker.moveToStep('phone_next');
     await clickElement('-ios predicate string:name == "Next"', 5000);
     log('Clicked Next after phone');
 
     // Récupérer et entrer le code SMS
+    progressTracker.moveToStep('sms_wait');
     const smsService = getSMSProvider(smsProvider);
     const code = await smsService.getCode(phone.id);
+    progressTracker.moveToStep('sms_input');
     await typeText(code);
     log('SMS code entered');
     await randomWait(1, 2);
+    progressTracker.moveToStep('sms_next');
     await clickElement('-ios predicate string:name == "Next"', 5000);
     log('Clicked Next after SMS code');
 
     // Basic info
+    progressTracker.moveToStep('basic_info');
     await findAndClickWithPolling(client, '-ios predicate string:name == "Enter basic info" AND label == "Enter basic info" AND type == "XCUIElementTypeButton"');
+    progressTracker.moveToStep('first_name');
     const firstName = profile.firstName || 'Emma';
     await randomWait(1.5, 2); // Attendre plus longtemps pour que le champ soit bien prêt
     // Cliquer dans le champ avant de taper
     await client.pause(500);
     await findAndTypeCharByChar(client, firstName);
     log(`Entered first name: ${firstName}`);
+    progressTracker.moveToStep('name_next');
     await findAndClickWithPolling(client, '-ios predicate string:name == "Next"');
 
     // No thanks, puis email (depuis env ou fichier)
+    progressTracker.moveToStep('email_skip');
     await findAndClickWithPolling(client, '-ios predicate string:name == "No thanks" AND label == "No thanks" AND value == "No thanks"');
 
     // Obtenir l'email selon la méthode configurée
@@ -510,6 +531,7 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     }
 
     if (email) {
+      progressTracker.moveToStep('email_input');
       await randomWait(1.5, 2); // Attendre plus longtemps pour que le champ soit bien prêt
       // Cliquer dans le champ avant de taper
       await client.pause(500);
@@ -518,6 +540,7 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     } else {
       log('Warning: No email available');
     }
+    progressTracker.moveToStep('email_next');
     await findAndClickWithPolling(client, '-ios predicate string:name == "Next"');
 
     // Code email - récupérer selon la méthode configurée
@@ -756,6 +779,7 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
       } catch {}
     }
 
+    progressTracker.complete(); // Mark as completed
     return true;
   } catch (e) {
     log(`Error during Hinge app session: ${e.message}`, e);

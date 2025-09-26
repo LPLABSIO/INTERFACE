@@ -7,7 +7,7 @@
     "proxyProvider": "marsproxies",
     "emailMethod": "gmail",
     "emailsFile": "hinge_emails.txt",
-    "quixApiKey": "",
+    "quixApiKey": "liagirtwcy1mnv0xszjg4ad3tbgqpurn",
     "locationsFile": "locations_usa_tinder.csv",
     "useQueue": true,
     "maxRetries": 3

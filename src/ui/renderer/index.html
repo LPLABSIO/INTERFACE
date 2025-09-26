@@ -1439,9 +1439,11 @@
                     </div>
                     ${isRunning ? `
                         <div class="progress-bar">
-                            <div class="progress-label">Creating account 1/1</div>
+                            <div class="progress-label" id="progress-label-${device.udid}">
+                                ${device.progressStep || 'Initialisation...'} (${device.progressPercent || 0}%)
+                            </div>
                             <div class="progress-track">
-                                <div class="progress-fill" style="width: 45%;"></div>
+                                <div class="progress-fill" id="progress-fill-${device.udid}" style="width: ${device.progressPercent || 0}%;"></div>
                             </div>
                         </div>
                     ` : ''}
