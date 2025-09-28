@@ -12,12 +12,12 @@
         "quixApiKey": "liagirtwcy1mnv0xszjg4ad3tbgqpurn",
         "debugMode": "assisted"
       },
-      "createdAt": "2025-09-28T16:49:58.464Z",
+      "createdAt": "2025-09-28T17:12:48.422Z",
       "attempts": 1,
       "maxAttempts": 3,
       "deviceId": "af5afd94d5a9256554e735003c2f72fd16ec22f8",
-      "startedAt": "2025-09-28T16:50:03.669Z",
-      "completedAt": "2025-09-28T16:53:30.197Z",
+      "startedAt": "2025-09-28T17:12:54.196Z",
+      "completedAt": "2025-09-28T17:17:50.807Z",
       "result": {
         "success": true
       }

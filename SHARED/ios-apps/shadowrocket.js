@@ -48,8 +48,8 @@ async function configureShadowrocket(client, proxyInfo, city) {
             const secureField = await client.$('-ios predicate string:type == "XCUIElementTypeSecureTextField"');
             await secureField.click();
             await randomWait(0.2, 0.3);
-            // Utiliser sendKeys au lieu de setValue pour éviter les problèmes de session
-            await secureField.sendKeys(proxyInfo.password);
+            // Utiliser sendKeys avec un tableau de caractères
+            await secureField.sendKeys(proxyInfo.password.split(''));
             log('Password set (sendKeys method)');
         } catch (e) {
             log(`Primary secure input failed: ${e.message}. Retrying with alternate method...`);

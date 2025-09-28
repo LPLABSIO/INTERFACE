@@ -24,20 +24,24 @@ function setDebugMode(isDebug, isAssisted = false) {
 async function findAndClickWithDebugFallback(client, selector, options = {}) {
   const maxRetries = assistedMode ? 10 : 1; // En mode assisté, on réessaye plus longtemps
   const waitTime = options.waitTime || 5000;
+  const throwError = options.throwError !== undefined ? options.throwError : true;
   const retryInterval = options.retryInterval || 10000; // 10 secondes entre les tentatives
+
+  // En mode debug assisté, on ne lance jamais d'erreur
+  const shouldThrow = assistedMode ? false : throwError;
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       // Importer dynamiquement pour éviter les dépendances circulaires
       const { findAndClickWithPolling } = require('./utils');
-      await findAndClickWithPolling(client, selector, waitTime);
+      await findAndClickWithPolling(client, selector, waitTime, shouldThrow);
       if (attempt > 1) {
         log(`✅ Élément trouvé après intervention manuelle (tentative ${attempt})`);
       }
       return true;
     } catch (error) {
-      if (!assistedMode) {
-        throw error; // En mode normal, on propage l'erreur
+      if (!assistedMode && throwError) {
+        throw error; // En mode normal, on propage l'erreur si demandé
       }
 
       log(`⚠️ DEBUG ASSISTÉ - Élément non trouvé: ${selector}`);
