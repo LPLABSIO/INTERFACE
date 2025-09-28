@@ -28,13 +28,13 @@ if (process.argv.length > 2) {
 /**
  * Configure et exécute Hinge avec tous les helper apps nécessaires
  */
-async function setupAndRunHinge(client, proxyInfo, location, phone, smsProvider, appType = 'hinge') {
+async function setupAndRunHinge(client, proxyInfo, location, phone, smsProvider, appType = 'hinge', debugMode = null) {
   // Pour Hinge Fast, toute la configuration est gérée dans le script lui-même
   if (appType === 'hinge-fast') {
     // Hinge Fast: configuration intégrée dans le script
     log("🚀 Using Hinge Fast mode - all configuration handled in script");
     const { runHingeApp } = require("../../BOTS/hinge-fast/index");
-    await runHingeApp(client, location, phone, proxyInfo, smsProvider);
+    await runHingeApp(client, location, phone, proxyInfo, smsProvider, debugMode);
   } else {
     // Hinge normal: configuration complète
     // 1. Configurer Crane pour l'isolation des conteneurs
@@ -120,7 +120,8 @@ async function processQueueTask(client, task) {
 
   // Exécuter Hinge (normal ou fast selon config)
   const appType = config.app || 'hinge';
-  await setupAndRunHinge(client, proxyInfo, location, phone, provider, appType);
+  const debugMode = config.debugMode || null;
+  await setupAndRunHinge(client, proxyInfo, location, phone, provider, appType, debugMode);
 
   // Sauvegarder la location utilisée
   await saveLocations(location.city, location_file);
@@ -316,8 +317,12 @@ async function main() {
 
       // Exécuter Hinge (utiliser BOT_MODE si défini)
       const botMode = process.env.BOT_MODE || 'hinge';
+      const debugMode = config.debugMode || process.env.DEBUG_MODE || null;
       log(`🤖 Using bot mode: ${botMode}`);
-      await setupAndRunHinge(client, proxyInfo, location, phone, provider, botMode);
+      if (debugMode) {
+        log(`🔧 Debug mode: ${debugMode}`);
+      }
+      await setupAndRunHinge(client, proxyInfo, location, phone, provider, botMode, debugMode);
 
       // Sauvegarder la progression (sauf si location vient de l'env)
       if (!process.env.HINGE_LOCATION) {

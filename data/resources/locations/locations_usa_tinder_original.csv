@@ -1,6 +1,4 @@
 CountryCode,state,city,lat,lon,area_code,zip_code
-us,California,Fontana,34.0926,-117.435,909,92335
-us,Texas,McKinney,33.1975,-96.6398,"214, 972",75069
 us,California,Moreno Valley,33.9425,-117.2297,951,92553
 us,Iowa,Des Moines,41.5868,-93.625,515,50301
 us,North Carolina,Fayetteville,35.0527,-78.8784,910,28301
@@ -72,7 +70,6 @@ us,Missouri,O'Fallon,38.8104,-90.6983,636,63366
 us,Texas,San Marcos,29.884,-97.9414,512,78666
 us,Massachusetts,Haverhill,42.7762,-71.0775,978,01830
 us,Ohio,Elyria,41.3685,-82.1076,440,44035
-us,Texas,McKinney,33.1977,-96.6398,"214, 469, 972",75069
 us,South Carolina,Sumter,33.9207,-80.3415,803,29150
 us,Illinois,Wheaton,41.8662,-88.1061,630,60187
 us,Idaho,Pocatello,42.8713,-112.4455,208,83201
