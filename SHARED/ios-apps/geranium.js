@@ -1,4 +1,4 @@
-const { log, checkAndTerminateApp, findAndClickWithPolling, findAndTypeCharByChar, randomWait } = require('../utils/utils');
+const { log, checkAndTerminateApp, findAndClickWithPolling, findAndSetValue, findAndTypeCharByChar, randomWait } = require('../utils/utils');
 
 /**
  * Configure l'app Geranium pour définir la localisation via LocSim.
@@ -29,20 +29,23 @@ async function setupGeraniumApp(client, location) {
     // Ouvrir Map Pin
     await findAndClickWithPolling(client, '-ios predicate string:name == "Map Pin" AND label == "Map Pin" AND type == "XCUIElementTypeButton"');
 
-    // Champ latitude
+    // Champ latitude - utiliser findAndSetValue pour une saisie rapide
     const latitude = String(location?.lat ?? '0');
-    await findAndTypeCharByChar(client, latitude);
+    await findAndSetValue(
+      client,
+      '-ios predicate string:type == "XCUIElementTypeTextField" AND value == "Latitude"',
+      latitude
+    );
+    log(`Latitude set: ${latitude}`);
 
-    // Attendre un peu après la latitude
-    await randomWait(0.3, 0.5);
-
-    // Cliquer sur le champ Longitude par son placeholder
-    await findAndClickWithPolling(client, '-ios predicate string:value == "Longitude"');
-    await randomWait(0.2, 0.3);
-
-    // Champ longitude
+    // Champ longitude - utiliser findAndSetValue pour une saisie rapide
     const longitude = String(location?.lon ?? '0');
-    await findAndTypeCharByChar(client, longitude);
+    await findAndSetValue(
+      client,
+      '-ios predicate string:type == "XCUIElementTypeTextField" AND value == "Longitude"',
+      longitude
+    );
+    log(`Longitude set: ${longitude}`);
 
     // Valider par OK
     await findAndClickWithPolling(client, '-ios predicate string:name == "OK"');
