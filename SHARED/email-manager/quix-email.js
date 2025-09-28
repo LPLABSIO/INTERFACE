@@ -24,11 +24,12 @@ class QuixEmailService {
         }
       });
 
-      if (response.data && response.data.success) {
+      if (response.data && response.data.success && response.data.result) {
         const result = response.data.result;
         this.currentEmail = result.email;
         this.activationId = result.id;
         log(`Quix Gmail generated: ${this.currentEmail.substring(0, 5)}***@gmail.com`);
+        log(`Activation ID: ${this.activationId}`);
         return this.currentEmail;
       }
 
@@ -59,13 +60,20 @@ class QuixEmailService {
           }
         });
 
-        if (response.data && response.data.success) {
+        if (response.data && response.data.result) {
           const result = response.data.result;
+          // Log the response for debugging
+          log(`Email status response: ${JSON.stringify(result)}`);
 
           // Si l'email est reçu (statut "completed")
-          if (result.status === 'completed' && result.email_content) {
+          if (result.status === 'completed' && result.data) {
             log('Email received from Hinge');
-            return result.email_content;
+            return result.data; // 'data' field contains the email content
+          }
+
+          // Log the current status
+          if (result.status) {
+            log(`Current email status: ${result.status}`);
           }
         }
       } catch (error) {
@@ -85,40 +93,108 @@ class QuixEmailService {
    * @param {number} timeout - Timeout en ms
    * @returns {Promise<string>} Le code de vérification Hinge
    */
-  async getHingeCode(timeout = 120000) {
+  async getHingeCode(timeout = 240000) {
     log('Waiting for Hinge verification code from Quix...');
 
-    const emailContent = await this.getEmailContent(timeout);
-
-    if (emailContent) {
-      // Chercher le code dans le contenu de l'email
-      // Pattern pour trouver un code à 6 chiffres
-      const codeMatch = emailContent.match(/\b(\d{6})\b/);
-
-      if (codeMatch) {
-        const code = codeMatch[1];
-        log(`Found Hinge verification code: ${code}`);
-        return code;
-      }
-
-      // Pattern alternatif pour "Your code is: XXXXXX" ou similaire
-      const altMatch = emailContent.match(/code\s*(?:is)?:?\s*(\d{6})/i);
-      if (altMatch) {
-        const code = altMatch[1];
-        log(`Found Hinge verification code (alt pattern): ${code}`);
-        return code;
-      }
-
-      // Pattern pour "verification code XXXXXX"
-      const verifyMatch = emailContent.match(/verification\s+code[:\s]+(\d{6})/i);
-      if (verifyMatch) {
-        const code = verifyMatch[1];
-        log(`Found Hinge verification code (verify pattern): ${code}`);
-        return code;
-      }
+    if (!this.activationId) {
+      throw new Error('No activation ID available. Generate an email first.');
     }
 
-    throw new Error('No verification code found in Quix email');
+    const startTime = Date.now();
+
+    // Poll for email status and code
+    while (Date.now() - startTime < timeout) {
+      try {
+        // Check email status first
+        const statusResponse = await axios.get(`${this.baseURL}/${this.apiKey}/emailStatus`, {
+          params: {
+            id: this.activationId
+          }
+        });
+
+        // Access result field from API response
+        const statusResult = statusResponse.data?.result;
+        log(`Email status check - Status: ${statusResult?.status}, Has parsed: ${!!statusResult?.parsed}`);
+
+        // Check if email is completed
+        if (statusResult && statusResult.status === 'completed') {
+
+          // First check if there's a parsed code
+          if (statusResult.parsed) {
+            // Extract 6-digit code from parsed field
+            const parsedMatch = statusResult.parsed.match(/(\d{6})/);
+            if (parsedMatch) {
+              const code = parsedMatch[1];
+              log(`Found Hinge code from parsed field: ${code}`);
+              return code;
+            }
+            log(`Parsed field exists but no 6-digit code found: ${statusResult.parsed}`);
+          }
+
+          // Try the emailCode endpoint for direct code extraction
+          try {
+            const codeResponse = await axios.get(`${this.baseURL}/${this.apiKey}/emailCode`, {
+              params: {
+                id: this.activationId
+              }
+            });
+
+            if (codeResponse.data?.result?.code) {
+              // Extract 6-digit code from code field
+              const codeMatch = codeResponse.data.result.code.match(/(\d{6})/);
+              if (codeMatch) {
+                const code = codeMatch[1];
+                log(`Found Hinge code via emailCode endpoint: ${code}`);
+                return code;
+              }
+            }
+          } catch (codeError) {
+            log(`emailCode endpoint error: ${codeError.message}`);
+          }
+
+          // Fallback to parsing email content
+          if (statusResult.data) {
+            const emailContent = statusResult.data;
+            log('Email received, parsing content for code...');
+
+            // Pattern pour trouver un code à 6 chiffres
+            const patterns = [
+              /\b(\d{6})\b/,                              // Simple 6-digit
+              /code\s*(?:is)?:?\s*(\d{6})/i,             // "code is: XXXXXX"
+              /verification\s+code[:\s]+(\d{6})/i,       // "verification code XXXXXX"
+              /enter\s+(\d{6})/i,                         // "enter XXXXXX"
+              /use\s+(\d{6})/i                            // "use XXXXXX"
+            ];
+
+            for (const pattern of patterns) {
+              const match = emailContent.match(pattern);
+              if (match) {
+                const code = match[1];
+                log(`Found Hinge verification code: ${code}`);
+                return code;
+              }
+            }
+
+            log('Email received but no code pattern matched');
+          }
+        } else if (statusResult?.status === 'cancelled') {
+          log('Email status is cancelled, stopping wait');
+          throw new Error('Email activation was cancelled');
+        } else if (statusResult?.status === 'no_email') {
+          log('Waiting for email to arrive...');
+        } else if (!statusResult) {
+          log('No result field in response, might be an API error');
+        }
+      } catch (error) {
+        log(`Error fetching email status: ${error.message}`);
+      }
+
+      // Attendre 3 secondes avant de réessayer
+      await new Promise(resolve => setTimeout(resolve, 3000));
+    }
+
+    log('Timeout waiting for Quix verification code');
+    throw new Error('Timeout waiting for Hinge verification code');
   }
 
   /**

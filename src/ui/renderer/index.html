@@ -982,88 +982,79 @@
                 <!-- Production Page -->
                 <div id="production-page" class="page">
 
-                    <div class="grid-2">
-                        <!-- Production Statistics -->
-                        <div class="card" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid rgba(10, 132, 255, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);">
-                            <div class="card-header" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 15px; margin-bottom: 20px;">
-                                <h3 class="card-title" style="background: linear-gradient(90deg, #0a84ff, #00d4ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 18px; font-weight: 600;">
-                                    📊 Statistiques de Production
-                                </h3>
-                                <button class="btn btn-secondary" onclick="exportStatistics()" style="padding: 8px 16px; font-size: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); transition: all 0.3s;">
-                                    📤 Exporter
-                                </button>
+                    <!-- Production Statistics - Full Width Bar -->
+                    <div style="background: linear-gradient(90deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%); border: 1px solid rgba(10, 132, 255, 0.15); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; height: 72px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); margin-bottom: 20px;">
+                            <!-- Title -->
+                            <div style="display: flex; align-items: center; gap: 6px; min-width: fit-content;">
+                                <span style="font-size: 18px;">📊</span>
+                                <span style="background: linear-gradient(90deg, #0a84ff, #00d4ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 14px; font-weight: 600; white-space: nowrap;">Statistiques de Production</span>
                             </div>
 
-                            <!-- Stats Grid -->
-                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                            <!-- Stats Container -->
+                            <div style="flex: 1; display: flex; align-items: center; gap: 2px;">
+                                <!-- Divider -->
+                                <div style="width: 1px; height: 40px; background: rgba(255, 255, 255, 0.1);"></div>
+
                                 <!-- Total Created -->
-                                <div style="background: rgba(10, 132, 255, 0.1); border-radius: 12px; padding: 15px; border: 1px solid rgba(10, 132, 255, 0.2);">
-                                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                                        <div>
-                                            <div style="color: #8e8e93; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">
-                                                Comptes Créés
-                                            </div>
-                                            <div style="color: #0a84ff; font-size: 24px; font-weight: 700;" id="stat-total-created">0</div>
-                                        </div>
-                                        <div style="font-size: 24px;">🎯</div>
-                                    </div>
+                                <div style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 8px;">
+                                    <span style="color: #8e8e93; font-size: 11px;">Créés</span>
+                                    <span style="color: #0a84ff; font-size: 22px; font-weight: 700;" id="stat-total-created">0</span>
                                 </div>
+
+                                <!-- Divider -->
+                                <div style="width: 1px; height: 40px; background: rgba(255, 255, 255, 0.1);"></div>
 
                                 <!-- Success Rate -->
-                                <div style="background: rgba(48, 209, 88, 0.1); border-radius: 12px; padding: 15px; border: 1px solid rgba(48, 209, 88, 0.2);">
-                                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                                        <div>
-                                            <div style="color: #8e8e93; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">
-                                                Taux de Réussite
-                                            </div>
-                                            <div style="color: #30d158; font-size: 24px; font-weight: 700;" id="stat-success-rate">0%</div>
-                                        </div>
-                                        <div style="font-size: 24px;">✅</div>
-                                    </div>
+                                <div style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 8px;">
+                                    <span style="color: #8e8e93; font-size: 11px;">Succès</span>
+                                    <span style="color: #30d158; font-size: 22px; font-weight: 700;" id="stat-success-rate">0%</span>
                                 </div>
+
+                                <!-- Divider -->
+                                <div style="width: 1px; height: 40px; background: rgba(255, 255, 255, 0.1);"></div>
 
                                 <!-- Average Time -->
-                                <div style="background: rgba(255, 159, 10, 0.1); border-radius: 12px; padding: 15px; border: 1px solid rgba(255, 159, 10, 0.2);">
-                                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                                        <div>
-                                            <div style="color: #8e8e93; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">
-                                                Temps Moyen
-                                            </div>
-                                            <div style="color: #ff9f0a; font-size: 24px; font-weight: 700;" id="stat-avg-time">0s</div>
-                                        </div>
-                                        <div style="font-size: 24px;">⏱️</div>
-                                    </div>
+                                <div style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 8px;">
+                                    <span style="color: #8e8e93; font-size: 11px;">Temps</span>
+                                    <span style="color: #ff9f0a; font-size: 22px; font-weight: 700;" id="stat-avg-time">0s</span>
                                 </div>
+
+                                <!-- Divider -->
+                                <div style="width: 1px; height: 40px; background: rgba(255, 255, 255, 0.1);"></div>
 
                                 <!-- Active Devices -->
-                                <div style="background: rgba(175, 82, 222, 0.1); border-radius: 12px; padding: 15px; border: 1px solid rgba(175, 82, 222, 0.2);">
-                                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                                        <div>
-                                            <div style="color: #8e8e93; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">
-                                                Appareils Actifs
-                                            </div>
-                                            <div style="color: #af52de; font-size: 24px; font-weight: 700;" id="stat-active-devices">0</div>
-                                        </div>
-                                        <div style="font-size: 24px;">📱</div>
-                                    </div>
+                                <div style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 8px;">
+                                    <span style="color: #8e8e93; font-size: 11px;">Actifs</span>
+                                    <span style="color: #af52de; font-size: 22px; font-weight: 700;" id="stat-active-devices">0</span>
+                                </div>
+
+                                <!-- Divider -->
+                                <div style="width: 1px; height: 40px; background: rgba(255, 255, 255, 0.1);"></div>
+
+                                <!-- Proxies -->
+                                <div style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 8px;">
+                                    <span style="color: #8e8e93; font-size: 11px;">Proxies</span>
+                                    <span style="color: #e5e5e7; font-size: 18px; font-weight: 600;" id="stat-proxies-used">0</span>
+                                </div>
+
+                                <!-- Divider -->
+                                <div style="width: 1px; height: 40px; background: rgba(255, 255, 255, 0.1);"></div>
+
+                                <!-- SMS -->
+                                <div style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 8px;">
+                                    <span style="color: #8e8e93; font-size: 11px;">SMS</span>
+                                    <span style="color: #e5e5e7; font-size: 18px; font-weight: 600;" id="stat-sms-consumed">0</span>
                                 </div>
                             </div>
 
-                            <!-- Secondary Stats -->
-                            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background: rgba(255, 255, 255, 0.03); border-radius: 8px;">
-                                        <span style="color: #8e8e93; font-size: 12px;">🌐 Proxies Utilisés</span>
-                                        <span style="color: #e5e5e7; font-size: 14px; font-weight: 600;" id="stat-proxies-used">0</span>
-                                    </div>
-                                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background: rgba(255, 255, 255, 0.03); border-radius: 8px;">
-                                        <span style="color: #8e8e93; font-size: 12px;">💬 SMS Consommés</span>
-                                        <span style="color: #e5e5e7; font-size: 14px; font-weight: 600;" id="stat-sms-consumed">0</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                            <!-- Export Button -->
+                            <button class="btn btn-secondary" onclick="exportStatistics()" style="padding: 6px 14px; font-size: 11px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 8px; white-space: nowrap; height: 32px;">
+                                📤 Export
+                            </button>
+                    </div>
 
+                    <!-- Main Grid Layout -->
+                    <div class="grid-2">
                         <!-- Production Setup -->
                         <div class="card" style="background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%); border: 1px solid rgba(88, 101, 242, 0.2); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);">
                             <h3 class="card-title" style="background: linear-gradient(90deg, #5865f2, #eb459e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 18px; font-weight: 700; margin-bottom: 25px;">
@@ -1187,86 +1178,89 @@
                             </div>
                         </div>
 
-                        <!-- Queue Status -->
-                        <div class="card" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border: 1px solid rgba(0, 212, 255, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);">
-                            <h3 class="card-title" style="background: linear-gradient(90deg, #00d4ff, #0a84ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 16px; font-weight: 600; margin-bottom: 20px;">
-                                📋 File d'attente
-                            </h3>
+                        <!-- Right Column: Resources and Queue -->
+                        <div style="display: flex; flex-direction: column; gap: 20px;">
+                            <!-- Resource Status - Compact -->
+                            <div class="card" style="background: linear-gradient(135deg, #232526 0%, #414345 100%); border: 1px solid rgba(175, 82, 222, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); padding: 15px;">
+                                <h3 class="card-title" style="background: linear-gradient(90deg, #af52de, #ff375f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 14px; font-weight: 600; margin-bottom: 15px;">
+                                    ⚡ Ressources
+                                </h3>
 
-                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 15px;">
-                                <!-- Total Tasks -->
-                                <div style="background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
-                                    <div style="color: #8e8e93; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Total</div>
-                                    <div style="color: #e5e5e7; font-size: 20px; font-weight: 700;" id="queue-total">0</div>
-                                </div>
-
-                                <!-- Pending -->
-                                <div style="background: rgba(255, 159, 10, 0.1); border-radius: 10px; padding: 12px; border: 1px solid rgba(255, 159, 10, 0.2);">
-                                    <div style="color: #8e8e93; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">⏳ En attente</div>
-                                    <div style="color: #ff9f0a; font-size: 20px; font-weight: 700;" id="queue-pending">0</div>
-                                </div>
-
-                                <!-- In Progress -->
-                                <div style="background: rgba(10, 132, 255, 0.1); border-radius: 10px; padding: 12px; border: 1px solid rgba(10, 132, 255, 0.2);">
-                                    <div style="color: #8e8e93; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">🔄 En cours</div>
-                                    <div style="color: #0a84ff; font-size: 20px; font-weight: 700;" id="queue-progress">0</div>
-                                </div>
-
-                                <!-- Completed -->
-                                <div style="background: rgba(48, 209, 88, 0.1); border-radius: 10px; padding: 12px; border: 1px solid rgba(48, 209, 88, 0.2);">
-                                    <div style="color: #8e8e93; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">✅ Terminés</div>
-                                    <div style="color: #30d158; font-size: 20px; font-weight: 700;" id="queue-completed">0</div>
-                                </div>
-                            </div>
-
-                            <button class="btn" onclick="clearQueue()" style="width: 100%; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); border: none; padding: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3); transition: all 0.3s;">
-                                🗑️ Vider la file
-                            </button>
-                        </div>
-
-                        <!-- Resource Status -->
-                        <div class="card" style="margin-top: 20px; background: linear-gradient(135deg, #232526 0%, #414345 100%); border: 1px solid rgba(175, 82, 222, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);">
-                            <h3 class="card-title" style="background: linear-gradient(90deg, #af52de, #ff375f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 16px; font-weight: 600; margin-bottom: 20px;">
-                                ⚡ Ressources
-                            </h3>
-
-                            <!-- Emails Resource -->
-                            <div style="margin-bottom: 20px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                    <span style="color: #e5e5e7; font-size: 14px; font-weight: 500;">📧 Emails</span>
-                                    <span style="color: #0a84ff; font-size: 16px; font-weight: 700;" id="email-count">0/0</span>
-                                </div>
-                                <div style="height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; overflow: hidden;">
-                                    <div id="email-bar" style="height: 100%; background: linear-gradient(90deg, #0a84ff, #00d4ff); width: 0%; transition: width 0.5s; border-radius: 10px; box-shadow: 0 0 10px rgba(10, 132, 255, 0.5);"></div>
-                                </div>
-                            </div>
-
-                            <!-- Locations Resource -->
-                            <div style="margin-bottom: 20px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <span style="color: #e5e5e7; font-size: 14px; font-weight: 500;">📍 Localisations</span>
-                                        <button id="reset-locations-btn" onclick="resetLocations()" style="padding: 4px 8px; font-size: 12px; background: linear-gradient(135deg, #30d158, #32d74b); color: white; border: none; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 8px rgba(48, 209, 88, 0.3); transition: all 0.3s;" title="Recycler toutes les villes">
-                                            ♻️ Recycler
-                                        </button>
+                                <!-- Emails Resource - Compact -->
+                                <div style="margin-bottom: 12px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                        <span style="color: #e5e5e7; font-size: 12px; font-weight: 500;">📧 Emails</span>
+                                        <span style="color: #0a84ff; font-size: 14px; font-weight: 700;" id="email-count">0/0</span>
                                     </div>
-                                    <span style="color: #af52de; font-size: 16px; font-weight: 700;" id="location-count">0/0</span>
+                                    <div style="height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 8px; overflow: hidden;">
+                                        <div id="email-bar" style="height: 100%; background: linear-gradient(90deg, #0a84ff, #00d4ff); width: 0%; transition: width 0.5s; border-radius: 8px;"></div>
+                                    </div>
                                 </div>
-                                <div style="height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; overflow: hidden;">
-                                    <div id="location-bar" style="height: 100%; background: linear-gradient(90deg, #af52de, #ff375f); width: 0%; transition: width 0.5s; border-radius: 10px; box-shadow: 0 0 10px rgba(175, 82, 222, 0.5);"></div>
+
+                                <!-- Locations Resource - Compact -->
+                                <div style="margin-bottom: 12px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span style="color: #e5e5e7; font-size: 12px; font-weight: 500;">📍 Localisations</span>
+                                            <button id="reset-locations-btn" onclick="resetLocations()" style="padding: 2px 6px; font-size: 10px; background: linear-gradient(135deg, #30d158, #32d74b); color: white; border: none; border-radius: 4px; cursor: pointer;" title="Recycler">
+                                                ♻️
+                                            </button>
+                                        </div>
+                                        <span style="color: #af52de; font-size: 14px; font-weight: 700;" id="location-count">0/0</span>
+                                    </div>
+                                    <div style="height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 8px; overflow: hidden;">
+                                        <div id="location-bar" style="height: 100%; background: linear-gradient(90deg, #af52de, #ff375f); width: 0%; transition: width 0.5s; border-radius: 8px;"></div>
+                                    </div>
+                                    <div style="margin-top: 6px; font-size: 9px; color: #8e8e93;">
+                                        <span id="locations-details">En test: 0 | Utilisées: 0 | Blacklist: 0</span>
+                                    </div>
                                 </div>
-                                <div style="margin-top: 8px; padding: 8px; background: rgba(255, 255, 255, 0.03); border-radius: 6px; font-size: 11px; color: #8e8e93;">
-                                    <span id="locations-details">🔍 En test: 0 | ✅ Utilisées: 0 | 🚫 Blacklist: 0</span>
+
+                                <!-- Control Buttons - Compact -->
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px;">
+                                    <button class="btn" onclick="stopAll()" style="background: linear-gradient(135deg, #ff453a, #ff6b6b); border: none; padding: 8px; font-size: 12px; font-weight: 600; box-shadow: 0 2px 10px rgba(255, 69, 58, 0.3);">
+                                        ⏹️ Tout arrêter
+                                    </button>
+                                    <button class="btn" onclick="pauseAll()" style="background: linear-gradient(135deg, #ffa500, #ff9f0a); border: none; padding: 8px; font-size: 12px; font-weight: 600; box-shadow: 0 2px 10px rgba(255, 159, 10, 0.3);">
+                                        ⏸️ Tout suspendre
+                                    </button>
                                 </div>
                             </div>
 
-                            <!-- Control Buttons -->
-                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px;">
-                                <button class="btn" onclick="stopAll()" style="background: linear-gradient(135deg, #ff453a, #ff6b6b); border: none; padding: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 15px rgba(255, 69, 58, 0.3); transition: all 0.3s;">
-                                    ⏹️ Tout arrêter
-                                </button>
-                                <button class="btn" onclick="pauseAll()" style="background: linear-gradient(135deg, #ffa500, #ff9f0a); border: none; padding: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 15px rgba(255, 159, 10, 0.3); transition: all 0.3s;">
-                                    ⏸️ Tout suspendre
+                            <!-- Queue Status -->
+                            <div class="card" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border: 1px solid rgba(0, 212, 255, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);">
+                                <h3 class="card-title" style="background: linear-gradient(90deg, #00d4ff, #0a84ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 16px; font-weight: 600; margin-bottom: 20px;">
+                                    📋 File d'attente
+                                </h3>
+
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 15px;">
+                                    <!-- Total Tasks -->
+                                    <div style="background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                        <div style="color: #8e8e93; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Total</div>
+                                        <div style="color: #e5e5e7; font-size: 20px; font-weight: 700;" id="queue-total">0</div>
+                                    </div>
+
+                                    <!-- Pending -->
+                                    <div style="background: rgba(255, 159, 10, 0.1); border-radius: 10px; padding: 12px; border: 1px solid rgba(255, 159, 10, 0.2);">
+                                        <div style="color: #8e8e93; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">⏳ En attente</div>
+                                        <div style="color: #ff9f0a; font-size: 20px; font-weight: 700;" id="queue-pending">0</div>
+                                    </div>
+
+                                    <!-- In Progress -->
+                                    <div style="background: rgba(10, 132, 255, 0.1); border-radius: 10px; padding: 12px; border: 1px solid rgba(10, 132, 255, 0.2);">
+                                        <div style="color: #8e8e93; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">🔄 En cours</div>
+                                        <div style="color: #0a84ff; font-size: 20px; font-weight: 700;" id="queue-progress">0</div>
+                                    </div>
+
+                                    <!-- Completed -->
+                                    <div style="background: rgba(48, 209, 88, 0.1); border-radius: 10px; padding: 12px; border: 1px solid rgba(48, 209, 88, 0.2);">
+                                        <div style="color: #8e8e93; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">✅ Terminés</div>
+                                        <div style="color: #30d158; font-size: 20px; font-weight: 700;" id="queue-completed">0</div>
+                                    </div>
+                                </div>
+
+                                <button class="btn" onclick="clearQueue()" style="width: 100%; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); border: none; padding: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3); transition: all 0.3s;">
+                                    🗑️ Vider la file
                                 </button>
                             </div>
                         </div>
@@ -1341,15 +1335,41 @@
                                         <th>Devices</th>
                                         <th>Accounts</th>
                                         <th>Success</th>
+                                        <th>Étape d'échec</th>
                                         <th>Status</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="history-tbody">
                                     <tr>
-                                        <td colspan="7" style="text-align: center; color: #8e8e93; padding: 20px;">No production history yet</td>
+                                        <td colspan="9" style="text-align: center; color: #8e8e93; padding: 20px;">No production history yet</td>
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+
+                    <!-- Modal pour les logs -->
+                    <div id="logs-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center;">
+                        <div style="background: #1c1c1e; border-radius: 12px; padding: 20px; width: 80%; max-width: 900px; max-height: 80vh; overflow: hidden; display: flex; flex-direction: column;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <h3 style="color: #fff; margin: 0;">Logs de Production</h3>
+                                <button onclick="closeLogsModal()" style="background: #ff453a; border: none; color: white; padding: 5px 15px; border-radius: 6px; cursor: pointer;">✕ Fermer</button>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                                <div style="color: #8e8e93; font-size: 14px;">
+                                    <strong>Session:</strong> <span id="modal-session-id">-</span>
+                                </div>
+                                <div style="color: #8e8e93; font-size: 14px;">
+                                    <strong>Appareil:</strong> <span id="modal-device-name">-</span>
+                                </div>
+                                <div style="color: #8e8e93; font-size: 14px;">
+                                    <strong>Date:</strong> <span id="modal-date">-</span>
+                                </div>
+                            </div>
+                            <div id="modal-logs-content" style="flex: 1; overflow-y: auto; background: #000; padding: 15px; border-radius: 8px; font-family: 'Monaco', 'Courier New', monospace; font-size: 12px; line-height: 1.5; color: #0f0;">
+                                <!-- Les logs apparaîtront ici -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1541,6 +1561,81 @@
 
                 alert('Statistiques effacées avec succès');
             }
+        }
+
+        // Fonction pour afficher les logs d'une production
+        function showProductionLogs(index) {
+            const entry = productionHistory[index];
+            if (!entry) return;
+
+            const modal = document.getElementById('logs-modal');
+            const sessionEl = document.getElementById('modal-session-id');
+            const deviceEl = document.getElementById('modal-device-name');
+            const dateEl = document.getElementById('modal-date');
+            const logsEl = document.getElementById('modal-logs-content');
+
+            // Remplir les informations de la session
+            sessionEl.textContent = entry.sessionId;
+            deviceEl.textContent = entry.deviceName;
+            dateEl.textContent = new Date(entry.startTime).toLocaleString('fr-FR');
+
+            // Récupérer les logs depuis appState.deviceLogs ou entry.logs
+            let logsContent = '';
+
+            // Si on a des logs stockés dans l'entrée
+            if (entry.logs && entry.logs.length > 0) {
+                logsContent = entry.logs.map(log => {
+                    const color = log.type === 'error' ? '#ff453a' :
+                                log.type === 'success' ? '#30d158' :
+                                log.type === 'warning' ? '#ff9f0a' : '#8e8e93';
+                    return `<div style="color: ${color};">[${log.time}] ${log.message}</div>`;
+                }).join('');
+            }
+            // Sinon, essayer de récupérer depuis appState.deviceLogs
+            else if (appState.deviceLogs.has(entry.udid)) {
+                const deviceLogs = appState.deviceLogs.get(entry.udid);
+                const allLogs = [];
+
+                // Combiner tous les types de logs
+                if (deviceLogs.script) allLogs.push(...deviceLogs.script.map(l => ({...l, source: 'SCRIPT'})));
+                if (deviceLogs.system) allLogs.push(...deviceLogs.system.map(l => ({...l, source: 'SYSTEM'})));
+                if (deviceLogs.appium) allLogs.push(...deviceLogs.appium.map(l => ({...l, source: 'APPIUM'})));
+
+                // Trier par timestamp
+                allLogs.sort((a, b) => new Date(a.timestamp || 0) - new Date(b.timestamp || 0));
+
+                logsContent = allLogs.map(log => {
+                    const color = log.type === 'error' ? '#ff453a' :
+                                log.type === 'success' ? '#30d158' :
+                                log.type === 'warning' ? '#ff9f0a' : '#0f0';
+                    const time = log.timestamp ? new Date(log.timestamp).toLocaleTimeString('fr-FR') : '';
+                    return `<div style="color: ${color};">[${log.source}] ${time} ${log.message || log.content || ''}</div>`;
+                }).join('');
+            }
+
+            // Si aucun log n'est disponible
+            if (!logsContent) {
+                logsContent = '<div style="color: #8e8e93;">Aucun log disponible pour cette session</div>';
+
+                // Ajouter les informations sur l'échec si disponible
+                if (entry.failureStep) {
+                    logsContent += `<div style="color: #ff453a; margin-top: 20px;">❌ Échec à l'étape : ${entry.failureStep}</div>`;
+                }
+                if (entry.lastProgress) {
+                    logsContent += `<div style="color: #ff9f0a;">⚠️ Dernière progression : ${entry.lastProgress}</div>`;
+                }
+            }
+
+            logsEl.innerHTML = logsContent;
+
+            // Afficher la modale
+            modal.style.display = 'flex';
+        }
+
+        // Fonction pour fermer la modale des logs
+        function closeLogsModal() {
+            const modal = document.getElementById('logs-modal');
+            modal.style.display = 'none';
         }
 
         // Production statistics - load saved data or use defaults
@@ -1969,9 +2064,9 @@
                                 display: flex;
                                 align-items: center;">
                                 <span style="margin-right: 10px; font-size: 18px;">🚀</span>
-                                <span>${production.currentStep || 'Initialisation...'}</span>
+                                <span id="progress-step-${udid}">${production.currentStep || 'Initialisation...'}</span>
                             </div>
-                            <div style="
+                            <div id="progress-percent-${udid}" style="
                                 font-size: 16px;
                                 font-weight: bold;
                                 background: linear-gradient(135deg, #4CAF50, #8BC34A);
@@ -1998,7 +2093,7 @@
                                 height: 100%;
                                 background: linear-gradient(90deg, #4CAF50, #8BC34A, #CDDC39);
                                 border-radius: 14px;
-                                transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+                                transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
                                 position: relative;
                                 box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);">
 
@@ -2555,6 +2650,8 @@
 
         // Update progress for a specific device
         function updateProgressForDevice(udid, progressData) {
+            console.log('[DEBUG] updateProgressForDevice called with:', { udid, progressData });
+
             // Update production data
             const production = appState.activeProductions.get(udid);
             if (production) {
@@ -2562,21 +2659,52 @@
                 production.progressPercent = progressData.percentage;
                 production.stepId = progressData.stepId;
 
+                // Stocker la dernière progression et l'étape actuelle
+                production.lastProgress = progressData.currentStep || progressData.step;
+                production.lastProgressPercentage = progressData.percentage;
+
+                // Ajouter le log de progression
+                if (!production.logs) production.logs = [];
+                production.logs.push({
+                    type: 'progress',
+                    time: new Date().toLocaleTimeString('fr-FR'),
+                    message: `${progressData.currentStep || progressData.step} - ${progressData.percentage}%`,
+                    timestamp: Date.now()
+                });
+
                 // Mise à jour du nouveau design de la barre de progression
                 const fillElement = document.getElementById(`progress-fill-${udid}`);
                 const percentElement = document.getElementById(`progress-percent-${udid}`);
                 const stepNameElement = document.getElementById(`progress-step-${udid}`);
 
+                console.log('[DEBUG] Looking for elements:', {
+                    fillId: `progress-fill-${udid}`,
+                    percentId: `progress-percent-${udid}`,
+                    stepId: `progress-step-${udid}`,
+                    fillFound: !!fillElement,
+                    percentFound: !!percentElement,
+                    stepFound: !!stepNameElement
+                });
+
                 if (fillElement) {
+                    console.log(`[DEBUG] Updating progress bar width to: ${progressData.percentage}%`);
                     fillElement.style.width = `${progressData.percentage}%`;
+                    // Force un reflow pour s'assurer que l'animation se déclenche
+                    fillElement.offsetWidth;
+                } else {
+                    console.log('[DEBUG] fillElement not found!');
                 }
 
                 if (percentElement) {
                     percentElement.textContent = `${progressData.percentage}%`;
+                } else {
+                    console.log('[DEBUG] percentElement not found!');
                 }
 
                 if (stepNameElement) {
-                    stepNameElement.textContent = progressData.currentStep;
+                    stepNameElement.textContent = progressData.currentStep || progressData.step;
+                } else {
+                    console.log('[DEBUG] stepNameElement not found!');
                 }
 
                 // Mettre à jour le temps écoulé
@@ -2835,7 +2963,13 @@
                     accountsCreated: production.accountsCreated || 0,
                     accountsTarget: production.accounts || 0,
                     successRate: production.accountsCreated ? Math.round((production.accountsCreated / production.accounts) * 100) : 0,
-                    status: status
+                    status: status,
+                    failureStep: production.failureStep || null,
+                    lastProgress: production.lastProgress || null,
+                    logs: production.logs || [],
+                    startTime: production.startTime,
+                    endTime: endTime,
+                    udid: udid
                 };
 
                 // Ajouter à l'historique (garder max 50 entrées)
@@ -2862,12 +2996,15 @@
                 return;
             }
 
-            tbody.innerHTML = productionHistory.map(entry => {
+            tbody.innerHTML = productionHistory.map((entry, index) => {
                 const statusBadge = entry.status === 'completed'
                     ? '<span style="background: #30d158; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px;">✅ Terminé</span>'
                     : entry.status === 'stopped'
                     ? '<span style="background: #ff453a; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px;">⏹️ Arrêté</span>'
                     : '<span style="background: #ff9f0a; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px;">⚠️ Erreur</span>';
+
+                const failureStep = entry.failureStep || entry.lastProgress || '-';
+                const failureColor = entry.status !== 'completed' ? '#ff453a' : '#8e8e93';
 
                 return `
                     <tr>
@@ -2877,7 +3014,13 @@
                         <td>${entry.deviceName}</td>
                         <td>${entry.accountsCreated}/${entry.accountsTarget}</td>
                         <td><span style="color: ${entry.successRate >= 80 ? '#30d158' : entry.successRate >= 50 ? '#ff9f0a' : '#ff453a'};">${entry.successRate}%</span></td>
+                        <td style="color: ${failureColor}; font-size: 11px;">${failureStep}</td>
                         <td>${statusBadge}</td>
+                        <td>
+                            <button onclick="showProductionLogs(${index})" style="background: linear-gradient(135deg, #007aff, #0051d5); border: none; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">
+                                📄 Logs
+                            </button>
+                        </td>
                     </tr>
                 `;
             }).join('');
@@ -3116,7 +3259,10 @@ WDA Port: ${production.wdaPort}`);
                 if (window.electronAPI.onProgressUpdate) {
                     window.electronAPI.onProgressUpdate((progressData) => {
                         console.log('Progress update received:', progressData);
-                        updateProgressForDevice(progressData.deviceId || progressData.udid, progressData);
+                        console.log('[DEBUG] Active productions:', Array.from(appState.activeProductions.entries()));
+                        const deviceId = progressData.deviceId || progressData.udid;
+                        console.log('[DEBUG] Using device ID:', deviceId);
+                        updateProgressForDevice(deviceId, progressData);
                     });
                 }
             }
@@ -3147,6 +3293,23 @@ WDA Port: ${production.wdaPort}`);
 
                         addDeviceLog(data.udid, deviceName, 'script', logType, data.line);
 
+                        // Ajouter le log à la production pour l'historique
+                        const production = appState.activeProductions.get(data.udid);
+                        if (production) {
+                            if (!production.logs) production.logs = [];
+                            production.logs.push({
+                                type: logType,
+                                time: new Date().toLocaleTimeString('fr-FR'),
+                                message: data.line,
+                                timestamp: Date.now()
+                            });
+
+                            // Si c'est une erreur, stocker l'étape d'échec
+                            if (logType === 'error' && production.lastProgress) {
+                                production.failureStep = production.lastProgress;
+                            }
+                        }
+
                         // Update statistics on certain events
                         if (data.line.includes('Account created successfully')) {
                             productionStats.totalCreated++;
@@ -3160,7 +3323,6 @@ WDA Port: ${production.wdaPort}`);
                             updateStatistics();
 
                             // Update production progress
-                            const production = appState.activeProductions.get(data.udid);
                             if (production) {
                                 production.accountsCreated++;
                                 renderActiveProductions();

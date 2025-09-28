@@ -1,4 +1,4 @@
-const { log, findAndClickWithPolling, findAndSetValue, randomWait, checkAndTerminateApp, findAndTypeCharByChar, waitForElementNotPresent, clickByCoordinates } = require('../../SHARED/utils/utils');
+const { log, updateProgress, findAndClickWithPolling, findAndSetValue, randomWait, checkAndTerminateApp, findAndTypeCharByChar, waitForElementNotPresent, clickByCoordinates } = require('../../SHARED/utils/utils');
 const { getSMSProvider } = require('../../SHARED/sms-providers/sms-provider');
 const EmailManager = require('../../SHARED/email-manager/EmailManager');
 const { getAndRemoveEmail } = require('../../SHARED/email-manager/email');
@@ -261,6 +261,7 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
       // PROXY STRING - Utiliser la séquence de coordonnées avec protection try-catch
       try {
         log('Configuring Proxy String using coordinates...');
+        updateProgress('Configuration du proxy', 10);
 
         // Clic 1: X:128 Y:375 - Premier clic sur le champ (MODIFIÉ)
         log('Click 1/4 at X:128 Y:375...');
@@ -287,6 +288,7 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
         await findAndTypeCharByChar(client, proxyString, true);
         await randomWait(0.5, 0.8);
         log('Proxy String configured successfully');
+        updateProgress('Proxy configuré avec succès', 12);
       } catch (proxyError) {
         log(`Proxy String configuration error: ${proxyError.message}`);
         // Continuer malgré l'erreur
@@ -462,27 +464,34 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     
     // Entrer le numéro de téléphone
     progressTracker.moveToStep('phone_input');
+    updateProgress('Entrée du numéro de téléphone', 15);
     await clickElement(
       '-ios predicate string:name == "phone number" AND label == "phone number" AND type == "XCUIElementTypeTextField"',
       5000
     );
     await typeText(phone?.number || '');
     log('Phone number entered');
+    updateProgress('Numéro de téléphone saisi', 18);
     await randomWait(1, 2);
     progressTracker.moveToStep('phone_next');
     await clickElement('-ios predicate string:name == "Next"', 5000);
     log('Clicked Next after phone');
+    updateProgress('Validation du numéro de téléphone', 20);
 
     // Récupérer et entrer le code SMS
     progressTracker.moveToStep('sms_wait');
+    updateProgress('Attente du code SMS', 22);
     const smsService = getSMSProvider(smsProvider);
     const code = await smsService.getCode(phone.id);
     progressTracker.moveToStep('sms_input');
+    updateProgress('Code SMS reçu - Saisie en cours', 25);
     await typeText(code);
     log('SMS code entered');
+    updateProgress('Code SMS saisi', 28);
     await randomWait(1, 2);
     progressTracker.moveToStep('sms_next');
     await clickElement('-ios predicate string:name == "Next"', 5000);
+    updateProgress('Validation du code SMS', 30);
     log('Clicked Next after SMS code');
 
     // Basic info
@@ -500,6 +509,7 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
 
     // No thanks, puis email (depuis env ou fichier)
     progressTracker.moveToStep('email_skip');
+    updateProgress('Configuration de l\'email', 32);
     await findAndClickWithPolling(client, '-ios predicate string:name == "No thanks" AND label == "No thanks" AND value == "No thanks"');
 
     // Obtenir l'email selon la méthode configurée
@@ -518,8 +528,10 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
       } else {
         try {
           quixService = new QuixEmailService(quixApiKey);
+          updateProgress('Génération de l\'email temporaire', 33);
           email = await quixService.generateEmail();
           log(`Generated temporary email via Quix: ${email.substring(0, 5)}***@${email.split('@')[1]}`);
+          updateProgress('Email temporaire généré', 34);
         } catch (error) {
           log(`Failed to generate Quix email: ${error.message}, falling back to Gmail method`);
           quixService = null;
@@ -543,11 +555,13 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
 
     if (email) {
       progressTracker.moveToStep('email_input');
+      updateProgress('Saisie de l\'adresse email', 35);
       await randomWait(1.5, 2); // Attendre plus longtemps pour que le champ soit bien prêt
       // Cliquer dans le champ avant de taper
       await client.pause(500);
       await findAndTypeCharByChar(client, email);
       log(`Entered email: ${email.substring(0, 3)}***`);
+      updateProgress('Email saisi avec succès', 36);
     } else {
       log('Warning: No email available');
     }
@@ -562,8 +576,10 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
         if (quixService && email && email.includes('@gmail.com')) {
           // Utiliser Quix si le service est disponible et qu'on a généré un email
           log('Waiting for email verification code from Quix...');
-          verificationCode = await quixService.getHingeCode(120000);
+          updateProgress('Attente du code de vérification email', 38);
+          verificationCode = await quixService.getHingeCode(240000); // 4 minutes au lieu de 2
           log(`Received verification code from Quix: ${verificationCode}`);
+          updateProgress('Code de vérification reçu', 40);
         } else {
           // Méthode Gmail traditionnelle
           log('Waiting for email verification code from Gmail...');
@@ -580,8 +596,10 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
         }
 
         await randomWait(0.5, 1); // Attendre avant de taper le code
+        updateProgress('Saisie du code de vérification', 42);
         await findAndTypeCharByChar(client, verificationCode);
         log('Entered email verification code');
+        updateProgress('Code de vérification saisi', 44);
       } catch (e) {
         log(`Email code not available (${e.message}), using placeholder 0000`);
         await randomWait(0.5, 1);
@@ -638,12 +656,14 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     await findAndClickWithPolling(client, '-ios predicate string:name == "Next"', 3000, false);
 
     // Relations et monogamie (depuis config)
+    updateProgress('Configuration des préférences de relation', 75);
     const relationshipGoal = profile.relationshipGoal || 'Long-term relationship, open to short';
     await findAndClickWithPolling(client, `-ios predicate string:name == "${relationshipGoal}"`);
     log(`Selected relationship goal: ${relationshipGoal}`);
     await findAndClickWithPolling(client, '-ios predicate string:name == "Next"');
     await findAndClickWithPolling(client, '-ios predicate string:name == "Monogamy"');
     await findAndClickWithPolling(client, '-ios predicate string:name == "Next"');
+    updateProgress('Préférences de relation configurées', 77);
 
     // Scroll containers aléatoires
     try {
@@ -658,6 +678,7 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     await findAndClickWithPolling(client, '-ios predicate string:name == "Next"', 3000, false);
 
     // Ethnicité depuis config
+    updateProgress('Configuration du profil démographique', 80);
     const ethnicity = profile.ethnicity || 'White/Caucasian';
     await findAndClickWithPolling(client, `-ios predicate string:name == "${ethnicity}"`, 3000, false);
     log(`Selected ethnicity: ${ethnicity}`);
@@ -690,6 +711,7 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     await findAndClickWithPolling(client, '-ios predicate string:name == "Next"', 3000, false);
 
     // Questions lifestyle depuis config
+    updateProgress('Configuration des préférences lifestyle', 85);
     // Drinking
     const drinking = profile.drinking || 'Sometimes';
     await findAndClickWithPolling(client, `-ios predicate string:name == "${drinking}"`, 3000, false);
@@ -708,19 +730,28 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     // Drugs (toujours No)
     await findAndClickWithPolling(client, '-ios predicate string:name == "No"', 3000, false);
     await findAndClickWithPolling(client, '-ios predicate string:name == "Fill out your profile" AND label == "Fill out your profile" AND value == "Fill out your profile"', 3000, false);
+    updateProgress('Préférences lifestyle configurées', 90);
 
     // Ajout de photos
     try {
+      updateProgress('Sélection des photos de profil', 45);
       await (await client.$('//XCUIElementTypeCell[@name=" Add 1st photo. "]/XCUIElementTypeOther/XCUIElementTypeImage')).click();
       await findAndClickWithPolling(client, '-ios predicate string:name == "Browse photo library instead"');
       await randomWait(1, 2);
+      updateProgress('Choix de la première photo', 47);
       await clickByCoordinates(client, 50, 200);
+      updateProgress('Choix de la deuxième photo', 48);
       await clickByCoordinates(client, 200, 200);
+      updateProgress('Choix de la troisième photo', 49);
       await clickByCoordinates(client, 320, 200);
+      updateProgress('Choix de la quatrième photo', 50);
       await clickByCoordinates(client, 50, 350);
+      updateProgress('Choix de la cinquième photo', 51);
       await clickByCoordinates(client, 200, 350);
+      updateProgress('Choix de la sixième photo', 52);
       await clickByCoordinates(client, 320, 350);
       await findAndClickWithPolling(client, '-ios predicate string:name == "Add"');
+      updateProgress('Photos ajoutées avec succès', 54);
       for (let i=0;i<5;i++) await findAndClickWithPolling(client, '-ios predicate string:name == "Next"', 3000, false);
       await findAndClickWithPolling(client, '-ios predicate string:name == "Done"', 3000, false);
       await findAndClickWithPolling(client, '-ios predicate string:name == "Next"', 3000, false);
@@ -731,14 +762,17 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     if (prompts && prompts.length > 0) {
       // Prompt 1
       try {
+        updateProgress('Configuration du premier prompt', 56);
         await findAndClickWithPolling(client, '-ios predicate string:name == "Missing prompt 1. Select a Prompt and write your own answer."', 3000, false);
         if (prompts[0]) {
           const prompt1Xpath = `(//XCUIElementTypeStaticText[@name="${prompts[0].prompt}"])[1]`;
           const el1 = await client.$(prompt1Xpath);
           if (el1) await el1.click();
           await randomWait(1, 2);
+          updateProgress('Rédaction de la réponse au premier prompt', 58);
           await findAndTypeCharByChar(client, prompts[0].answer);
           log(`Added prompt 1: ${prompts[0].prompt}`);
+          updateProgress('Premier prompt complété', 60);
           await findAndClickWithPolling(client, '-ios predicate string:name == "Next"', 3000, false);
         }
       } catch (e) {
@@ -747,14 +781,17 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
 
       // Prompt 2
       try {
+        updateProgress('Configuration du deuxième prompt', 62);
         await findAndClickWithPolling(client, '-ios predicate string:name == "Missing prompt 2. Select a Prompt and write your own answer."', 3000, false);
         if (prompts[1]) {
           const prompt2Xpath = `(//XCUIElementTypeStaticText[@name="${prompts[1].prompt}"])[1]`;
           const el2 = await client.$(prompt2Xpath);
           if (el2) await el2.click();
           await randomWait(1, 2);
+          updateProgress('Rédaction de la réponse au deuxième prompt', 64);
           await findAndTypeCharByChar(client, prompts[1].answer);
           log(`Added prompt 2: ${prompts[1].prompt}`);
+          updateProgress('Deuxième prompt complété', 66);
           await findAndClickWithPolling(client, '-ios predicate string:name == "Next"', 3000, false);
         }
       } catch (e) {
@@ -763,14 +800,17 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
 
       // Prompt 3
       try {
+        updateProgress('Configuration du troisième prompt', 68);
         await findAndClickWithPolling(client, '-ios predicate string:name == "Missing prompt 3. Select a Prompt and write your own answer."', 3000, false);
         if (prompts[2]) {
           const prompt3Xpath = `(//XCUIElementTypeStaticText[@name="${prompts[2].prompt}"])[1]`;
           const el3 = await client.$(prompt3Xpath);
           if (el3) await el3.click();
           await randomWait(1, 2);
+          updateProgress('Rédaction de la réponse au troisième prompt', 70);
           await findAndTypeCharByChar(client, prompts[2].answer);
           log(`Added prompt 3: ${prompts[2].prompt}`);
+          updateProgress('Troisième prompt complété', 72);
           await findAndClickWithPolling(client, '-ios predicate string:name == "Done"', 3000, false);
         }
       } catch (e) {
@@ -790,7 +830,9 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
       } catch {}
     }
 
+    updateProgress('Finalisation du profil', 95);
     progressTracker.complete(); // Mark as completed
+    updateProgress('Compte créé avec succès !', 100);
     return true;
   } catch (e) {
     log(`Error during Hinge app session: ${e.message}`, e);

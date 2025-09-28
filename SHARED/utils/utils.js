@@ -47,6 +47,22 @@ function log(message, error = false) {
     }
 }
 
+// Progress update function for UI
+function updateProgress(step, percentage) {
+    const progressData = {
+        currentStep: step,  // Changed from 'step' to 'currentStep' to match main.js expectation
+        percentage: percentage,
+        timestamp: new Date().toISOString()
+    };
+
+    // Send progress update via console.log with special format that main.js will catch
+    // This goes to stdout which is captured by the parent process
+    console.log(`[PROGRESS-UPDATE]${JSON.stringify(progressData)}`);
+
+    // Also log normally for debugging (this goes to the log file)
+    log(`📊 Progress: ${step} (${percentage}%)`);
+}
+
 // Helper function for element interactions with polling
 async function findAndClickWithPolling(client, selector, timeout = 30000, trow_error=true) {
     const startTime = Date.now();
@@ -379,6 +395,7 @@ async function clickByCoordinates(client, x, y) {
 
 module.exports = {
     log,
+    updateProgress,
     findAndClickWithPolling,
     findAndSetValue,
     findAndTypeCharByChar,
