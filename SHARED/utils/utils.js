@@ -63,8 +63,33 @@ function updateProgress(step, percentage) {
     log(`📊 Progress: ${step} (${percentage}%)`);
 }
 
+// Global flags for debug control
+global.debugResumed = false;
+global.debugSkipped = false;
+
+// Listen for debug commands from parent process
+if (process.send) {
+    process.on('message', (msg) => {
+        if (msg.command === 'resume') {
+            log('Received resume command from interface');
+            global.debugResumed = true;
+        } else if (msg.command === 'skip') {
+            log('Received skip command from interface');
+            global.debugSkipped = true;
+        }
+    });
+}
+
 // Helper function for element interactions with polling
-async function findAndClickWithPolling(client, selector, timeout = 30000, trow_error=true) {
+async function findAndClickWithPolling(client, selector, timeout = 30000, throw_error=true, debugMode = null) {
+    // Check if debug mode is enabled globally
+    const isDebugMode = debugMode || (global.debugAssisted === true);
+
+    // In debug mode, never throw errors - always allow pause
+    if (isDebugMode) {
+        throw_error = false;
+    }
+
     const startTime = Date.now();
     while (Date.now() - startTime < timeout) {
         try {
@@ -78,8 +103,49 @@ async function findAndClickWithPolling(client, selector, timeout = 30000, trow_e
         }
         await new Promise(resolve => setTimeout(resolve, 100)); // Poll every 100ms
     }
-    if (trow_error)
+
+    // Element not found - handle debug mode
+    if (isDebugMode && process.send) {
+        log(`⚠️ DEBUG PAUSE: Element not found after ${timeout}ms`);
+        log(`🔍 Selector: ${selector}`);
+        log('📝 Use Appium Inspector to find the correct selector');
+        log('📝 Update the script if needed');
+        log('▶️ Click Resume in the interface to retry');
+        log('⏭️ Click Skip in the interface to skip this step');
+
+        // Notify the interface about debug pause
+        console.log(`[DEBUG-PAUSE]${JSON.stringify({
+            selector: selector,
+            timestamp: new Date().toISOString(),
+            message: `Element not found: ${selector}`
+        })}`);
+
+        updateProgress('🔧 Debug Pause - Waiting for action', -1);
+
+        // Reset flags
+        global.debugResumed = false;
+        global.debugSkipped = false;
+
+        // Wait for user action
+        while (!global.debugResumed && !global.debugSkipped) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+
+        if (global.debugResumed) {
+            log('▶️ Resuming execution - retrying selector...');
+            updateProgress('Resuming automation', -1);
+            // Retry with normal mode to avoid infinite pause loop
+            return await findAndClickWithPolling(client, selector, 30000, throw_error, false);
+        } else if (global.debugSkipped) {
+            log('⏭️ Skipping this step as requested');
+            updateProgress('Step skipped - continuing', -1);
+            return false;
+        }
+    }
+
+    if (throw_error)
         throw new Error(`Element ${selector} not clickable after ${timeout}ms`);
+    return false;
 }
 
 // Helper function for text input interactions
@@ -97,6 +163,15 @@ async function findAndSetValue(client, selector, value) {
 // Helper function to type characters one by one with direct keyboard input
 async function findAndTypeCharByChar(client, value, fast = false) {
     try {
+        // Pour les textes très longs (>30 caractères), utiliser une saisie rapide
+        const isLongText = value.length > 30;
+
+        if (isLongText) {
+            log(`Typing long text (${value.length} chars) in fast mode: "${value.substring(0, 20)}..."`);
+        } else {
+            log(`Typing text character by character: "${value}"`);
+        }
+
         // Taper d'abord un espace pour activer le champ puis le supprimer
         await client.keys(' ');
         await client.pause(200);
@@ -106,10 +181,16 @@ async function findAndTypeCharByChar(client, value, fast = false) {
         for (let i = 0; i < value.length; i++) {
             // Use the keyboard to type the character
             await client.keys(value[i]);
-            if (fast == false)
+            // Pour les textes longs ou en mode fast, pas de pause
+            if (!fast && !isLongText) {
                 await randomWait(0.2, 0.5);
+            } else if (i % 10 === 0) {
+                // Petite pause tous les 10 caractères pour les longs textes
+                await client.pause(50);
+            }
         }
 
+        log(`Finished typing: ${isLongText ? value.substring(0, 20) + '...' : value}`);
         return true;
     } catch (error) {
         log(`Error typing characters: ${error.message}`);

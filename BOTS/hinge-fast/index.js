@@ -90,13 +90,20 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
 
   try {
     // Configurer le mode debug assisté
-    const isDebugAssisted = debugMode === 'assisted' || process.env.DEBUG_ASSISTED === 'true';
+    const isDebugAssisted = debugMode === 'assisted' || process.env.DEBUG_ASSISTED === 'true' || process.env.DEBUG_MODE === 'assisted';
+
+    // Activer le mode debug global pour utils.js
+    if (isDebugAssisted) {
+      global.debugAssisted = true;
+    }
+
     setDebugMode(debugMode, isDebugAssisted);
 
     if (isDebugAssisted) {
       log('\n' + '🔧'.repeat(20));
-      log('MODE DEBUG ASSISTÉ ACTIVÉ');
-      log('Le bot continuera même si des éléments ne sont pas trouvés');
+      log('MODE DEBUG ASSISTÉ ACTIVÉ - Avec pause interactive');
+      log('Le bot se mettra en pause si un élément n\'est pas trouvé');
+      log('Vous pourrez alors modifier le script et reprendre l\'exécution');
       log('Vous pouvez intervenir manuellement si nécessaire');
       log('🔧'.repeat(20) + '\n');
     }
@@ -628,11 +635,44 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     let birthdate = (Math.floor(Math.random() * 28) + 1).toString();
     if (birthmonth.length === 1) birthmonth = '0' + birthmonth;
     if (birthdate.length === 1) birthdate = '0' + birthdate;
-    await findAndTypeCharByChar(client, birthmonth);
-    await findAndTypeCharByChar(client, birthdate);
-    await findAndTypeCharByChar(client, birthyear);
+
+    // Log détaillé de la date de naissance
+    const fullBirthDate = `${birthmonth}${birthdate}${birthyear}`;
+    log(`Generating birthday - Age: ${age}, Date: ${birthmonth}/${birthdate}/${birthyear} (MM/DD/YYYY format)`);
+    log(`Full date string to type: ${fullBirthDate}`);
+    updateProgress('Saisie de la date de naissance', 46);
+
+    // Taper toute la date d'un coup sans les espaces/backspace qui perturbent
+    try {
+        // Cliquer d'abord sur le champ de date pour s'assurer qu'il est actif
+        const dateField = await client.$('-ios predicate string:type == "XCUIElementTypeTextField" OR type == "XCUIElementTypeTextView"');
+        if (dateField) {
+            await dateField.click();
+            await randomWait(0.3, 0.5);
+        }
+
+        log(`Typing full birth date: ${fullBirthDate}`);
+        // Taper directement toute la date sans passer par findAndTypeCharByChar
+        for (let char of fullBirthDate) {
+            await client.keys(char);
+            await client.pause(100); // Pause courte entre chaque caractère
+        }
+        log(`Finished typing birth date: ${fullBirthDate}`);
+    } catch (error) {
+        log(`Error with direct date typing, fallback to standard method: ${error.message}`);
+        // Fallback: utiliser l'ancienne méthode si erreur
+        await findAndTypeCharByChar(client, fullBirthDate, true);
+    }
+
+    await randomWait(0.8, 1.2);
+
+    log('Clicking Next to submit birthday');
     await findAndClickWithPolling(client, '-ios predicate string:name == "Next"');
+    await randomWait(1, 1.5);
+
+    log('Clicking Confirm to validate birthday');
     await findAndClickWithPolling(client, '-ios predicate string:name == "Confirm" AND label == "Confirm" AND value == "Confirm"');
+    updateProgress('Date de naissance confirmée', 48);
 
     // Notifications / détails
     await findAndClickWithPolling(client, '-ios predicate string:name == "Disable notifications" AND label == "Disable notifications" AND value == "Disable notifications"', 3000, false);
@@ -644,6 +684,36 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     await findAndClickWithPolling(client, '-ios predicate string:name == "Locate me"');
     await findAndClickWithPolling(client, '-ios predicate string:name == "Locate me"');
     await findAndClickWithPolling(client, '-ios predicate string:name == "Next"');
+    await findAndClickWithPolling(client, '-ios predicate string:name == "Next"');
+
+
+    // Configuration du genre et des préférences
+    updateProgress('Configuration du profil', 70);
+
+    // Sélection du genre : Woman
+    log('Selecting gender: Woman');
+    await findAndClickWithPolling(client, '-ios predicate string:name == "Woman" AND label == "Woman" AND value == "Woman"');
+    await randomWait(0.5, 1);
+    await findAndClickWithPolling(client, '-ios predicate string:name == "Next"');
+
+    // Sélection de pronom : She
+    log('Selecting pronom: She');
+    await findAndClickWithPolling(client, '-ios predicate string:name == "She"');
+    await randomWait(0.5, 1);
+    await findAndClickWithPolling(client, '-ios predicate string:name == "Next"');
+
+    // Sélection de l'orientation : Straight
+    log('Selecting orientation: Straight');
+    await findAndClickWithPolling(client, '-ios predicate string:name == "Straight"');
+    await randomWait(0.5, 1);
+    await findAndClickWithPolling(client, '-ios predicate string:name == "Next"');
+
+    // Sélection de la préférence : Men
+    log('Selecting preference: Men');
+    await findAndClickWithPolling(client, '-ios predicate string:name == "Men"');
+    await randomWait(0.5, 1);
+    await findAndClickWithPolling(client, '-ios predicate string:name == "Next"');
+
 
     // Sélections par XPaths
     try { await (await client.$('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeOther[2]')).click(); } catch {}
@@ -658,11 +728,11 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     // Relations et monogamie (depuis config)
     updateProgress('Configuration des préférences de relation', 75);
     const relationshipGoal = profile.relationshipGoal || 'Long-term relationship, open to short';
-    await findAndClickWithPolling(client, `-ios predicate string:name == "${relationshipGoal}"`);
+    await clickElement(`-ios predicate string:name == "${relationshipGoal}"`, 30000);
     log(`Selected relationship goal: ${relationshipGoal}`);
-    await findAndClickWithPolling(client, '-ios predicate string:name == "Next"');
-    await findAndClickWithPolling(client, '-ios predicate string:name == "Monogamy"');
-    await findAndClickWithPolling(client, '-ios predicate string:name == "Next"');
+    await clickElement('-ios predicate string:name == "Next"');
+    await clickElement('-ios predicate string:name == "Monogamy"');
+    await clickElement('-ios predicate string:name == "Next"');
     updateProgress('Préférences de relation configurées', 77);
 
     // Scroll containers aléatoires

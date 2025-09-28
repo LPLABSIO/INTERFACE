@@ -1,15 +1,4 @@
 CountryCode,state,city,lat,lon,area_code,zip_code
-us,New Mexico,Albuquerque,35.0844,-106.6504,505,87101
-us,Arizona,Tucson,32.2226,-110.9747,520,85701
-us,California,Fresno,36.7378,-119.7871,559,93650
-us,California,Sacramento,38.5816,-121.4944,916,95814
-us,Arizona,Mesa,33.4152,-111.8315,480,85201
-us,Georgia,Atlanta,33.749,-84.388,"404, 470, 678, 770",30301
-us,Florida,Cape Coral,26.6406,-81.9923,239,33904
-us,California,Santa Clarita,34.3917,-118.5426,661,91350
-us,California,San Bernardino,34.1083,-117.2898,909,92401
-us,Washington,Tacoma,47.2529,-122.4443,253,98401
-us,Florida,Hialeah,25.8576,-80.2785,"305, 786",33002
 us,Louisiana,Baton Rouge,30.4515,-91.1871,225,70801
 us,California,Modesto,37.6391,-120.9969,209,95350
 us,California,Fontana,34.0926,-117.435,909,92335

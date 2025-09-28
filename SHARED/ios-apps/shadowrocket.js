@@ -43,22 +43,26 @@ async function configureShadowrocket(client, proxyInfo, city) {
         log('Username set');
 
         // Renseignement du mot de passe dans un champ sécurisé
-        // Stratégie plus robuste: cliquer le champ puis taper caractère par caractère
+        // Utiliser sendKeys qui est plus stable pour les SecureTextField
         try {
             const secureField = await client.$('-ios predicate string:type == "XCUIElementTypeSecureTextField"');
             await secureField.click();
             await randomWait(0.2, 0.3);
-            // Taper via le clavier système (évite setValue sur SecureTextField)
-            await findAndTypeCharByChar(client, proxyInfo.password, true);
-            log('Password set (typed)');
+            // Utiliser sendKeys au lieu de setValue pour éviter les problèmes de session
+            await secureField.sendKeys(proxyInfo.password);
+            log('Password set (sendKeys method)');
         } catch (e) {
-            log(`Primary secure input failed: ${e.message}. Retrying after re-activating Shadowrocket...`);
-            await client.execute('mobile: activateApp', { bundleId: 'com.liguangming.Shadowrocket' });
-            const secureFieldRetry = await client.$('-ios predicate string:type == "XCUIElementTypeSecureTextField"');
-            await secureFieldRetry.click();
-            await randomWait(0.2, 0.3);
-            await findAndTypeCharByChar(client, proxyInfo.password, true);
-            log('Password set (retry typed)');
+            log(`Primary secure input failed: ${e.message}. Retrying with alternate method...`);
+            try {
+                // Méthode alternative: utiliser keys directement
+                await client.keys(proxyInfo.password);
+                log('Password set (keys method)');
+            } catch (keyError) {
+                log(`Keys method also failed: ${keyError.message}. Falling back to char-by-char...`);
+                // Fallback ultime: taper caractère par caractère
+                await findAndTypeCharByChar(client, proxyInfo.password, true);
+                log('Password set (char-by-char fallback)');
+            }
         }
 
         await findAndClickWithPolling(client, '-ios predicate string:name == "Done"');

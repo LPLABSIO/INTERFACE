@@ -97,6 +97,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onSystemLog: (callback) => ipcRenderer.on('system-log', (event, data) => callback(data)),
     onProgressUpdate: (callback) => ipcRenderer.on('progress-update', (event, data) => callback(data)),
 
+    // Debug controls
+    onDebugPause: (callback) => ipcRenderer.on('debug-pause', (event, data) => callback(data)),
+    debugResume: (udid) => ipcRenderer.send('debug-resume', udid),
+    debugSkip: (udid) => ipcRenderer.send('debug-skip', udid),
+
     // Settings
     saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
     loadSettings: () => ipcRenderer.invoke('load-settings'),

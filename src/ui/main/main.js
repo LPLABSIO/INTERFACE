@@ -847,6 +847,22 @@ function startDeviceBot(_e, payload = {}) {
         }
       }
 
+      // Check if this is a debug pause message
+      if (message.startsWith('[DEBUG-PAUSE]')) {
+        try {
+          const debugData = JSON.parse(message.substring('[DEBUG-PAUSE]'.length));
+          debugData.udid = udid;
+          mainWindow?.webContents.send('debug-pause', debugData);
+          console.log('[Main] Debug pause triggered:', debugData.message);
+
+          // Store the child process for this udid to allow sending commands
+          if (!global.debugPausedProcesses) global.debugPausedProcesses = new Map();
+          global.debugPausedProcesses.set(udid, child);
+        } catch (err) {
+          console.error('[Main] Failed to parse debug pause:', err);
+        }
+      }
+
       // Send only via deviceRun:output to avoid duplicates
       mainWindow?.webContents.send('deviceRun:output', {
         udid,
@@ -919,6 +935,53 @@ ipcMain.handle('state:read', () => {
     return json;
   } catch (e) {
     return { error: e?.message || String(e) };
+  }
+});
+
+// Handlers pour les contrôles de debug pause
+ipcMain.on('debug-resume', (event, udid) => {
+  console.log(`[Main] Debug resume requested for device ${udid}`);
+
+  // Get the child process for this udid
+  const child = global.debugPausedProcesses?.get(udid) || perDeviceChildren.get(udid);
+
+  if (child && child.send) {
+    try {
+      child.send({ command: 'resume' });
+      console.log(`[Main] Sent resume command to bot process for ${udid}`);
+
+      // Clean up from paused processes map
+      if (global.debugPausedProcesses) {
+        global.debugPausedProcesses.delete(udid);
+      }
+    } catch (err) {
+      console.error(`[Main] Failed to send resume command: ${err.message}`);
+    }
+  } else {
+    console.warn(`[Main] No child process found for udid ${udid}`);
+  }
+});
+
+ipcMain.on('debug-skip', (event, udid) => {
+  console.log(`[Main] Debug skip requested for device ${udid}`);
+
+  // Get the child process for this udid
+  const child = global.debugPausedProcesses?.get(udid) || perDeviceChildren.get(udid);
+
+  if (child && child.send) {
+    try {
+      child.send({ command: 'skip' });
+      console.log(`[Main] Sent skip command to bot process for ${udid}`);
+
+      // Clean up from paused processes map
+      if (global.debugPausedProcesses) {
+        global.debugPausedProcesses.delete(udid);
+      }
+    } catch (err) {
+      console.error(`[Main] Failed to send skip command: ${err.message}`);
+    }
+  } else {
+    console.warn(`[Main] No child process found for udid ${udid}`);
   }
 });
 
@@ -1274,7 +1337,8 @@ ipcMain.handle('queue:getStats', async () => {
       return { success: false, error: 'QueueManager not initialized' };
     }
     const stats = queueManager.getStats();
-    return { success: true, stats };
+    const tasks = queueManager.getTasks(); // Get all tasks as well
+    return { success: true, stats, tasks };
   } catch (error) {
     console.error('[Main] Error getting queue stats:', error);
     return { success: false, error: error.message };

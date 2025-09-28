@@ -746,6 +746,134 @@
             border-bottom-color: #0a84ff;
         }
 
+        /* Debug Pause Controls */
+        .debug-pause-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .debug-pause-overlay.active {
+            display: flex;
+        }
+
+        .debug-pause-card {
+            background: #1c1c1e;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .debug-pause-header {
+            margin-bottom: 20px;
+        }
+
+        .debug-pause-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ff9500;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .debug-pause-subtitle {
+            font-size: 14px;
+            color: #8e8e93;
+        }
+
+        .debug-pause-info {
+            background: #2c2c2e;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .debug-selector {
+            font-family: 'SF Mono', monospace;
+            font-size: 12px;
+            color: #0a84ff;
+            background: #1c1c1e;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            word-break: break-all;
+        }
+
+        .debug-instructions {
+            font-size: 13px;
+            color: #e5e5e7;
+            line-height: 1.6;
+        }
+
+        .debug-instructions li {
+            margin: 8px 0;
+        }
+
+        .debug-pause-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .debug-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .debug-btn-resume {
+            background: #34c759;
+            color: white;
+        }
+
+        .debug-btn-resume:hover {
+            background: #2fb24a;
+            transform: scale(1.02);
+        }
+
+        .debug-btn-skip {
+            background: #3a3a3c;
+            color: #e5e5e7;
+        }
+
+        .debug-btn-skip:hover {
+            background: #48484a;
+        }
+
+        .debug-device-name {
+            font-size: 12px;
+            color: #8e8e93;
+            margin-top: 5px;
+        }
+
         .tab-content {
             display: none;
         }
@@ -2121,7 +2249,6 @@
                                 font-weight: 600;
                                 color: #fff;
                                 text-shadow: 0 1px 3px rgba(0,0,0,0.5);">
-                                Compte ${production.progress || 0} sur ${production.accounts || 1}
                             </div>
                         </div>
 
@@ -2505,6 +2632,61 @@
                         document.getElementById('queue-pending').textContent = stats.pending || 0;
                         document.getElementById('queue-progress').textContent = stats.inProgress || 0;
                         document.getElementById('queue-completed').textContent = stats.completed || 0;
+
+                        // Synchronize active tasks with activeProductions
+                        if (result.tasks) {
+                            // Find tasks that are in progress
+                            const inProgressTasks = result.tasks.filter(task => task.status === 'in_progress');
+
+                            for (const task of inProgressTasks) {
+                                const udid = task.deviceId;
+                                if (udid && !appState.activeProductions.has(udid)) {
+                                    // Add to active productions if not already there
+                                    console.log('[Queue Sync] Adding active production for device:', udid);
+                                    const device = appState.devices.get(udid);
+
+                                    appState.activeProductions.set(udid, {
+                                        app: task.config?.app || 'hinge-fast',
+                                        accounts: 1,
+                                        accountsCreated: 0,
+                                        progress: 0,
+                                        currentStep: 'Initialisation',
+                                        progressPercent: 0,
+                                        startTime: new Date(task.startedAt).getTime(),
+                                        taskId: task.id,
+                                        status: 'running'
+                                    });
+
+                                    // Update device status
+                                    if (device) {
+                                        device.status = 'running';
+                                        device.progressStep = 'Initialisation';
+                                        device.progressPercent = 0;
+                                    }
+                                }
+                            }
+
+                            // Clean up finished tasks from activeProductions
+                            for (const [udid, production] of appState.activeProductions) {
+                                const taskStillActive = inProgressTasks.some(task => task.deviceId === udid);
+                                if (!taskStillActive && production.taskId) {
+                                    console.log('[Queue Sync] Removing finished production for device:', udid);
+                                    appState.activeProductions.delete(udid);
+                                    const device = appState.devices.get(udid);
+                                    if (device) {
+                                        device.status = 'idle';
+                                        device.progressStep = '';
+                                        device.progressPercent = 0;
+                                    }
+                                }
+                            }
+
+                            // Refresh UI if there were changes
+                            if (inProgressTasks.length > 0 || appState.activeProductions.size > 0) {
+                                renderActiveProductions();
+                                renderDevices();
+                            }
+                        }
                     }
                 }
             } catch (error) {
@@ -2688,9 +2870,22 @@
 
                 if (fillElement) {
                     console.log(`[DEBUG] Updating progress bar width to: ${progressData.percentage}%`);
+
+                    // Forcer le navigateur à recalculer le style avant la mise à jour
+                    fillElement.style.transition = 'none';
+                    fillElement.offsetHeight; // Force reflow
+
+                    // Réappliquer la transition et mettre à jour la largeur
+                    fillElement.style.transition = 'width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
                     fillElement.style.width = `${progressData.percentage}%`;
-                    // Force un reflow pour s'assurer que l'animation se déclenche
-                    fillElement.offsetWidth;
+
+                    // Ajouter une classe pour l'effet de pulsation quand on atteint certains paliers
+                    if (progressData.percentage % 10 === 0) {
+                        fillElement.style.boxShadow = '0 2px 12px rgba(76, 175, 80, 0.8)';
+                        setTimeout(() => {
+                            fillElement.style.boxShadow = '0 2px 8px rgba(76, 175, 80, 0.4)';
+                        }, 300);
+                    }
                 } else {
                     console.log('[DEBUG] fillElement not found!');
                 }
@@ -2963,8 +3158,9 @@
                     accountsCreated: production.accountsCreated || 0,
                     accountsTarget: production.accounts || 0,
                     successRate: production.accountsCreated ? Math.round((production.accountsCreated / production.accounts) * 100) : 0,
+                    progressPercent: production.progressPercent || production.lastProgressPercentage || 0,
                     status: status,
-                    failureStep: production.failureStep || null,
+                    failureStep: production.failureStep || production.lastProgress || null,
                     lastProgress: production.lastProgress || null,
                     logs: production.logs || [],
                     startTime: production.startTime,
@@ -3013,7 +3209,7 @@
                         <td>${entry.duration}</td>
                         <td>${entry.deviceName}</td>
                         <td>${entry.accountsCreated}/${entry.accountsTarget}</td>
-                        <td><span style="color: ${entry.successRate >= 80 ? '#30d158' : entry.successRate >= 50 ? '#ff9f0a' : '#ff453a'};">${entry.successRate}%</span></td>
+                        <td><span style="color: ${entry.progressPercent >= 80 ? '#30d158' : entry.progressPercent >= 50 ? '#ff9f0a' : '#ff453a'};">${entry.progressPercent || entry.successRate || 0}%</span></td>
                         <td style="color: ${failureColor}; font-size: 11px;">${failureStep}</td>
                         <td>${statusBadge}</td>
                         <td>
@@ -3336,6 +3532,113 @@ WDA Port: ${production.wdaPort}`);
                         }
                     }
                 });
+            }
+        });
+    </script>
+
+    <!-- Debug Pause Overlay -->
+    <div id="debug-pause-overlay" class="debug-pause-overlay">
+        <div class="debug-pause-card">
+            <div class="debug-pause-header">
+                <div class="debug-pause-title">
+                    ⚠️ Debug Mode - Automation Paused
+                </div>
+                <div class="debug-pause-subtitle">
+                    Le script n'a pas trouvé l'élément requis
+                </div>
+                <div class="debug-device-name" id="debug-device-name"></div>
+            </div>
+
+            <div class="debug-pause-info">
+                <div style="font-size: 13px; color: #8e8e93; margin-bottom: 10px;">
+                    Sélecteur non trouvé :
+                </div>
+                <div class="debug-selector" id="debug-selector"></div>
+            </div>
+
+            <div class="debug-instructions">
+                <ol style="margin: 0; padding-left: 20px;">
+                    <li>Ouvrez Appium Inspector pour examiner l'app</li>
+                    <li>Trouvez le bon sélecteur pour l'élément</li>
+                    <li>Modifiez le script avec le nouveau sélecteur</li>
+                    <li>Cliquez sur "Resume" pour réessayer ou "Skip" pour passer</li>
+                </ol>
+            </div>
+
+            <div class="debug-pause-actions">
+                <button class="debug-btn debug-btn-resume" onclick="debugResume()">
+                    ▶️ Resume
+                </button>
+                <button class="debug-btn debug-btn-skip" onclick="debugSkip()">
+                    ⏭️ Skip
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variable to store current debug pause state
+        let currentDebugPause = null;
+
+        // Handle debug pause events from main process
+        if (window.electronAPI) {
+            window.electronAPI.onDebugPause((data) => {
+                console.log('Debug pause triggered:', data);
+                currentDebugPause = data;
+                showDebugPause(data);
+            });
+        }
+
+        function showDebugPause(data) {
+            const overlay = document.getElementById('debug-pause-overlay');
+            const selectorEl = document.getElementById('debug-selector');
+            const deviceNameEl = document.getElementById('debug-device-name');
+
+            if (overlay && selectorEl) {
+                selectorEl.textContent = data.selector || 'Unknown selector';
+
+                // Show device name if available
+                if (deviceNameEl && data.udid) {
+                    const device = appState.devices.get(data.udid);
+                    if (device) {
+                        deviceNameEl.textContent = `Device: ${device.name || data.udid}`;
+                    }
+                }
+
+                overlay.classList.add('active');
+            }
+        }
+
+        function debugResume() {
+            const overlay = document.getElementById('debug-pause-overlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+
+            if (window.electronAPI && currentDebugPause) {
+                window.electronAPI.debugResume(currentDebugPause.udid);
+                addLog('debug', `Debug resumed for device ${currentDebugPause.udid}`);
+                currentDebugPause = null;
+            }
+        }
+
+        function debugSkip() {
+            const overlay = document.getElementById('debug-pause-overlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+
+            if (window.electronAPI && currentDebugPause) {
+                window.electronAPI.debugSkip(currentDebugPause.udid);
+                addLog('debug', `Debug skipped for device ${currentDebugPause.udid}`);
+                currentDebugPause = null;
+            }
+        }
+
+        // Allow closing with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && currentDebugPause) {
+                debugSkip();
             }
         });
     </script>
