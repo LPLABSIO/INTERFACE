@@ -10,34 +10,59 @@ class QuixEmailService {
   }
 
   /**
-   * Génère un nouvel email Gmail temporaire via l'API Quix
+   * Génère un nouvel email temporaire via l'API Quix
+   * Essaye Gmail en premier, puis outlook.com, puis hotmail.com en cas d'indisponibilité
    * @returns {Promise<string>} L'adresse email générée
    */
   async generateEmail() {
-    try {
-      log('Requesting new Gmail address from Quix API...');
+    const domains = ['gmail.com', 'outlook.com', 'hotmail.com'];
+    let lastError = null;
 
-      const response = await axios.get(`${this.baseURL}/${this.apiKey}/emailGet`, {
-        params: {
-          site: 'hinge.co',  // Le site depuis lequel l'email sera envoyé
-          domain: 'gmail.com' // Domaine Gmail spécifiquement
+    for (const domain of domains) {
+      try {
+        log(`Requesting new ${domain} address from Quix API...`);
+
+        const response = await axios.get(`${this.baseURL}/${this.apiKey}/emailGet`, {
+          params: {
+            site: 'hinge.co',  // Le site depuis lequel l'email sera envoyé
+            domain: domain
+          }
+        });
+
+        if (response.data && response.data.success && response.data.result) {
+          const result = response.data.result;
+          this.currentEmail = result.email;
+          this.activationId = result.id;
+
+          // Log avec masquage partiel de l'email
+          const [localPart, domainPart] = this.currentEmail.split('@');
+          log(`Quix email generated: ${localPart.substring(0, 5)}***@${domainPart}`);
+          log(`Activation ID: ${this.activationId}`);
+          return this.currentEmail;
         }
-      });
 
-      if (response.data && response.data.success && response.data.result) {
-        const result = response.data.result;
-        this.currentEmail = result.email;
-        this.activationId = result.id;
-        log(`Quix Gmail generated: ${this.currentEmail.substring(0, 5)}***@gmail.com`);
-        log(`Activation ID: ${this.activationId}`);
-        return this.currentEmail;
+        // Si la réponse indique que le domaine n'est pas disponible, essayer le suivant
+        if (response.data?.error) {
+          log(`${domain} not available: ${response.data.error}`);
+          lastError = response.data.error;
+          continue;
+        }
+
+        throw new Error(response.data?.error || `Failed to generate email from ${domain}`);
+      } catch (error) {
+        log(`Error generating Quix email with ${domain}: ${error.message}`);
+        lastError = error.message;
+
+        // Si c'est le dernier domaine de la liste et qu'on a encore une erreur, on propage l'erreur
+        if (domain === domains[domains.length - 1]) {
+          throw new Error(`Failed to generate email from any domain. Last error: ${lastError}`);
+        }
+        // Sinon, on continue avec le domaine suivant
+        continue;
       }
-
-      throw new Error(response.data?.error || 'Failed to generate email from Quix API');
-    } catch (error) {
-      log(`Error generating Quix email: ${error.message}`);
-      throw error;
     }
+
+    throw new Error(`Could not generate email from any available domain. Last error: ${lastError}`);
   }
 
   /**

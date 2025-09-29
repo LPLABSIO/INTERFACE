@@ -1,11 +1,34 @@
 {
-  "tasks": [],
+  "tasks": [
+    {
+      "id": 1,
+      "type": "create_account",
+      "status": "in_progress",
+      "config": {
+        "app": "hinge-fast",
+        "proxyProvider": "marsproxies",
+        "smsProvider": "daisysms",
+        "emailMethod": "quix",
+        "quixApiKey": "liagirtwcy1mnv0xszjg4ad3tbgqpurn",
+        "debugMode": "assisted"
+      },
+      "createdAt": "2025-09-29T17:30:53.695Z",
+      "attempts": 1,
+      "maxAttempts": 3,
+      "deviceId": "af5afd94d5a9256554e735003c2f72fd16ec22f8",
+      "startedAt": "2025-09-29T17:31:12.333Z"
+    }
+  ],
   "stats": {
-    "total": 0,
+    "total": 1,
     "pending": 0,
-    "inProgress": 0,
+    "inProgress": 1,
     "completed": 0,
     "failed": 0
   },
-  "deviceAssignments": {}
+  "deviceAssignments": {
+    "af5afd94d5a9256554e735003c2f72fd16ec22f8": [
+      1
+    ]
+  }
 }
