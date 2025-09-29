@@ -3,7 +3,7 @@
     {
       "id": 1,
       "type": "create_account",
-      "status": "in_progress",
+      "status": "completed",
       "config": {
         "app": "hinge-fast",
         "proxyProvider": "marsproxies",
@@ -12,23 +12,25 @@
         "quixApiKey": "liagirtwcy1mnv0xszjg4ad3tbgqpurn",
         "debugMode": "assisted"
       },
-      "createdAt": "2025-09-29T17:55:04.055Z",
+      "createdAt": "2025-09-29T18:08:46.532Z",
       "attempts": 1,
       "maxAttempts": 3,
       "deviceId": "af5afd94d5a9256554e735003c2f72fd16ec22f8",
-      "startedAt": "2025-09-29T17:55:09.723Z"
+      "startedAt": "2025-09-29T18:08:52.091Z",
+      "completedAt": "2025-09-29T18:26:57.782Z",
+      "result": {
+        "success": true
+      }
     }
   ],
   "stats": {
     "total": 1,
     "pending": 0,
-    "inProgress": 1,
-    "completed": 0,
+    "inProgress": 0,
+    "completed": 1,
     "failed": 0
   },
   "deviceAssignments": {
-    "af5afd94d5a9256554e735003c2f72fd16ec22f8": [
-      1
-    ]
+    "af5afd94d5a9256554e735003c2f72fd16ec22f8": []
   }
 }
