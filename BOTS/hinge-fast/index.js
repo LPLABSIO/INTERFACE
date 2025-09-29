@@ -794,8 +794,8 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     updateProgress('Date de naissance confirmée', 48);
 
     // Notifications / détails
-    await clickElement( '-ios predicate string:name == "Disable notifications"', 3000, false);
-    await clickElement( '-ios predicate string:name == "Not now"', 3000, false);
+    await clickElement( '-ios predicate string:name == "Disable notifications" AND label == "Disable notifications" AND value == "Disable notifications"', 3000, false);
+    await clickElement( '-ios predicate string:name == "Not now" AND label == "Not now" AND value == "Not now"', 3000, false);
     await clickElement( '-ios predicate string:name == "Next"', 3000, false);
     await clickElement( '-ios predicate string:name == "Add more details" AND label == "Add more details" AND value == "Add more details"', 5000, true);
 
@@ -809,10 +809,9 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     // Configuration du genre et des préférences
     updateProgress('Configuration du profil', 70);
 
-    // Sélection de pronom : she
-    log('Selecting pronom: she');
-    await clickElement( '-ios predicate string:name == "Next"', 3000, false); // Next avant de chercher she
-    await clickElement( '-ios predicate string:name == "she"', 5000, true);
+    // Sélection de pronom : She
+    log('Selecting pronom: She');
+    await clickElement( '-ios predicate string:name == "She"', 5000, true);
     await randomWait(0.5, 1);
     await clickElement( '-ios predicate string:name == "Next"', 5000, true);
 
@@ -828,25 +827,15 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     await randomWait(0.5, 1);
     await clickElement( '-ios predicate string:name == "Next"', 5000, true);
 
-    // Sélection des préférences de relation
-    await clickElement('-ios predicate string:name == "Men"', 5000, true);
-
-    // Sélection aléatoire du type de relation
-    const relationshipTypes = [
-      'Long-term relationship',
-      'Long-term relationship, open to short',
-      'Short-term relationship, open to long',
-      'Short-term relationship'
-    ];
-    const randomRelationship = relationshipTypes[Math.floor(Math.random() * relationshipTypes.length)];
-    log(`Selecting random relationship type: ${randomRelationship}`);
-    await clickElement(`-ios predicate string:name == "${randomRelationship}"`, 5000, true);
     await clickElement('-ios predicate string:name == "Monogamy"', 5000, true);
     await clickElement( '-ios predicate string:name == "Next"', 5000, true);
-    await clickElement( '-ios predicate string:name == "Next"', 3000, false); // Next supplémentaire après monogamy
 
-    // Ethnicité depuis config - Supprimé car remplacé par Next
+    // Ethnicité depuis config
     updateProgress('Configuration du profil démographique', 80);
+    const ethnicity = profile.ethnicity || 'White/Caucasian';
+    await clickElement( `-ios predicate string:name == "${ethnicity}"`, 3000, false);
+    log(`Selected ethnicity: ${ethnicity}`);
+    await clickElement( '-ios predicate string:name == "checked; Visible on profile"', 3000, false);
     await clickElement( '-ios predicate string:name == "Next"', 3000, false);
     await clickElement( '-ios predicate string:name == "Don\'t have children"', 3000, false);
     await clickElement( '-ios predicate string:name == "Next"', 3000, false);
@@ -889,9 +878,6 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     for (let i=0;i<3;i++) {
       await clickElement( '-ios predicate string:name == "Next"', 5000, false);
     }
-    // 2 Next supplémentaires avant "Prefer not to say"
-    await clickElement( '-ios predicate string:name == "Next"', 3000, false);
-    await clickElement( '-ios predicate string:name == "Next"', 3000, false);
     await clickElement( '-ios predicate string:name == "Prefer not to say"', 3000, false);
     await clickElement( '-ios predicate string:name == "Next"', 3000, false);
     const religion = profile.religion || 'Spiritual';
@@ -906,8 +892,6 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     await clickElement( '-ios predicate string:name == "Next"', 3000, false);
     // Questions lifestyle depuis config
     updateProgress('Configuration des préférences lifestyle', 85);
-    // Prefer not to say avant Sometimes
-    await clickElement( '-ios predicate string:name == "Prefer not to say"', 3000, false);
     // Drinking
     const drinking = profile.drinking || 'Sometimes';
     await clickElement( `-ios predicate string:name == "${drinking}"`, 3000, false);
@@ -925,9 +909,6 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
 
     // Drugs (toujours No)
     await clickElement( '-ios predicate string:name == "No"', 3000, false);
-    // 2 fois "No" avant "Fill out profile"
-    await clickElement( '-ios predicate string:name == "No"', 3000, false);
-    await clickElement( '-ios predicate string:name == "No"', 3000, false);
     await clickElement( '-ios predicate string:name == "Fill out your profile" AND label == "Fill out your profile" AND value == "Fill out your profile"', 3000, false);
     updateProgress('Préférences lifestyle configurées', 90);
 
@@ -939,8 +920,6 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
       await clickElement( '-ios predicate string:name == "Camera Roll" AND label == "Camera Roll" AND value == "Camera Roll"', 5000, true);
       await randomWait(1, 2);
       updateProgress('Choix de la première photo', 47);
-      // Délai avant de cliquer sur la première photo
-      await randomWait(1, 2);
       await clickByCoordinates(client, 50, 200);
       updateProgress('Choix de la deuxième photo', 48);
       await clickByCoordinates(client, 200, 200);
@@ -954,12 +933,7 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
       await clickByCoordinates(client, 320, 350);
       await clickElement( '-ios predicate string:name == "Add"', 5000, true);
       updateProgress('Photos ajoutées avec succès', 54);
-      // Correction de l'incrémentation des Next
-      for (let i=0;i<5;i++) {
-        await clickElement( '-ios predicate string:name == "Next"', 3000, false);
-        await randomWait(0.5, 1);
-      }
-      // Remplacer Next par Done
+      for (let i=0;i<5;i++) await clickElement( '-ios predicate string:name == "Next"', 3000, false);
       await clickElement( '-ios predicate string:name == "Done"', 3000, false);
       await clickElement( '-ios predicate string:name == "Next"', 3000, false);
       await clickElement( '-ios predicate string:name == "Next"', 3000, false);
@@ -1038,28 +1012,8 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     }
 
     updateProgress('Finalisation du profil', 95);
-
-    // Séquence finale
-    log('Starting final setup sequence');
-    await clickElement( '-ios predicate string:name == "Next"', 3000, false);
-    await clickElement( '-ios predicate string:name == "Maybe later"', 3000, false);
-    await clickElement( '-ios predicate string:name == "Start sending likes" AND label == "Start sending likes" AND value == "Start sending likes"', 5000, false);
-    await clickElement( '-ios predicate string:name == "Allow"', 3000, false);
-    await clickElement( '-ios predicate string:name == "Send"', 3000, false);
-    await clickElement( '-ios predicate string:name == "OK"', 3000, false);
-
-    log('Account setup completed successfully');
     progressTracker.complete(); // Mark as completed
     updateProgress('Compte créé avec succès !', 100);
-
-    // Terminer l'app
-    try {
-      await client.terminateApp('co.hinge.app');
-      log('App terminated successfully');
-    } catch (e) {
-      log('Could not terminate app:', e.message);
-    }
-
     return true;
   } catch (e) {
     log(`Error during Hinge app session: ${e.message}`, e);

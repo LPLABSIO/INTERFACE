@@ -45,6 +45,11 @@ class QuixEmailService {
         if (response.data?.error) {
           log(`${domain} not available: ${response.data.error}`);
           lastError = response.data.error;
+          // Attendre 2-3 secondes avant d'essayer le domaine suivant
+          if (domain !== domains[domains.length - 1]) {
+            log(`Waiting before trying next domain...`);
+            await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 1000));
+          }
           continue;
         }
 
@@ -57,7 +62,9 @@ class QuixEmailService {
         if (domain === domains[domains.length - 1]) {
           throw new Error(`Failed to generate email from any domain. Last error: ${lastError}`);
         }
-        // Sinon, on continue avec le domaine suivant
+        // Sinon, attendre avant d'essayer le domaine suivant
+        log(`Waiting 2-3 seconds before trying next domain...`);
+        await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 1000));
         continue;
       }
     }
