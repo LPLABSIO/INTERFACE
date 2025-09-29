@@ -830,7 +830,17 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
 
     // Sélection des préférences de relation
     await clickElement('-ios predicate string:name == "Men"', 5000, true);
-    await clickElement('-ios predicate string:name == "Long-term partner"', 5000, true);
+
+    // Sélection aléatoire du type de relation
+    const relationshipTypes = [
+      'Long-term relationship',
+      'Long-term relationship, open to short',
+      'Short-term relationship, open to long',
+      'Short-term relationship'
+    ];
+    const randomRelationship = relationshipTypes[Math.floor(Math.random() * relationshipTypes.length)];
+    log(`Selecting random relationship type: ${randomRelationship}`);
+    await clickElement(`-ios predicate string:name == "${randomRelationship}"`, 5000, true);
     await clickElement('-ios predicate string:name == "Monogamy"', 5000, true);
     await clickElement( '-ios predicate string:name == "Next"', 5000, true);
     await clickElement( '-ios predicate string:name == "Next"', 3000, false); // Next supplémentaire après monogamy
