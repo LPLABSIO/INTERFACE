@@ -142,13 +142,9 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
           await element.click();
         } catch (error) {
           log(`Direct click failed in debug mode: ${error.message}`);
-          const pauseResponse = await pauseForDebug(client, 'Direct element click failed');
-          if (pauseResponse === 'retry') {
-            try {
-              await element.click();
-            } catch (retryError) {
-              log(`Retry failed: ${retryError.message}`);
-            }
+          // En mode debug, on continue sans bloquer
+          if (debugMode === 'assisted') {
+            log('Continuing in assisted debug mode...');
           }
         }
       } else {
@@ -698,15 +694,15 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
       try {
         let verificationCode;
 
-        if (quixService && email && email.includes('@gmail.com')) {
-          // Utiliser Quix si le service est disponible et qu'on a généré un email
+        if (quixService && email) {
+          // Utiliser Quix pour tous les emails générés (gmail.com, outlook.com, hotmail.com)
           log('Waiting for email verification code from Quix...');
           updateProgress('Attente du code de vérification email', 38);
           verificationCode = await quixService.getHingeCode(240000); // 4 minutes au lieu de 2
           log(`Received verification code from Quix: ${verificationCode}`);
           updateProgress('Code de vérification reçu', 40);
-        } else {
-          // Méthode Gmail traditionnelle
+        } else if (email && email.includes('@gmail.com')) {
+          // Méthode Gmail traditionnelle seulement pour les emails Gmail non-Quix
           log('Waiting for email verification code from Gmail...');
           const gmailUser = process.env.GMAIL_IMAP_USER || 'lucas@lpplabs.io';
           const gmailPass = (process.env.GMAIL_IMAP_PASS || 'mxtiogiawujyffyy'); // sans espaces
@@ -789,12 +785,17 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     await randomWait(1, 1.5);
 
     log('Clicking Confirm to validate birthday');
-    await clickElement( '-ios predicate string:name == "Confirm" AND label == "Confirm" AND value == "Confirm"', 5000, true);
+    // Essayer différents sélecteurs pour le bouton Confirm
+    const confirmClicked = await clickElement( '-ios predicate string:name == "Confirm"', 5000, false);
+    if (!confirmClicked) {
+      // Essayer avec un sélecteur moins restrictif
+      await clickElement( '-ios predicate string:label == "Confirm"', 3000, false);
+    }
     updateProgress('Date de naissance confirmée', 48);
 
     // Notifications / détails
-    await clickElement( '-ios predicate string:name == "Disable notifications" AND label == "Disable notifications" AND value == "Disable notifications"', 3000, false);
-    await clickElement( '-ios predicate string:name == "Not now" AND label == "Not now" AND value == "Not now"', 3000, false);
+    await clickElement( '-ios predicate string:name == "Disable notifications"', 3000, false);
+    await clickElement( '-ios predicate string:name == "Not now"', 3000, false);
     await clickElement( '-ios predicate string:name == "Next"', 3000, false);
     await clickElement( '-ios predicate string:name == "Add more details" AND label == "Add more details" AND value == "Add more details"', 5000, true);
 
