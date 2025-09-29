@@ -31,34 +31,37 @@ async function findAndClickWithDebugFallback(client, selector, options = {}) {
   const shouldThrow = assistedMode ? false : throwError;
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      // Importer dynamiquement pour éviter les dépendances circulaires
-      const { findAndClickWithPolling } = require('./utils');
-      await findAndClickWithPolling(client, selector, waitTime, shouldThrow);
+    // Importer dynamiquement pour éviter les dépendances circulaires
+    const { findAndClickWithPolling } = require('./utils');
+
+    // Appeler findAndClickWithPolling qui retourne true/false sans lancer d'erreur
+    const clicked = await findAndClickWithPolling(client, selector, waitTime, false);
+
+    if (clicked) {
       if (attempt > 1) {
         log(`✅ Élément trouvé après intervention manuelle (tentative ${attempt})`);
       }
       return true;
-    } catch (error) {
-      if (!assistedMode && throwError) {
-        throw error; // En mode normal, on propage l'erreur si demandé
-      }
+    }
 
-      log(`⚠️ DEBUG ASSISTÉ - Élément non trouvé: ${selector}`);
-      log(`   → Tentative ${attempt}/${maxRetries}`);
-      log(`   → Vous pouvez intervenir manuellement`);
-      log(`   → Le bot réessayera dans ${retryInterval/1000} secondes...`);
+    // L'élément n'a pas été trouvé
+    if (!assistedMode && throwError) {
+      throw new Error(`Element not clickable after ${waitTime}ms: ${selector}`);
+    }
 
-      if (attempt < maxRetries) {
-        // Attendre avant de réessayer
-        await randomWait(retryInterval/1000, retryInterval/1000 + 2);
+    // En mode assisté, on affiche les messages et on pause
+    log(`⚠️ DEBUG ASSISTÉ - Élément non trouvé: ${selector}`);
+    log(`   → Tentative ${attempt}/${maxRetries}`);
+    log(`   → Vous pouvez intervenir manuellement`);
+    log(`   → Le bot réessayera dans ${retryInterval/1000} secondes...`);
 
-        // Vérifier si on peut continuer (l'utilisateur a peut-être déjà fait l'action)
-        log(`   → Nouvelle tentative...`);
-      } else {
-        log(`⏭️ DEBUG ASSISTÉ - Passage à l'étape suivante après ${maxRetries} tentatives`);
-        return false; // On continue le flow sans bloquer
-      }
+    if (attempt < maxRetries) {
+      // Attendre avant de réessayer
+      await randomWait(retryInterval/1000, retryInterval/1000 + 2);
+      log(`   → Nouvelle tentative...`);
+    } else {
+      log(`⏭️ DEBUG ASSISTÉ - Passage à l'étape suivante après ${maxRetries} tentatives`);
+      return false; // On continue le flow sans bloquer
     }
   }
 

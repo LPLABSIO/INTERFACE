@@ -314,9 +314,23 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
         await client.execute('mobile: tap', { x: 315, y: 230 });
         await randomWait(0.3, 0.5);
 
-        // Écrire Proxy String directement
+        // Écrire Proxy String rapidement
         log(`Writing proxy string: ${proxyString}`);
-        await findAndTypeCharByChar(client, proxyString, true);
+        try {
+          // Méthode 1: Essayer setValue directement après avoir l'élément actif
+          await client.execute('mobile: setValue', { value: proxyString });
+          log('Proxy string written quickly with mobile:setValue');
+        } catch (setValueError) {
+          log(`mobile:setValue failed: ${setValueError.message}, trying alternative...`);
+          try {
+            // Méthode 2: Utiliser la commande sendKeys du client
+            await client.sendKeys(proxyString.split(''));
+            log('Proxy string written with sendKeys()');
+          } catch (sendKeysError) {
+            log(`sendKeys also failed: ${sendKeysError.message}, falling back to char-by-char`);
+            await findAndTypeCharByChar(client, proxyString, true);
+          }
+        }
         await randomWait(0.5, 0.8);
         log('Proxy String configured successfully');
         updateProgress('Proxy configuré avec succès', 12);
@@ -349,9 +363,23 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
       await client.execute('mobile: tap', { x: 315, y: 190 });
       await randomWait(0.3, 0.5);
 
-      // Écrire MP Credentials directement
+      // Écrire MP Credentials rapidement
       log(`Writing MP Credentials: ${mpCredential}`);
-      await findAndTypeCharByChar(client, mpCredential, true);
+      try {
+        // Méthode 1: Essayer setValue directement après avoir l'élément actif
+        await client.execute('mobile: setValue', { value: mpCredential });
+        log('MP Credentials written quickly with mobile:setValue');
+      } catch (setValueError) {
+        log(`mobile:setValue failed: ${setValueError.message}, trying alternative...`);
+        try {
+          // Méthode 2: Utiliser la commande sendKeys du client
+          await client.sendKeys(mpCredential.split(''));
+          log('MP Credentials written with sendKeys()');
+        } catch (sendKeysError) {
+          log(`sendKeys also failed: ${sendKeysError.message}, falling back to char-by-char`);
+          await findAndTypeCharByChar(client, mpCredential, true);
+        }
+      }
       await randomWait(0.5, 0.8);
       log('MP Credentials configured successfully');
     } catch (mpError) {
@@ -528,9 +556,72 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     updateProgress('Validation du code SMS', 30);
     log('Clicked Next after SMS code');
 
-    // Basic info
+    // Basic info - Attendre que la page soit bien chargée
     progressTracker.moveToStep('basic_info');
-    await clickElement('-ios predicate string:name == "Enter basic info" AND label == "Enter basic info" AND type == "XCUIElementTypeButton"', 5000, true);
+    await randomWait(2, 3); // Attendre que la page soit bien chargée après le SMS
+    log(`Attempting to click "Enter basic info" button (Debug mode: ${isDebugAssisted ? 'ASSISTED' : 'OFF'})`);
+
+    // Essayer plusieurs fois de cliquer si nécessaire
+    let pageChanged = false;
+    for (let attempt = 1; attempt <= 3 && !pageChanged; attempt++) {
+      if (attempt > 1) {
+        log(`Retry attempt ${attempt}/3 for "Enter basic info" button...`);
+      }
+
+      const basicInfoClicked = await clickElement('-ios predicate string:name == "Enter basic info" AND label == "Enter basic info" AND type == "XCUIElementTypeButton"', 5000, attempt === 3);
+
+      if (basicInfoClicked) {
+        log(`✅ "Enter basic info" button clicked (attempt ${attempt})`);
+        // Attendre un peu plus pour la transition
+        await randomWait(2, 3);
+        log('Verifying page transition...');
+
+        try {
+          // Vérifier plusieurs éléments qui devraient être présents sur la page suivante
+          const textFields = await client.$$('-ios predicate string:type == "XCUIElementTypeTextField"');
+          const hasTextFields = textFields.length > 0;
+
+          if (hasTextFields) {
+            // Essayer de vérifier si un champ est visible
+            for (const field of textFields) {
+              try {
+                if (await field.isDisplayed()) {
+                  log('✅ Page transition successful - text field visible');
+                  pageChanged = true;
+                  break;
+                }
+              } catch {}
+            }
+          }
+
+          if (!pageChanged) {
+            log(`⚠️ Page may not have changed (attempt ${attempt}) - no visible text fields`);
+            if (attempt < 3) {
+              await randomWait(1, 2);
+            }
+          }
+        } catch (e) {
+          log(`⚠️ Could not verify page transition (attempt ${attempt}): ${e.message}`);
+        }
+      } else {
+        log(`❌ Button not found on attempt ${attempt}`);
+      }
+    }
+
+    // Si après 3 tentatives la page n'a pas changé
+    if (!pageChanged) {
+      if (isDebugAssisted) {
+        log('🔧 DEBUG MODE PAUSE: Page transition failed after 3 attempts');
+        log('📝 Please manually click "Enter basic info" or check what\'s happening');
+        log('⏸️ Pausing for manual intervention...');
+        await randomWait(10, 15); // Donner beaucoup de temps pour intervention manuelle
+        log('▶️ Resuming after pause...');
+      } else {
+        log('❌ CRITICAL ERROR: Could not transition to basic info page after 3 attempts');
+        throw new Error('Failed to click "Enter basic info" button after 3 attempts');
+      }
+    }
+
     progressTracker.moveToStep('first_name');
     const firstName = profile.firstName || 'Emma';
     await randomWait(1.5, 2); // Attendre plus longtemps pour que le champ soit bien prêt
@@ -717,15 +808,15 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     // Configuration du genre et des préférences
     updateProgress('Configuration du profil', 70);
 
-    // Sélection du genre : Woman
-    log('Selecting gender: Woman');
-    await clickElement( '-ios predicate string:name == "Woman" AND label == "Woman" AND value == "Woman"', 5000, true);
-    await randomWait(0.5, 1);
-    await clickElement( '-ios predicate string:name == "Next"', 5000, true);
-
     // Sélection de pronom : She
     log('Selecting pronom: She');
     await clickElement( '-ios predicate string:name == "She"', 5000, true);
+    await randomWait(0.5, 1);
+    await clickElement( '-ios predicate string:name == "Next"', 5000, true);
+
+    // Sélection du genre : Woman
+    log('Selecting gender: Woman');
+    await clickElement( '-ios predicate string:name == "Woman" AND label == "Woman" AND value == "Woman"', 5000, true);
     await randomWait(0.5, 1);
     await clickElement( '-ios predicate string:name == "Next"', 5000, true);
 
@@ -735,56 +826,8 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     await randomWait(0.5, 1);
     await clickElement( '-ios predicate string:name == "Next"', 5000, true);
 
-    // Sélection de la préférence : Men
-    log('Selecting preference: Men');
-    await clickElement( '-ios predicate string:name == "Men"', 5000, true);
-    await randomWait(0.5, 1);
-    await clickElement( '-ios predicate string:name == "Next"', 5000, true);
-
-
-    // Sélections par XPaths
-    try {
-      const el1 = await client.$('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeOther[2]');
-      await clickDirectElement(el1);
-    } catch {}
-    await clickElement( '-ios predicate string:name == "Next"', 3000, false);
-    try {
-      const el2 = await client.$('//XCUIElementTypeTable/XCUIElementTypeCell[2]/XCUIElementTypeOther[5]');
-      await clickDirectElement(el2);
-    } catch {}
-    await clickElement( '-ios predicate string:name == "Next"', 3000, false);
-    try {
-      const el3 = await client.$('//XCUIElementTypeTable/XCUIElementTypeCell[2]/XCUIElementTypeOther[3]');
-      await clickDirectElement(el3);
-    } catch {}
-    await clickElement( '-ios predicate string:name == "Next"', 3000, false);
-    try {
-      const el4 = await client.$('//XCUIElementTypeTable/XCUIElementTypeCell[1]/XCUIElementTypeOther[2]');
-      await clickDirectElement(el4);
-    } catch {}
-    await clickElement( '-ios predicate string:name == "Next"', 3000, false);
-
-    // Relations et monogamie (depuis config)
-    updateProgress('Configuration des préférences de relation', 75);
-    const relationshipGoal = profile.relationshipGoal || 'Long-term relationship, open to short';
-    await clickElement(`-ios predicate string:name == "${relationshipGoal}"`, 30000);
-    log(`Selected relationship goal: ${relationshipGoal}`);
-    await clickElement('-ios predicate string:name == "Next"', 5000, true);
     await clickElement('-ios predicate string:name == "Monogamy"', 5000, true);
-    await clickElement('-ios predicate string:name == "Next"', 5000, true);
-    updateProgress('Préférences de relation configurées', 77);
-
-    // Scroll containers aléatoires
-    try {
-      const xpaths = [
-        '//XCUIElementTypeApplication[@name="Hinge"]/XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeScrollView[2]',
-        '//XCUIElementTypeApplication[@name="Hinge"]/XCUIElementTypeWindow[1]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeScrollView[2]/XCUIElementTypeOther/XCUIElementTypeOther'
-      ];
-      const pick = xpaths[Math.floor(Math.random()*xpaths.length)];
-      const el = await client.$(pick);
-      if (el) await el.click();
-    } catch {}
-    await clickElement( '-ios predicate string:name == "Next"', 3000, false);
+    await clickElement( '-ios predicate string:name == "Next"', 5000, true);
 
     // Ethnicité depuis config
     updateProgress('Configuration du profil démographique', 80);
@@ -802,13 +845,37 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
 
     // Ville du proxy
     if (location?.city) {
+      // Click sur le champ pour s'assurer qu'il est bien focusé
+      const hometownField = await client.$('-ios predicate string:type == "XCUIElementTypeTextField" OR type == "XCUIElementTypeTextView"');
+      if (await hometownField.isDisplayed()) {
+        await hometownField.click();
+        // Attendre que le champ soit complètement prêt
+        await randomWait(1, 1.5);
+
+        // Effacer le contenu existant s'il y en a
+        try {
+          await hometownField.clear();
+        } catch (e) {
+          // Ignorer si clear n'est pas supporté
+        }
+
+        // Attendre un peu après le clear
+        await randomWait(0.5, 0.8);
+      }
+
+      // Maintenant taper le nom de la ville
+      log(`Typing hometown: ${location.city}`);
       await findAndTypeCharByChar(client, location.city);
+
+      // Petit délai pour s'assurer que le texte est bien écrit
+      await randomWait(0.5, 1);
+
       await clickElement( '-ios predicate string:name == "Next"', 3000, false);
     }
 
     // Chaîne de Next
     for (let i=0;i<3;i++) {
-      await clickElement( '-ios predicate string:name == "Next"', 3000, false);
+      await clickElement( '-ios predicate string:name == "Next"', 5000, false);
     }
     await clickElement( '-ios predicate string:name == "Prefer not to say"', 3000, false);
     await clickElement( '-ios predicate string:name == "Next"', 3000, false);
@@ -818,7 +885,10 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
     await clickElement( '-ios predicate string:name == "Next"', 3000, false);
     await clickElement( '-ios predicate string:name == "Prefer not to say"', 3000, false);
     await clickElement( '-ios predicate string:name == "Next"', 3000, false);
-
+    await clickElement( '-ios predicate string:name == "Prefer not to say"', 3000, false);
+    await clickElement( '-ios predicate string:name == "Next"', 3000, false);
+    await clickElement( '-ios predicate string:name == "Prefer not to say"', 3000, false);
+    await clickElement( '-ios predicate string:name == "Next"', 3000, false);
     // Questions lifestyle depuis config
     updateProgress('Configuration des préférences lifestyle', 85);
     // Drinking
@@ -846,7 +916,7 @@ async function runHingeApp(client, location, phone, proxyInfo, smsProvider = 'ap
       updateProgress('Sélection des photos de profil', 45);
       const photoButton = await client.$('//XCUIElementTypeCell[@name=" Add 1st photo. "]/XCUIElementTypeOther/XCUIElementTypeImage');
       await clickDirectElement(photoButton);
-      await clickElement( '-ios predicate string:name == "Browse photo library instead"', 5000, true);
+      await clickElement( '-ios predicate string:name == "Camera Roll" AND label == "Camera Roll" AND value == "Camera Roll"', 5000, true);
       await randomWait(1, 2);
       updateProgress('Choix de la première photo', 47);
       await clickByCoordinates(client, 50, 200);

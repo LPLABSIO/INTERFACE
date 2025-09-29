@@ -317,7 +317,7 @@ async function main() {
 
       // Exécuter Hinge (utiliser BOT_MODE si défini)
       const botMode = process.env.BOT_MODE || 'hinge';
-      const debugMode = config.debugMode || process.env.DEBUG_MODE || null;
+      const debugMode = process.env.DEBUG_MODE || null;
       log(`🤖 Using bot mode: ${botMode}`);
       if (debugMode) {
         log(`🔧 Debug mode: ${debugMode}`);
