@@ -384,8 +384,20 @@ class UnifiedStateManager extends EventEmitter {
       // Créer une sauvegarde
       await this.createBackup();
 
+      // Replacer pour éviter les références circulaires
+      const seen = new WeakSet();
+      const replacer = (key, value) => {
+        if (typeof value === 'object' && value !== null) {
+          if (seen.has(value)) {
+            return '[Circular]';
+          }
+          seen.add(value);
+        }
+        return value;
+      };
+
       // Écriture atomique
-      const data = JSON.stringify(this.state, null, 2);
+      const data = JSON.stringify(this.state, replacer, 2);
       const tempPath = this.mainStatePath + '.tmp';
 
       await fs.writeFile(tempPath, data);

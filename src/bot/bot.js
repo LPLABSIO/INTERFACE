@@ -58,6 +58,15 @@ async function setupAndRunHinge(client, proxyInfo, location, phone, smsProvider,
 }
 
 /**
+ * Configure et exécute Tinder avec BlazeX
+ */
+async function setupAndRunTinder(client, proxyInfo, location, phone, smsProvider) {
+  log("🚀 Using Tinder mode with BlazeX GPS spoofing");
+  const { runTinderApp } = require("../../BOTS/tinder/index");
+  await runTinderApp(client, phone, location, proxyInfo);
+}
+
+/**
  * Traite une tâche depuis la queue
  */
 async function processQueueTask(client, task) {
@@ -103,9 +112,13 @@ async function processQueueTask(client, task) {
   log(`Getting phone number from ${provider}...`);
 
   let phone;
+  const appType = config.app || 'hinge';
+
   if (provider === 'daisysms') {
     // DaisySMS nécessite area_code, carrier et service
-    phone = await smsService.rentNumber(null, null, 'vz'); // 'vz' est le code pour Hinge
+    // 'vz' pour Hinge, 'ti' pour Tinder
+    const serviceCode = appType === 'tinder' ? 'ti' : 'vz';
+    phone = await smsService.rentNumber(null, null, serviceCode);
   } else if (provider === 'api21k') {
     // API21K n'a pas besoin de paramètres
     phone = await smsService.rentNumber();
@@ -118,10 +131,15 @@ async function processQueueTask(client, task) {
     throw new Error('Failed to get phone number');
   }
 
-  // Exécuter Hinge (normal ou fast selon config)
+  // Exécuter le bot selon l'app configurée
   const appType = config.app || 'hinge';
   const debugMode = config.debugMode || null;
-  await setupAndRunHinge(client, proxyInfo, location, phone, provider, appType, debugMode);
+
+  if (appType === 'tinder') {
+    await setupAndRunTinder(client, proxyInfo, location, phone, provider);
+  } else {
+    await setupAndRunHinge(client, proxyInfo, location, phone, provider, appType, debugMode);
+  }
 
   // Sauvegarder la location utilisée
   await saveLocations(location.city, location_file);
