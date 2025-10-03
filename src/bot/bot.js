@@ -116,8 +116,8 @@ async function processQueueTask(client, task) {
 
   if (provider === 'daisysms') {
     // DaisySMS nécessite area_code, carrier et service
-    // 'vz' pour Hinge, 'ti' pour Tinder
-    const serviceCode = appType === 'tinder' ? 'ti' : 'vz';
+    // 'vz' pour Hinge, 'oi' pour Tinder
+    const serviceCode = appType === 'tinder' ? 'oi' : 'vz';
     phone = await smsService.rentNumber(null, null, serviceCode);
   } else if (provider === 'api21k') {
     // API21K n'a pas besoin de paramètres
