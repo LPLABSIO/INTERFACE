@@ -1,5 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
+const { getInstance: getUnifiedStateManager } = require('./UnifiedStateManager');
 
 /**
  * Gestionnaire de queue pour la production multi-appareils
@@ -7,7 +8,9 @@ const path = require('path');
  */
 class QueueManager {
   constructor(configPath = null) {
+    // MIGRATION: On garde configPath pour compatibilité mais on utilise UnifiedStateManager
     this.configPath = configPath || path.join(__dirname, '../../config/app/queue-state.json');
+    this.stateManager = null; // Sera initialisé dans initialize()
     this.state = {
       tasks: [],
       stats: {
@@ -26,22 +29,30 @@ class QueueManager {
    * Initialise le gestionnaire de queue
    */
   async initialize() {
-    console.log('[QueueManager] Initializing...');
-    console.log('[QueueManager] Config path:', this.configPath);
+    console.log('[QueueManager] Initializing with UnifiedStateManager...');
 
     try {
-      // Créer le dossier si nécessaire
-      const dir = path.dirname(this.configPath);
-      await fs.mkdir(dir, { recursive: true });
+      // Initialiser UnifiedStateManager
+      this.stateManager = getUnifiedStateManager();
+      if (!this.stateManager.isInitialized) {
+        await this.stateManager.initialize();
+      }
 
-      // Charger l'état existant
+      // Charger l'état depuis UnifiedStateManager
       await this.loadState();
 
       // Nettoyer les tâches abandonnées
-      await this.cleanupAbandonedTasks();
+      // Au démarrage, toutes les tâches in_progress sont forcément abandonnées (crash)
+      await this.cleanupAbandonedTasks(true);
+
+      // Démarrer un nettoyage périodique (toutes les 10 secondes)
+      this.cleanupInterval = setInterval(async () => {
+        await this.cleanupAbandonedTasks(false);
+      }, 10000);
 
       console.log('[QueueManager] Initialized with', this.state.tasks.length, 'tasks');
       console.log('[QueueManager] Tasks:', this.state.tasks.map(t => ({ id: t.id, status: t.status })));
+      console.log('[QueueManager] Periodic cleanup enabled (every 10s)');
     } catch (error) {
       console.error('[QueueManager] Initialization error:', error);
       throw error;
@@ -49,32 +60,46 @@ class QueueManager {
   }
 
   /**
-   * Charge l'état depuis le fichier
+   * Charge l'état depuis UnifiedStateManager
    */
   async loadState() {
     try {
-      console.log('[QueueManager] Loading state from:', this.configPath);
-      const data = await fs.readFile(this.configPath, 'utf8');
-      this.state = JSON.parse(data);
-      console.log('[QueueManager] State loaded from file, tasks:', this.state.tasks.length);
-    } catch (error) {
-      if (error.code === 'ENOENT') {
-        console.log('[QueueManager] No existing state file, starting fresh');
-        await this.saveState();
+      // Charger depuis UnifiedStateManager
+      const queueState = this.stateManager.get('queue');
+
+      if (queueState && Object.keys(queueState).length > 0) {
+        this.state = queueState;
+        console.log('[QueueManager] State loaded from UnifiedStateManager, tasks:', this.state.tasks?.length || 0);
       } else {
-        console.error('[QueueManager] Error loading state:', error);
-        throw error;
+        console.log('[QueueManager] No existing queue state, initializing with defaults');
+        // Initialiser avec les valeurs par défaut
+        this.state = {
+          tasks: [],
+          stats: {
+            total: 0,
+            pending: 0,
+            inProgress: 0,
+            completed: 0,
+            failed: 0
+          },
+          deviceAssignments: {}
+        };
+        await this.saveState();
       }
+    } catch (error) {
+      console.error('[QueueManager] Error loading state:', error);
+      throw error;
     }
   }
 
   /**
-   * Sauvegarde l'état dans le fichier
+   * Sauvegarde l'état dans UnifiedStateManager
    */
   async saveState() {
-    const tempPath = this.configPath + '.tmp';
-    await fs.writeFile(tempPath, JSON.stringify(this.state, null, 2));
-    await fs.rename(tempPath, this.configPath);
+    // Sauvegarder dans UnifiedStateManager
+    await this.stateManager.set('queue', this.state);
+    // La rétrocompatibilité avec l'ancien fichier est gérée automatiquement par UnifiedStateManager
+    console.log('[QueueManager] State saved via UnifiedStateManager');
   }
 
   /**
@@ -235,29 +260,67 @@ class QueueManager {
   }
 
   /**
-   * Nettoie les tâches abandonnées (timeout)
+   * Nettoie les tâches abandonnées (timeout ou crash)
+   * @param {boolean} isStartup - Si true, reset toutes les tâches in_progress (crash recovery)
    */
-  async cleanupAbandonedTasks() {
+  async cleanupAbandonedTasks(isStartup = false) {
     const now = Date.now();
     let cleaned = 0;
+    let recoveredFromCrash = 0;
 
     for (const task of this.state.tasks) {
-      if (task.status === 'in_progress' && task.startedAt) {
-        const startTime = new Date(task.startedAt).getTime();
-        if (now - startTime > this.lockTimeout) {
-          // Tâche abandonnée, la remettre en pending
+      if (task.status === 'in_progress') {
+        let shouldReset = false;
+
+        if (isStartup) {
+          // Au démarrage, toutes les tâches in_progress sont abandonnées (crash/restart)
+          shouldReset = true;
+          recoveredFromCrash++;
+          console.log(`[QueueManager] 🔄 Recovering task ${task.id} from crash (was in_progress)`);
+        } else if (task.startedAt) {
+          // En runtime, vérifier le timeout
+          const startTime = new Date(task.startedAt).getTime();
+          if (now - startTime > this.lockTimeout) {
+            shouldReset = true;
+            console.log(`[QueueManager] ⏱️ Task ${task.id} timed out after ${Math.round((now - startTime) / 1000)}s`);
+          }
+        }
+
+        if (shouldReset) {
+          // Remettre la tâche en pending
           task.status = 'pending';
           delete task.deviceId;
           delete task.startedAt;
           cleaned++;
+
+          // Nettoyer aussi les assignations d'appareils si nécessaire
+          if (task.deviceId && this.state.deviceAssignments[task.deviceId]) {
+            const deviceTasks = this.state.deviceAssignments[task.deviceId];
+            const index = deviceTasks.indexOf(task.id);
+            if (index > -1) {
+              deviceTasks.splice(index, 1);
+            }
+          }
         }
+      }
+    }
+
+    // Nettoyer les assignations d'appareils orphelines au démarrage
+    if (isStartup) {
+      for (const deviceId in this.state.deviceAssignments) {
+        this.state.deviceAssignments[deviceId] = [];
+      }
+      if (recoveredFromCrash > 0) {
+        console.log(`[QueueManager] ✅ Recovered ${recoveredFromCrash} tasks from previous crash`);
       }
     }
 
     if (cleaned > 0) {
       this.updateStats();
       await this.saveState();
-      // console.log(`[QueueManager] Cleaned up ${cleaned} abandoned tasks`);
+      if (!isStartup) {
+        console.log(`[QueueManager] Cleaned up ${cleaned} abandoned tasks`);
+      }
     }
   }
 
@@ -320,6 +383,24 @@ class QueueManager {
    */
   getTasks() {
     return this.state.tasks;
+  }
+
+  /**
+   * Arrête proprement le gestionnaire de queue
+   */
+  async shutdown() {
+    console.log('[QueueManager] Shutting down...');
+
+    // Arrêter le nettoyage périodique
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = null;
+      console.log('[QueueManager] Periodic cleanup stopped');
+    }
+
+    // Sauvegarder l'état final
+    await this.saveState();
+    console.log('[QueueManager] Final state saved');
   }
 }
 

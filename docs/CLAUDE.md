@@ -1,15 +1,12 @@
 # CLAUDE.md
 
-Ce fichier fournit des indications à Claude Code (claude.ai/code) lors du travail avec le code de ce dépôt.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Vue d'ensemble du projet
+## Project Overview
 
-**Plateforme d'automatisation iOS multi-appareils professionnelle** avec gestion intelligente des ressources :
-- **Interface Electron** : Application desktop pour monitoring et contrôle centralisé
-- **Architecture modulaire** : Séparation claire entre interface, bots et modules partagés
-- **Production System** : Support de 50+ appareils simultanés avec allocation thread-safe
+**iOS Multi-Device Automation Platform** (v0.2.0) - Professional automation system supporting 50+ simultaneous iOS devices with thread-safe resource management and real-time monitoring via Electron interface.
 
-## Architecture Actuelle (v0.2.0)
+## High-Level Architecture
 
 ```
 INTERFACE/
@@ -67,22 +64,68 @@ INTERFACE/
     └── start_appium.sh       # Lancement Appium
 ```
 
-## Commandes courantes
+## Essential Commands
 
-### Production Multi-Appareils
+### Development & Testing
 
 ```bash
-# Lancer l'API server
+# Start API server (port 3000)
 npm start
 
-# Lancer l'interface graphique
+# Launch Electron UI
 npm run ui
 
-# Mode développement
+# Development mode with hot reload
 npm run dev
+
+# Run tests
+npm test                  # All tests
+npm run test:ui          # UI tests via Lerna
+npm run api:test         # API tests only
+
+# Code quality
+npm run lint             # ESLint check
+npm run format           # Prettier formatting
+
+# Clean & rebuild
+npm run clean            # Remove build artifacts
+npm run bootstrap        # Lerna bootstrap packages
 ```
 
-### Configuration Environnement
+### Production Operations
+
+```bash
+# Start multi-device production
+npm run ui               # Open UI first
+# Then use UI to select devices and start production
+
+# Manual bot execution (legacy)
+export APPIUM_PORT=4723
+export APPIUM_UDID=<device_udid>
+export WDA_URL=http://<ip>:8100
+npm run bot
+
+# Build executables
+npm run build:mac        # macOS build
+npm run build:win        # Windows build
+```
+
+### Appium & Device Setup
+
+```bash
+# Start Appium server
+npm run appium           # Uses scripts/start_appium.sh
+# Or manually:
+npx appium --address 127.0.0.1 --port 4723 --allow-cors
+
+# List connected iOS devices
+idevice_id -l
+
+# Get device info
+ideviceinfo -u <udid>
+```
+
+### Environment Configuration
 
 ```bash
 # Variables d'environnement bot.js
@@ -97,9 +140,9 @@ export HINGE_EMAIL=email@example.com
 export HINGE_LOCATION='{"city":"Austin","state":"TX","lat":30.2672,"lon":-97.7431}'
 ```
 
-## Flux de Production
+## Key Architecture Patterns
 
-### 1. Allocation Thread-Safe des Ressources
+### Thread-Safe Resource Management
 
 ```javascript
 // LocationManager - Prévention des conflits
@@ -113,7 +156,7 @@ const email = await resourceManager.acquireEmail('hinge');
 await resourceManager.releaseEmail(email);
 ```
 
-### 2. Queue System avec Priorités
+### Priority Queue System
 
 ```javascript
 // Ajout de tâches prioritaires
@@ -125,7 +168,7 @@ await queueManager.addTask({
 });
 ```
 
-### 3. Communication IPC Electron
+### IPC Communication Channels
 
 ```javascript
 // Canaux principaux
@@ -136,9 +179,9 @@ await queueManager.addTask({
 'error:occurred'       // Gestion erreurs
 ```
 
-## Points d'Attention Techniques
+## Critical Technical Patterns
 
-### Sélection d'éléments WebDriverIO
+### WebDriverIO Element Selection
 ```javascript
 // Prédicats iOS
 await driver.$('-ios predicate string:type == "XCUIElementTypeButton" AND name CONTAINS "Continue"');
@@ -150,37 +193,37 @@ await driver.$('~accessibility-id');
 await driver.$('-ios class chain:**/XCUIElementTypeButton[`name == "Allow"`]');
 ```
 
-### Gestion EPIPE Errors
+### EPIPE Error Handling
 - Protection multi-niveaux intégrée
 - Global error handler dans main.js
 - Retry automatique avec backoff exponentiel
 
-### Architecture Multi-Device
+### Multi-Device Port Allocation
 - Ports Appium dynamiques (4723+)
 - Ports WDA dynamiques (8100+)
 - Isolation complète entre appareils
 - Queue centralisée avec priorités
 
-## Flux de Développement
+## Development Workflows
 
-### Ajouter une nouvelle app
+### Adding New Application Support
 1. Créer module dans `BOTS/<app>/index.js`
 2. Implémenter interface standard (setup, createAccount, etc.)
 3. Ajouter ressources dans `data/emails/<app>.txt`
 4. Mettre à jour ResourceManager pour gérer la nouvelle app
 
-### Ajouter un provider SMS
+### Adding SMS Provider
 1. Créer module dans `SHARED/sms-providers/<provider>.js`
 2. Implémenter interface: `getNumber()`, `getCode()`
 3. Ajouter configuration API dans `.env`
 
-### Debug d'automatisation
+### Debugging Automation Issues
 1. Logs temps réel dans l'interface Electron
 2. Vérifier `data/logs/` pour traces complètes
 3. Utiliser Appium Inspector pour sélecteurs
 4. Scripts debug dans `scripts/debug/`
 
-## Métriques Système
+## System Performance Metrics
 
 | Métrique | Valeur |
 |----------|--------|
@@ -191,26 +234,17 @@ await driver.$('-ios class chain:**/XCUIElementTypeButton[`name == "Allow"`]');
 | **Providers SMS** | 3 actifs |
 | **Architecture** | Thread-safe, EPIPE protected |
 
-## Phase Actuelle : 6 - Advanced Features (40%)
+## Current Development Phase
 
-### Complété
-- ✅ Queue prioritization dynamique
-- ✅ Health monitoring système
-- ✅ Protection EPIPE multi-niveaux
-- ✅ Resource management thread-safe
+Phase 7 (Hinge Bot V1) - 100% Complete
+- Stable V1 with complete flow from account creation to app termination
+- Debug mode with pause/retry instead of crash
+- Email fallback (Gmail → Outlook → Hotmail)
+- Natural delays between actions (1-2 seconds)
+- Random relationship type selection
 
-### En cours
-- 🚧 ML-based optimization
-- 🚧 Advanced analytics
-- 🚧 Auto-scaling
 
-### Prochaine Phase : 7 - Script Optimization
-- Optimisation complète script Hinge
-- Variations dynamiques par région
-- Templates adaptatifs
-- A/B testing intégré
-
-## Dépendances Critiques
+## Critical Dependencies
 
 - **WebDriverIO** (^9.19.2) : Client automation
 - **Electron** (^31.3.0) : Interface desktop
@@ -219,10 +253,74 @@ await driver.$('-ios class chain:**/XCUIElementTypeButton[`name == "Allow"`]');
 - **@turf/turf** (^7.2.0) : Calculs géographiques
 - **Lerna** (^8.2.4) : Monorepo management
 
-## Notes Importantes
+## Important Architectural Decisions
 
-1. **Thread Safety** : LocationManager et ResourceManager garantissent aucun conflit
-2. **EPIPE Protection** : Gestion robuste des erreurs de pipe
-3. **Scalabilité** : Architecture prête pour 50+ appareils
-4. **Modularité** : SHARED/ pour code réutilisable entre apps
-5. **Clean Architecture** : Séparation claire UI/Core/Bot/API
+1. **Thread-Safe Managers**: LocationManager and ResourceManager use mutex locks to prevent concurrent access conflicts
+2. **EPIPE Protection**: Triple-layer protection against pipe errors in main.js
+3. **Dynamic Port Allocation**: Each device gets unique Appium (4723+N) and WDA (8100+N) ports
+4. **Shared Modules**: SHARED/ directory contains reusable modules across all bot implementations
+5. **Clean Separation**: UI (Electron) → API (Express) → Core (Orchestrator) → Bots (WebDriverIO)
+6. **State Management Migration**: UnifiedStateManager centralizes all state (replaces multiple JSON files) with backward compatibility via legacy file sync
+
+## New State Management Pattern (UnifiedStateManager)
+
+The codebase is migrating from multiple scattered JSON files to a centralized UnifiedStateManager:
+
+```javascript
+// Old pattern (deprecated)
+const state = JSON.parse(fs.readFileSync('data/state.json'));
+
+// New pattern (preferred)
+const stateManager = require('./src/core/UnifiedStateManager').getInstance();
+await stateManager.initialize();
+const uiState = stateManager.get('ui');
+await stateManager.set('ui', updatedState);
+```
+
+**Namespace mapping:**
+- `ui` → Replaces `data/state.json`
+- `queue` → Replaces `config/app/queue-state.json`
+- `servers` → Replaces `config/app/appium_servers.json`
+- `locations` → Replaces `config/app/locations-state.json`
+- `resources` → Replaces `config/app/emails-state.json`
+
+**Key features:**
+- Automatic migration from legacy files on first run
+- Auto-save with 5-second interval
+- Backup rotation (5 max backups)
+- Legacy sync enabled by default for backward compatibility
+
+## Port Management
+
+The platform includes sophisticated port cleanup utilities in [src/utils/port-cleanup.js](src/utils/port-cleanup.js):
+
+```bash
+# Cleanup zombie ports from crashes
+node -e "require('./src/utils/port-cleanup').smartCleanup()"
+
+# Common ports used:
+# - Appium: 4723-4727, 1265-1269 (custom)
+# - WDA: 8100-8104
+```
+
+## Debugging Bot Scripts
+
+When working on bot automation scripts (BOTS/*/index.js):
+
+1. **Debug Mode**: Use debug helpers from `SHARED/utils/debug-helpers.js`
+   ```javascript
+   const { setDebugMode, debugPause, logDebugStep } = require('../../SHARED/utils/debug-helpers');
+   setDebugMode(true); // Pauses on errors instead of crashing
+   ```
+
+2. **Progress Tracking**: Use progress tracker for visibility
+   ```javascript
+   const { createProgressTracker } = require('../../SHARED/utils/progress-tracker');
+   const tracker = createProgressTracker(totalSteps);
+   tracker.update(currentStep, 'Step description');
+   ```
+
+3. **Session Validation**: Always validate WebDriver sessions before critical operations
+   ```javascript
+   const isValid = await validateSession(client, 'operation_name');
+   ```

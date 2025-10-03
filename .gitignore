@@ -48,3 +48,18 @@ tmp/
 # Coverage
 coverage/
 .nyc_output/
+
+# Backup files
+**/*.backup
+**/*.backup.*
+*.backup.js
+*.backup.json
+*.backup.html
+
+# State files (local only)
+data/unified-state.json
+data/unified-state.json.backup.*
+data/test-unified-state.json.backup.*
+
+# Claude settings (local)
+.claude/settings.local.json

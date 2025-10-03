@@ -17,7 +17,6 @@
     "test": "jest",
     "test:ui": "lerna run test",
     "clean": "rm -rf dist build node_modules",
-    "clean:old": "rm -rf AppiumUI electron",
     "lint": "eslint src/",
     "format": "prettier --write \"src/**/*.{js,json,css,html}\"",
     "setup": "npm install && node scripts/setup.js",

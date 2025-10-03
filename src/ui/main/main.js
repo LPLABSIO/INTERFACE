@@ -26,9 +26,14 @@ const setupOrchestratorHandlers = require('./orchestrator-handlers');
 const LocationManager = require('../../core/LocationManager');
 const ResourceManager = require('../../core/ResourceManager');
 const QueueManager = require('../../core/QueueManager');
+const portCleanup = require('../../utils/port-cleanup');
+const UnifiedStateManager = require('../../core/UnifiedStateManager');
 
 // Initialiser l'orchestrateur
 let orchestrator = null;
+
+// Initialiser le gestionnaire d'état unifié
+const stateManager = UnifiedStateManager.getInstance();
 
 // Initialiser les gestionnaires de ressources
 let locationManager = null;
@@ -67,19 +72,16 @@ function readDataJson() {
 
 function readServers() {
   try {
-    const p = ensureServersJsonPath();
-    const raw = fs.readFileSync(p, 'utf8');
-    const json = JSON.parse(raw);
-    return Array.isArray(json?.servers) ? json : { servers: [] };
+    const serversData = stateManager.get('servers');
+    return Array.isArray(serversData?.servers) ? serversData : { servers: [] };
   } catch (_) {
     return { servers: [] };
   }
 }
 
 function writeServers(servers) {
-  const p = ensureServersJsonPath();
   const payload = { servers };
-  fs.writeFileSync(p, JSON.stringify(payload, null, 2));
+  stateManager.update('servers', payload);
 }
 
 function upsertServerMapping({ host = '127.0.0.1', port, basepath = '/wd/hub', udid = null, wdaPort = 8100 }) {
@@ -122,10 +124,23 @@ function createWindow() {
 }
 
 app.whenReady().then(async () => {
+  // Cleanup ports from potential previous crashes
+  console.log('🧹 Cleaning up ports from previous sessions...');
+  try {
+    await portCleanup.smartCleanup();
+  } catch (error) {
+    console.error('Port cleanup failed:', error.message);
+    // Continue anyway, don't block the app startup
+  }
+
   createWindow();
 
   // Initialiser les gestionnaires de ressources
   try {
+    // Initialiser le state manager en premier
+    await stateManager.initialize();
+    console.log('[Main] UnifiedStateManager initialized');
+
     locationManager = new LocationManager();
     await locationManager.initialize();
     console.log('[Main] LocationManager initialized');
@@ -772,8 +787,8 @@ function startDeviceBot(_e, payload = {}) {
   const hingeRoot = path.join(projectRoot, 'src', 'bot');
   const nodeBin = process.env.npm_node_execpath || 'node';
   const scriptPath = path.join(hingeRoot, 'bot.js');
-  // Utiliser hinge-fast au lieu de hinge pour avoir le progress tracking
-  const args = [scriptPath, 'iphonex', 'hinge-fast', '1', 'marsproxies'];
+  // Utiliser hinge pour avoir le progress tracking (ancien hinge-fast)
+  const args = [scriptPath, 'iphonex', 'hinge', '1', 'marsproxies'];
   // Lire appium_servers.json pour trouver host/port/basepath du device
   let env = { ...process.env };
   try {
@@ -805,8 +820,8 @@ function startDeviceBot(_e, payload = {}) {
   if (payload.quixApiKey) env.QUIX_API_KEY = payload.quixApiKey;
   if (payload.smsProvider) env.SMS_PROVIDER = payload.smsProvider;
 
-  // Définir le mode du bot (hinge-fast pour le progress tracking)
-  env.BOT_MODE = 'hinge-fast';
+  // Définir le mode du bot (hinge pour le progress tracking)
+  env.BOT_MODE = 'hinge';
 
   // Debug: Log the command being executed
   console.log('[DEBUG] Starting bot with:');

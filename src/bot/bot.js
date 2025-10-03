@@ -29,11 +29,11 @@ if (process.argv.length > 2) {
  * Configure et exécute Hinge avec tous les helper apps nécessaires
  */
 async function setupAndRunHinge(client, proxyInfo, location, phone, smsProvider, appType = 'hinge', debugMode = null) {
-  // Pour Hinge Fast, toute la configuration est gérée dans le script lui-même
-  if (appType === 'hinge-fast') {
-    // Hinge Fast: configuration intégrée dans le script
-    log("🚀 Using Hinge Fast mode - all configuration handled in script");
-    const { runHingeApp } = require("../../BOTS/hinge-fast/index");
+  // Pour Hinge (ancien hinge-fast), toute la configuration est gérée dans le script lui-même
+  if (appType === 'hinge' || appType === 'hinge-fast') {
+    // Hinge: configuration intégrée dans le script
+    log("🚀 Using Hinge mode with integrated configuration");
+    const { runHingeApp } = require("../../BOTS/hinge/index");
     await runHingeApp(client, location, phone, proxyInfo, smsProvider, debugMode);
   } else {
     // Hinge normal: configuration complète

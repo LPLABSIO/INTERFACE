@@ -1,6 +1,6 @@
 const { SessionManager, SessionState } = require('@shared/session-manager');
 const ProcessManager = require('@shared/process-manager');
-const StateManager = require('@shared/state-manager');
+const UnifiedStateManager = require('./UnifiedStateManager');
 const { QueueManager, TaskPriority } = require('@shared/queue-manager');
 const ErrorRecovery = require('@shared/error-recovery/src/ErrorRecovery');
 const HealthMonitor = require('@shared/error-recovery/src/HealthMonitor');
@@ -27,11 +27,7 @@ class AppOrchestrator {
       cpuThreshold: 80 // 80%
     });
 
-    this.stateManager = new StateManager({
-      persistPath: options.statePath || path.join(process.cwd(), 'data', 'state.json'),
-      autoSaveInterval: options.autoSaveInterval || 30000,
-      maxHistorySize: 50
-    });
+    this.stateManager = UnifiedStateManager.getInstance();
 
     this.queueManager = new QueueManager({
       maxConcurrentTasks: options.maxConcurrentTasks || 5,
@@ -75,8 +71,8 @@ class AppOrchestrator {
 
     try {
       // Initialiser les managers
+      await this.stateManager.initialize(); // UnifiedStateManager first
       await this.sessionManager.initialize();
-      await this.stateManager.initialize();
       await this.queueManager.initialize();
       await this.errorRecovery.initialize();
       // deviceDiscovery n'a pas de méthode initialize
@@ -371,8 +367,10 @@ class AppOrchestrator {
    * Obtenir l'état global de l'application
    */
   getGlobalStatus() {
-    const devices = Array.from(this.stateManager.state.devices.values());
-    const sessions = Array.from(this.stateManager.state.sessions.values());
+    // Avec UnifiedStateManager, les données sont dans le namespace ui
+    const uiState = this.stateManager.get('ui') || {};
+    const devices = uiState.devices ? Object.values(uiState.devices) : [];
+    const sessions = uiState.sessions ? Object.values(uiState.sessions) : [];
     const processes = this.processManager.getAllProcesses();
 
     return {
