@@ -132,7 +132,6 @@ async function processQueueTask(client, task) {
   }
 
   // Exécuter le bot selon l'app configurée
-  const appType = config.app || 'hinge';
   const debugMode = config.debugMode || null;
 
   if (appType === 'tinder') {
