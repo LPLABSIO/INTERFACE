@@ -1,5 +1,5 @@
 const { log, findAndClickWithPolling, findAndSetValue, randomWait, touchAndHoldThenPaste, checkAndTerminateApp, clickByCoordinates } = require('../../SHARED/utils/utils');
-const { getRandomLocationInCity } = require('../../SHARED/location-manager/locations');
+const { getRandomLocationInCity } = require('../../SHARED/utils/locations');
 const { sendTelegramMessage } = require('../../SHARED/utils/telegram');
 
 async function runBlazeXApp(client, location) {
