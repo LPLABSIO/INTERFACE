@@ -1,7 +1,9 @@
-const { log, findAndClickWithPolling, clickByCoordinates, findAndTypeCharByChar, randomWait, waitForElementNotPresent, checkAndTerminateApp } = require('../../SHARED/utils/utils');
+const { log, findAndClickWithPolling, clickByCoordinates, findAndTypeCharByChar, randomWait, waitForElementNotPresent, checkAndTerminateApp, findAndSetValue } = require('../../SHARED/utils/utils');
 const { getSMSProvider } = require('../../SHARED/sms-providers/sms-provider');
 const EmailManager = require('../../SHARED/email-manager/EmailManager');
-const { closeBlazeXApp } = require('./blazex');
+const { configureShadowrocket } = require('../../SHARED/ios-apps/shadowrocket');
+const { generateProxyInfo } = require('../../SHARED/proxy-manager/proxy');
+const { runBlazeXApp, closeBlazeXApp } = require('./blazex');
 
 async function swipeRight(client) {
     await client.performActions([{
@@ -168,10 +170,29 @@ async function clickWithRetryOnPopup(client, targetSelector, popupSelector = `-i
 }
 
 
-async function runTinderApp(client, phone, proxyInfo) {
+async function runTinderApp(client, phone, location, proxyInfo) {
     try {
         log('Starting Tinder app session...');
 
+        // ========== ÉTAPE 1: Configurer Shadowrocket (Proxy) ==========
+        log('Configuring Shadowrocket proxy...');
+        const shadowrocketSuccess = await configureShadowrocket(client, proxyInfo, location.city);
+        if (!shadowrocketSuccess) {
+            log('❌ Shadowrocket configuration failed, aborting...');
+            return false;
+        }
+        log('✅ Shadowrocket configured successfully');
+
+        // ========== ÉTAPE 2: Configurer BlazeX (GPS Spoofing) ==========
+        log('Configuring BlazeX for GPS spoofing...');
+        const blazexSuccess = await runBlazeXApp(client, location);
+        if (!blazexSuccess) {
+            log('❌ BlazeX configuration failed, aborting...');
+            return false;
+        }
+        log('✅ BlazeX configured successfully');
+
+        // ========== ÉTAPE 3: Tinder Account Creation ==========
         // Cliquer sur le bouton "Create account"
         await findAndClickWithPolling(client, '-ios predicate string:name == "create_account_button"');
         log('Create account button clicked');

@@ -1,21 +1,23 @@
 const { log, findAndClickWithPolling, findAndSetValue, randomWait, touchAndHoldThenPaste, checkAndTerminateApp, clickByCoordinates } = require('../../SHARED/utils/utils');
-const { getRandomLocationInCity } = require('../../SHARED/utils/locations');
-const { sendTelegramMessage } = require('../../SHARED/notifications/telegram');
+const { getRandomLocationInCity } = require('../../SHARED/location-manager/locations');
+const { sendTelegramMessage } = require('../../SHARED/utils/telegram');
 
 async function runBlazeXApp(client, location) {
     try {
         log('Starting BlazeX app session...');
 
+        const tinderBundleId = 'com.cardify.tinder';
+        log(`Using Tinder bundle ID: ${tinderBundleId}`);
+
         // Vérifier et terminer l'application Tinder si elle est en cours d'exécution
-        await checkAndTerminateApp(client, 'com.cardify.tinder');
+        await checkAndTerminateApp(client, tinderBundleId);
         // Open the Tinder app
-        await client.execute('mobile: launchApp', { bundleId: 'com.cardify.tinder' });
+        await client.execute('mobile: launchApp', { bundleId: tinderBundleId });
         log('Tinder app opened');
 
         // Cliquer sur le bouton "chevron.compact.left"
         await findAndClickWithPolling(client, '-ios predicate string:name == "chevron.compact.left"');
         log('Chevron left button clicked');
-
         await randomWait(1, 1);
 
         // Cliquer sur le bouton "name == "rectangle.3.offgrid.fill""
@@ -49,8 +51,7 @@ async function runBlazeXApp(client, location) {
 
         await findAndClickWithPolling(client, '-ios predicate string:name == "Set Location"');
         log('Set Location button clicked');
-
-        await randomWait(10, 10);
+        await randomWait(7, 7);
 
         await findAndClickWithPolling(client, '-ios class chain:**/XCUIElementTypeWindow[3]/XCUIElementTypeOther[3]/XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[3]/XCUIElementTypeButton');
         log('Close maps button clicked');
