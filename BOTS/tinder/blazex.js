@@ -6,7 +6,7 @@ async function runBlazeXApp(client, location) {
     try {
         log('Starting BlazeX app session...');
 
-        const tinderBundleId = 'com.cardify.tinder';
+        const tinderBundleId = 'com.cardify.tinder.JLS2F99MK6';
         log(`Using Tinder bundle ID: ${tinderBundleId}`);
 
         // Vérifier et terminer l'application Tinder si elle est en cours d'exécution

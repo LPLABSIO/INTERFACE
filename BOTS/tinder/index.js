@@ -103,8 +103,8 @@ async function checkForCaptcha(client) {
 
     if (captchaDetectedOnce) {
         log('Captcha was present earlier. Restarting Tinder app once...');
-        await checkAndTerminateApp(client, 'com.cardify.tinder');
-        await client.execute('mobile: launchApp', { bundleId: 'com.cardify.tinder' });
+        await checkAndTerminateApp(client, 'com.cardify.tinder.JLS2F99MK6');
+        await client.execute('mobile: launchApp', { bundleId: 'com.cardify.tinder.JLS2F99MK6' });
         log('Tinder app re-opened after captcha.');
         await randomWait(10, 15);
 
@@ -799,8 +799,8 @@ async function runTinderApp(client, phone, location, proxyInfo) {
         await checkForCaptcha(client);
 
         // Restart tinder app
-        await checkAndTerminateApp(client, 'com.cardify.tinder');
-        await client.execute('mobile: launchApp', { bundleId: 'com.cardify.tinder' });
+        await checkAndTerminateApp(client, 'com.cardify.tinder.JLS2F99MK6');
+        await client.execute('mobile: launchApp', { bundleId: 'com.cardify.tinder.JLS2F99MK6' });
         log('Tinder app re opened');
         await randomWait(10, 15);
 
