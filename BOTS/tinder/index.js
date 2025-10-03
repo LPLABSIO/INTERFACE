@@ -219,7 +219,7 @@ async function runTinderApp(client, phone, location, proxyInfo) {
         await randomWait(15, 20);
 
         // Cliquer sur le bouton "Suivant"
-        await clickWithRetryOnPopup(client, '-ios predicate string:name == "continue_button"');
+        await clickWithRetryOnPopup(client, '-ios predicate string:name == "next_button"');
         log('Next button clicked');
         await randomWait(5, 10);
 
@@ -246,11 +246,15 @@ async function runTinderApp(client, phone, location, proxyInfo) {
         await randomWait(15, 20);
 
         // Cliquer sur le bouton "Suivant"
-        await clickWithRetryOnPopup(client, '-ios predicate string:name == "continueButton"');
+        await clickWithRetryOnPopup(client, '-ios predicate string:name == "next_button"');
         log('Next button clicked');
         await randomWait(5, 10);
 
-        const email = await getAndRemoveEmail('email_tinder.txt');
+        // Utiliser EmailManager pour obtenir un email
+        const emailManager = new EmailManager('tinder');
+        await emailManager.initialize();
+        const email = await emailManager.allocateEmail('tinder-account');
+
         await findAndTypeCharByChar(
             client,
             email
